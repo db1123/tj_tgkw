@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<div id="v"></div>
+<script src="/nui-ad/lib/jquery/1.9.1/jquery.min.js"></script>
+<script src="/javascript/ReturnData.js"></script>
+<script type="text/javascript">
+  function getURLParam(name) {
+    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)', "ig").exec(location.search) || [, ""])[1].replace(/\+/g, '%20')) || null;
+  }
+  $.ajax({
+    type: 'POST',
+    contentType: 'application/json',
+    url: '/s/flow/queryScriptFile', // 调用地址
+    data: JSON.stringify({
+      type: 1,
+      state: 1
+    }),
+    async: false,
+    success: function(data) {
+      data.list.forEach((item)=>{
+        var oHead = document.getElementsByTagName('HEAD').item(0);
+        var oScript = document.createElement('script');
+        oScript.type = 'text/javascript';
+        oScript.charset = 'UTF-8';
+        oScript.src = item['f_path'];
+        oHead.appendChild(oScript);
+      });
+    },
+    error : function(e) {
+      toastr.error(e.status);
+      toastr.error(e.responseText);
+    }
+  });
+  var id = getURLParam('id'); // 脚本ID
+  var row = {}; // 创建行模型
+  row['key'] = id;
+  var d = getJSCodeData(row);
+  document.getElementById('v').innerHTML = d['returnData'];
+</script>
+</html>

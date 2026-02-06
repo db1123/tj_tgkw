@@ -1,0 +1,480 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <!--/_only 独立样式 -->
+</head>
+<style>
+    body {
+        /*font-family: Arial, sans-serif;*/
+        margin: 20px;
+        background-color: #f4f4f9;
+        color: #333;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        text-align: center;
+        color: #007bff;
+    }
+
+    .sections-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .section {
+        flex: 1 1 calc(50% - 10px); /* 两两并排，每项占 50% 宽度，减去间隙 */
+        padding: 15px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        box-sizing: border-box;
+    }
+
+    .section h2 {
+        margin-bottom: 10px;
+        font-size: 20px;
+        color: #333;
+    }
+
+    .section p {
+        margin: 5px 0;
+        font-size: 16px;
+        color: #555;
+    }
+
+    .form-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .form-group label {
+        margin-right: 10px;
+        font-weight: bold;
+        color: #555;
+    }
+
+    .form-group input {
+        /*flex: 1;*/
+        padding: 8px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .btn {
+        display: block;
+        width: 100%;
+        /*padding: 10px;*/
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    .btn:hover {
+        background-color: #0056b3;
+    }
+
+    .total {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #e9f5ff;
+        border-radius: 8px;
+        border: 1px solid #007bff;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .total p {
+        margin: 5px 0;
+        font-size: 18px;
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .stamp {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 24px;
+        font-weight: bold;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        transform: rotate(15deg);
+        opacity: 0.9;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* 文字阴影，增加突出效果 */
+    }
+
+    .stamp.pass {
+        background-color: rgba(0, 128, 0, 0.4); /* 浅绿色，透明度更低 */
+    }
+
+    .stamp.fail {
+        background-color: rgba(255, 0, 0, 0.4); /* 浅红色，透明度更低 */
+    }
+
+    .error-message {
+        color: red;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+
+
+    .xs {
+        cursor: pointer;
+    }
+</style>
+<body>
+<article class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="studentchengjiForm">
+        <div class="container">
+            <!--            <h1>学生考核分数计算</h1>-->
+            <div class="sections-container" id="sectionsContainer"></div> <!-- 动态生成内容 -->
+            <div class="total">
+                <p>总分：<span id="totalScore">0</span> 分</p>
+                <div id="stamp" class="stamp"></div> <!-- 印戳 -->
+            </div>
+            <input id="tijiaobtn" class="btn btn-primary radius mr-20" type="submit"
+                   value="&nbsp;&nbsp;提交成绩&nbsp;&nbsp;"/>
+            <!--            <button class="btn" onclick="calculateTotalScore()">提交成绩</button>-->
+        </div>
+        <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+        <input type="hidden" value="" name="FCourseID" id="FCourseID"/>
+        <input type="hidden" value="" name="FStudentID" id="FStudentID"/>
+        <input type="hidden" value="" name="indexs" id="indexs"/>
+        <input type="hidden" value="" name="totalScores" id="totalScores"/>
+        <input type="hidden" value="" name="Fabilitylevelid" id="Fabilitylevelid"/>
+    </form>
+</article>
+<!--<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>-->
+<!--<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>-->
+<!--<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>-->
+<!--<script src="/plugins/select2/js/select2.full.min.js"></script>-->
+<!--<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>-->
+<!--<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>-->
+<!--<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>-->
+<script type="text/javascript">
+    // 编辑框状态 1新建 2修改
+    var op = getQueryStringByName('op');
+    var Fabilitylevelid = getQueryStringByName('Fabilitylevelid');//课程能力等级ID
+    var FCourseID = getQueryStringByName('fcourseID');//课程ID
+    var id = getQueryStringByName('id');//课程报名ID
+    var FStudentID = getQueryStringByName('FStudentID');//学生ID
+    var examData;
+    var indexs=0;
+    var passThresholds;
+    // 业务代码
+    $(function () {
+        $("#FKeyID").val(id);//课程报名ID
+        $("#FCourseID").val(FCourseID);
+        $("#FStudentID").val(FStudentID);
+        $("#Fabilitylevelid").val(Fabilitylevelid);
+
+
+        //获取能力等级的考核条件与考核方式分数及权重
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/coursestudent/getCoursestudentscore', // 调用地址
+            data: JSON.stringify({
+                id: Fabilitylevelid,
+                op:op
+            }),
+            async: false,
+            success: function (data) {
+                // 定义 JSON 数据
+                examData = data.examData;
+                $("#indexs").val(data.examData.length);
+                passThresholds =data.FScoreMin;
+                // console.log(examData);
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+
+
+        // 动态生成页面内容
+        const sectionsContainer = document.getElementById('sectionsContainer');
+        // examData.forEach((exam, index) => {
+        //     const section = document.createElement('div');
+        //     section.className = 'section';
+        //     section.innerHTML = `
+        //         <h2>${exam.title}：</h2>
+        //         <p>考核条件总分：${exam.total}分（${exam.details}）</p>
+        //         <div class="form-group">
+        //             <label for="score${index}">学生得分：</label>
+        //             <input type="number" id="score${index}" name="score${index}" min="0" max="${exam.total}" required>
+        //         </div>
+        //         <p>考核得分：(学生得分/${exam.total}) * ${exam.contributionWeight} = <span id="contribution${index}">0</span> 分</p>
+        //         <div id="error${index}" class="error-message"></div>
+        //     `;
+        //     sectionsContainer.appendChild(section);
+        // });
+
+        // html +=`    <label for="`+data.list[i].id+`">`;
+        // html += `        <span class="xs" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="`+data.list[i].text+`">课程目标` + data.list[i].num + `</span>&nbsp;`;
+        // html += `    </label>`;
+
+
+
+        if(op==1){
+            $("#tijiaobtn").show();
+            if (examData.length > 0) {
+                examData.forEach((exam, index) => {
+                    const section = document.createElement('div');
+                    section.className = 'section';
+                    const detailsHtml = exam.details.map(detail => `
+                <label >
+                    <span class="xs" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="${detail.description}">${detail.name}[${detail.score}]</span>
+                </label>
+            `).join(' + ');
+                    section.innerHTML = `
+                <h2>${exam.title}：</h2>
+                <p>考核条件总分：${exam.total}分（${detailsHtml}）</p>
+                <div class="form-group">
+                    <label for="score${index}">学生得分：</label>
+                    <input type="number" id="score${index}" name="score${index}" min="0" max="${exam.total}" style="width: 400px;"  required>分
+                </div>
+                <p>考核分数：(学生得分/${exam.total}) * ${exam.contributionWeight} = <span id="contribution${index}">0</span> 分</p>
+                <div id="error${index}" class="error-message"></div>
+                <input type="hidden" id="FConditionID${index}" value="${exam.ConditionIDs}" name="FConditionID${index}"/>
+                <input type="hidden" id="FContributionWeight${index}" value="${exam.contributionWeight}" name="FContributionWeight${index}"/>
+                <input type="hidden" id="FConditionScores${index}" value="${exam.ConditionScores}" name="FConditionScores${index}"/>
+                <input type="hidden" id="Ftotal${index}" value="${exam.total}" name="Ftotal${index}"/>
+                <input type="hidden" id="FKeyID${index}" value="${exam.FKeyID}" name="FKeyID${index}"/>
+            `;
+                    sectionsContainer.appendChild(section);
+                });
+                $("[data-toggle='popover']").popover();
+                $("#tijiaobtn").prop('disabled', false);
+
+            } else {
+                const section = document.createElement('div');
+                section.innerHTML = `<span style='color: red;'>未设置考核条件与考核方式！</span>`;
+                sectionsContainer.appendChild(section);
+                $("#tijiaobtn").prop('disabled', true);
+            }
+            const inputs = document.querySelectorAll('input[type="number"]');
+            jiankonginput(inputs);
+        }else{
+            $("#tijiaobtn").hide();
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/coursestudentscore/selectCourseStudentScore', // 调用地址
+                data: JSON.stringify({
+                    id: id,
+                    FStudentID:FStudentID,
+                    FCourseID:FCourseID
+                }),
+                async: false,
+                success: function (data) {
+                    examData.forEach((exam, index) => {
+                        const section = document.createElement('div');
+                        var studentscore = 0;
+                        section.className = 'section';
+                        data.coursestudentscorelist.forEach((ll, index) => {
+                            if(ll.FCAMID == exam.FKeyID){
+                                studentscore = ll.FStudentScore;
+                            }
+                        });
+                        const detailsHtml = exam.details.map(detail => `
+                            <label >
+                                <span class="xs" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="${detail.description}">${detail.name}[${detail.score}]</span>
+                            </label>
+                        `).join(' + ');
+                                    section.innerHTML = `
+                            <h2>${exam.title}：</h2>
+                            <p>考核条件总分：${exam.total}分（${detailsHtml}）</p>
+                            <div class="form-group">
+                                <label for="score${index}">学生得分：</label>
+                                <input type="number" id="score${index}" name="score${index}" min="0" max="${exam.total}" value="${studentscore}" style="width: 400px;" disabled="disabled">分
+                            </div>
+                            <p>考核分数：(学生得分/${exam.total}) * ${exam.contributionWeight} = <span id="contribution${index}">0</span> 分</p>
+                            <div id="error${index}" class="error-message"></div>
+                            <input type="hidden" id="FConditionID${index}" value="${exam.ConditionIDs}" name="FConditionID${index}"/>
+                            <input type="hidden" id="FContributionWeight${index}" value="${exam.contributionWeight}" name="FContributionWeight${index}"/>
+                            <input type="hidden" id="FConditionScores${index}" value="${exam.ConditionScores}" name="FConditionScores${index}"/>
+                            <input type="hidden" id="Ftotal${index}" value="${exam.total}" name="Ftotal${index}"/>
+                            <input type="hidden" id="FKeyID${index}" value="${exam.FKeyID}" name="FKeyID${index}"/>
+                        `;
+                        sectionsContainer.appendChild(section);
+                    });
+                    $("[data-toggle='popover']").popover();
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+            const inputs = document.querySelectorAll('input[type="number"]');
+            jiankonginput(inputs);
+            //查询成绩
+            calculateTotalScore();
+        }
+
+
+        // $.ajax({
+        //     type: 'POST',
+        //     contentType: 'application/json',
+        //     url: '/s/dept/adddept', // 调用地址
+        //     data: JSON.stringify(data),
+        //     async: false,
+        //     success: function (data) {
+        //         if (data.result == 'success') {
+        //             parent.$('#mainTable').DataTable().ajax.reload(null, false);
+        //             parent.toastr.success('添加成功！');
+        //             layer_close();
+        //         } else if (data.result == 'fail') {
+        //             toastr.warning('部门名称重复，请重新输入');
+        //         } else if (data.result == 'error') {
+        //             toastr.error(data.error);
+        //         }
+        //     },
+        //     error: function (e) {
+        //         toastr.error(e.status);
+        //         toastr.error(e.responseText);
+        //     }
+        // });
+
+        // 表单提交事件
+        document.getElementById('studentchengjiForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // 阻止表单默认提交行为
+            // 组织表单数据
+            const formData = new FormData(this);
+            const scores = {};
+            examData.forEach((exam, index) => {
+                scores[exam.title] = formData.get(`score${index}`);
+            });
+            var iserror = false;
+
+            // const inputs = document.querySelectorAll('input[type="number"]');
+            // inputs.forEach((input, index) => {
+            //     input.addEventListener('input', () => {
+            //         const errorMessage = document.getElementById(`error${index}`);
+            //         if(input.value == null || input.value == ""){
+            //             errorMessage.innerText = `*请填写学生得分！`;
+            //             iserror = true;
+            //         }else {
+            //             errorMessage.innerText = ''; // 清空错误提示
+            //         }
+            //     });
+            // });
+            if (iserror == false) {
+                // 获取参数
+                var data = form2Json('studentchengjiForm');
+                //totalScores
+                console.log(data);
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    url: '/s/coursestudentscore/coursestudentscore', // 调用地址
+                    data: JSON.stringify(data),
+                    async: false,
+                    success: function (data) {
+                        if (data.result == 'success') {
+                            parent.$('#mainTable').DataTable().ajax.reload(null, false);
+                            parent.toastr.success('提交成功！');
+                            layer_close();
+                        } else if (data.result == 'error') {
+                            toastr.error(data.error);
+                        }
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+            }
+
+        });
+    });
+
+    function jiankonginput(inputs){
+        // 获取所有输入框并监听 input 事件
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', () => {
+                validateInput(input, index);
+                calculateTotalScore();
+            });
+        });
+    }
+    // 校验输入值
+    function validateInput(input, index) {
+        const maxScore = examData[index].total;
+        const errorMessage = document.getElementById(`error${index}`);
+
+        if (parseFloat(input.value) > maxScore) {
+            errorMessage.innerText = `得分不能超过 ${maxScore} 分！`;
+            // input.value = maxScore; // 重置为最大值
+        } else {
+            errorMessage.innerText = ''; // 清空错误提示
+        }
+    }
+
+    // 计算总分函数
+    function calculateTotalScore() {
+
+        let totalScore = 0;
+
+        examData.forEach((exam, index) => {
+            const score = parseFloat(document.getElementById(`score${index}`).value) || 0;
+            const contribution = (score / exam.total) * exam.contributionWeight;
+            document.getElementById(`contribution${index}`).innerText = contribution.toFixed(1);
+            totalScore += contribution;
+        });
+        // 更新总分
+        document.getElementById('totalScore').innerText = totalScore.toFixed(1);
+        $("#totalScores").val(totalScore.toFixed(1));
+        // 更新印戳
+        if(op==2)
+            updateStamp(totalScore);
+    }
+
+    // 更新印戳
+    function updateStamp(totalScore) {
+        const stamp = document.getElementById('stamp');
+        const passThreshold = passThresholds; // 通过分数线
+        if (totalScore >= passThreshold) {
+            stamp.innerText = '通过';
+            stamp.className = 'stamp pass';
+        } else {
+            stamp.innerText = '不通过';
+            stamp.className = 'stamp fail';
+        }
+    }
+</script>
+</body>
+</html>

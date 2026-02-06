@@ -1,0 +1,168 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script>
+    <!--/_global 公共配置文件-->
+</head>
+<body>
+<article class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="coursecategoryForm">
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>父节点：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="FPName" id="FPName" disabled="disabled" />
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>名称：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="FName" id="FName"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">说明：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="FNote" id="FNote"/>
+            </div>
+        </div>
+        <div class="toolbar-bottom-line"></div>
+        <div class="toolbar-bottom-btn">
+            <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+            <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                   onclick="layer_close()"/>
+        </div>
+        <input type="hidden" value="" name="FKeyID"/>
+        <input type="hidden" value="" name="FPID">
+    </form>
+</article>
+
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript">
+    // 编辑框状态 1新建 2修改
+    var op = getQueryStringByName('op');
+
+    var fpname = parent.fpname;
+    // 业务代码
+    $(function () {
+        $("#FPName").val(fpname);
+        // 修改操作时读取表单信息
+        if (op == 2) {
+            var id = getQueryStringByName('id');
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/coursecategory/queryCourseTypeInfo', // 调用地址
+                data: JSON.stringify({
+                    id
+                }),
+                async: false,
+                success: function (data) {
+                    $("#coursecategoryForm input[name='FPID']").val(data.info.FPID);
+                    $("#coursecategoryForm input[name='FName']").val(data.info.FName);
+                    $("#coursecategoryForm input[name='FKeyID']").val(data.info.key);
+                    $("#FPName").val(data.info.FPName);
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        }
+        // 检验数据
+        $('#coursecategoryForm').validate({
+            rules: {
+                FName: {
+                    required: true
+                }
+            },
+            messages: {
+                FName: {
+                    required: '*请输入名称'
+                }
+            },
+            onfocusout: false, // 是否在获取焦点时验证
+            onkeyup: false, // 是否在敲击键盘时验证
+            focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+            focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+            success: 'valid',
+            submitHandler: function () {
+                var nodes = parent.coursecategoryTree.getSelectedNodes();
+                if (nodes.length == 0) {
+                    toastr.error('请选择添加节点的位置');
+                } else {
+                    // 获取参数
+                    var JsonData = form2Json('coursecategoryForm');
+                    JsonData['FPID'] = nodes[0].id;
+                    // 执行
+                    if (op == 1) { // 添加操作
+                        $.ajax({
+                            type: 'POST',
+                            contentType: 'application/json',
+                            url: '/s/coursecategory/addcourseCategory', // 调用地址
+                            data: JSON.stringify(JsonData),
+                            async: false,
+                            success: function (data) {
+                                if (data.result == 'success') {
+                                    // 更新当前节点状态
+                                    nodes[0].isParent = 1;
+                                    parent.coursecategoryTree.updateNode(nodes[0]);
+                                    // 添加新节点
+                                    var newNodes = [{id: data.id, pId: nodes[0].id, name: JsonData['FName']}];
+                                    parent.coursecategoryTree.addNodes(nodes[0], newNodes);
+                                    // 提示->隐藏面板
+                                    parent.toastr.success('添加成功！');
+                                    layer_close();
+                                } else if (data.result == 'fial') {
+                                    toastr.error("课程类别称重复，请重新输入！");
+                                } else if (data.result == 'error') {
+                                    toastr.error(data.error);
+                                }
+                            },
+                            error: function (e) {
+                                toastr.error(e.status);
+                                toastr.error(e.responseText);
+                            }
+                        });
+                    } else {
+                        $.ajax({
+                            type: 'POST',
+                            contentType: 'application/json',
+                            url: '/s/coursecategory/updatecourseCategory', // 调用地址
+                            data: JSON.stringify(JsonData),
+                            async: false,
+                            success: function (data) {
+                                if (data.result == 'success') {
+                                    nodes[0].name = JsonData['FName'];
+                                    parent.coursecategoryTree.updateNode(nodes[0]);
+                                    parent.toastr.success('修改成功！');
+                                    layer_close();
+                                } else if (data.result == 'fial') {
+                                    toastr.error("课程类别称重复，请重新输入！");
+                                } else if (data.result == 'error') {
+                                    toastr.error(data.error);
+                                }
+                            },
+                            error: function (e) {
+                                toastr.error(e.status);
+                                toastr.error(e.responseText);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fun.server.mapper.TCourseStudentMapper">
+  <resultMap id="BaseResultMap" type="fun.server.model.TCourseStudent">
+    <!--
+    @mbg.generated
+    -->
+    <constructor>
+      <idArg column="FKeyID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FUID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCDATE" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FUDATE" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FState" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FDate" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FCourseID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FMode" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FStudentID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FScore" javaType="java.math.BigDecimal" jdbcType="DECIMAL" />
+      <arg column="FIfPass" javaType="java.lang.Integer" jdbcType="INTEGER" />
+    </constructor>
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <!--
+    @mbg.generated
+    -->
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <!--
+    @mbg.generated
+    -->
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    <!--
+    @mbg.generated
+    -->
+    FKeyID, FCID, FUID, FCDATE, FUDATE, FState, FDate, FCourseID, FMode, FStudentID, 
+    FScore, FIfPass
+  </sql>
+  <select id="getCourseStudentdata" parameterType="fun.server.model.customQuery.coursestudent.CourseStudentCS"
+          resultType="fun.server.model.customQuery.coursestudent.CourseStudendata">
+      -- 定义公共表表达式 FClassNames，用于计算每个学生对应的班级名称组合
+      WITH FClassNames AS (
+      SELECT
+      ts2.FKeyID AS FStudentID,
+      IFNULL(GROUP_CONCAT(tc.FClassName SEPARATOR '/'), '') AS combined_names
+      FROM
+      t_class_student tcs
+      LEFT JOIN
+      t_student ts2 ON tcs.FStudentID = ts2.FKeyID
+      LEFT JOIN
+      t_class tc ON tcs.FClassID = tc.FKeyID
+      -- 按学生 ID 分组，确保每个学生有一个对应的班级名称组合
+      GROUP BY
+      ts2.FKeyID
+      )
+      -- 主查询，从多个表中获取学生和课程相关信息，并关联 FClassNames 中的班级名称组合
+      SELECT
+      tcs.FKeyID AS FCourseStudentID,
+      tc.FKeyID AS FCourseID,
+      IFNULL(tc.FName, '') AS FCourseName,
+      IFNULL(tc.FNo, '') AS FCourseNo,
+      IFNULL(ts.FName, '') AS FStudentName,
+      ts.FKeyID AS FStudentID,
+      IFNULL(tcs.FScore, 0) AS FScore,
+      tcs.FIfPass,
+      IFNULL(ts.FTel, '') AS FTel,
+      tc.FType AS FCourseFType,
+      tc.FCNature AS FCourseNatureID,
+      tc.FEdition,
+      IFNULL(tc.FYWName, '') AS FYWName,
+      ts.FSex as FStudentSex,
+      ts.FNo as FStudentNo,
+      -- 从 FClassNames 中获取每个学生对应的班级名称组合
+      fcn.combined_names AS FClassName
+      FROM
+      t_course_student tcs
+      LEFT JOIN
+      t_course tc ON tcs.FCourseID = tc.FKeyID
+      LEFT JOIN
+      t_student ts ON tcs.FStudentID = ts.FKeyID
+      -- 通过学生 ID 关联 FClassNames 公共表表达式
+      LEFT JOIN
+      FClassNames fcn ON ts.FKeyID = fcn.FStudentID
+      WHERE 1=1
+      <if test="FStudentNo != null and FStudentNo!=''">
+          and ts.FNo like concat('%',#{FStudentNo},'%')
+      </if>
+      <if test="FSex != null and FSex!='' and FSex!= -1 ">
+          and ts.FSex = #{FSex}
+      </if>
+      <if test="FLTypeID != null and FLTypeID!='' and FLTypeID!=0">
+          and tc.FType = #{FLTypeID}
+      </if>
+      <if test="FNatureID != null and FNatureID!='' and FNatureID!=0">
+          and tc.FCNature = #{FNatureID}
+      </if>
+      <if test="FCourseName != null and FCourseName!=''">
+          and tc.FName like concat('%',#{FCourseName},'%')
+      </if>
+      <if test="FTel != null and FTel!=''">
+          and ts.FTel like concat('%',#{FTel},'%')
+      </if>
+      <if test="FStudentName != null and FStudentName!=''">
+          and ts.FName like concat('%',#{FStudentName},'%')
+     </if>
+      <if test="orderBy != null and orderBy!=''">
+          order by ${orderBy}
+      </if>
+  </select>
+
+<!--    <select id="getCoursestudentscore" parameterType="fun.server.model.customQuery.coursestudent.CoursestudentscoreCS"-->
+<!--            resultType="fun.server.model.customQuery.coursestudent.CoursestudentscoreData">-->
+<!--        SELECT-->
+<!--        taam.`FKeyID`,  &#45;&#45; 显示 taam.FKeyID-->
+<!--        taam.`FMethodName`,-->
+<!--        tacam.`FMethodWeight` AS FMethodWeight,-->
+<!--        GROUP_CONCAT(-->
+<!--        CONCAT(tac.`FConditionName`, ' (', tac.`FConditionScore`, ')')-->
+<!--        ORDER BY tac.`FConditionName` ASC  &#45;&#45; 按 FConditionName 升序排列-->
+<!--        SEPARATOR '，'-->
+<!--        ) AS Conditions,-->
+<!--        GROUP_CONCAT(tac.`FKeyID` ORDER BY tac.`FConditionName` ASC SEPARATOR ',') AS ConditionIDs,  &#45;&#45; 按 FConditionName 升序排列-->
+<!--        GROUP_CONCAT(tac.`FConditionScore` ORDER BY tac.`FConditionName` ASC SEPARATOR ',') AS ConditionScores,  &#45;&#45; 按 FConditionName 升序排列-->
+<!--        SUM(tac.`FConditionScore`) AS TotalScore-->
+<!--        FROM-->
+<!--        `t_ability_condition_assessment_method` tacam-->
+<!--        LEFT JOIN-->
+<!--        `t_ability_condition` tac ON tacam.`FConditionID` = tac.`FKeyID`-->
+<!--        LEFT JOIN-->
+<!--        `t_ability_assessment_method` taam ON tacam.`FMethodID` = taam.`FKeyID`-->
+<!--        LEFT JOIN-->
+<!--        `t_ability_level` tal ON tal.`FKeyID` = tacam.`FALID`-->
+<!--        WHERE 1 = 1-->
+<!--        <choose>-->
+<!--            <when test="FStudentScoreID != null and FStudentScoreID!=''">-->
+<!--                and tal.FKeyID = #{FStudentScoreID}-->
+<!--            </when>-->
+<!--            <otherwise>-->
+<!--                and tal.FKeyID = 0-->
+<!--            </otherwise>-->
+<!--        </choose>-->
+<!--        GROUP BY-->
+<!--            taam.`FKeyID`, taam.`FMethodName`, tacam.`FMethodWeight`;  &#45;&#45; GROUP BY 中添加 tacam.FMethodWeight-->
+<!--    </select>-->
+
+    <select id="getCoursestudentscore" parameterType="fun.server.model.customQuery.coursestudent.CoursestudentscoreCS"
+            resultType="fun.server.model.customQuery.coursestudent.CoursestudentscoreData">
+        SELECT
+        taam.`FKeyID`,  -- 显示 taam.FKeyID
+        taam.`FMethodName`,
+        SUM(tacam.`FMethodWeight`)  AS FMethodWeight,  -- FMethodWeight 累加并乘以 100
+--         GROUP_CONCAT(
+--         CONCAT(tac.`FConditionName`, ' (', tac.`FConditionScore`, ')')
+--         ORDER BY tac.`FConditionName` ASC  -- 按 FConditionName 升序排列
+--         SEPARATOR '，'
+--         ) AS Conditions,
+        CONCAT(
+        '[',
+        GROUP_CONCAT(
+        CONCAT(
+        '{"name": "', tac.`FConditionName`, '", ',
+        '"score": ', tac.`FConditionScore`, ', ',
+        '"description": "', tac.`FConditionValue`, '"}'
+        )
+        ORDER BY tac.`FConditionName` ASC  -- 按 FConditionName 升序排列
+        SEPARATOR ','
+        ),
+        ']'
+        ) AS Conditions,  -- 生成 JSON 数组
+        GROUP_CONCAT(tac.`FKeyID` ORDER BY tac.`FConditionName` ASC SEPARATOR ',') AS ConditionIDs,  -- 按 FConditionName 升序排列
+        GROUP_CONCAT(tac.`FConditionScore` ORDER BY tac.`FConditionName` ASC SEPARATOR ',') AS ConditionScores,  -- 按 FConditionName 升序排列
+        SUM(tac.`FConditionScore`) AS TotalScore,tal.FScoreMin
+        FROM
+        `t_ability_condition_assessment_method` tacam
+        LEFT JOIN
+        `t_ability_condition` tac ON tacam.`FConditionID` = tac.`FKeyID`
+        LEFT JOIN
+        `t_ability_assessment_method` taam ON tacam.`FMethodID` = taam.`FKeyID`
+        LEFT JOIN
+        `t_ability_level` tal ON tal.`FKeyID` = tacam.`FALID`
+        WHERE 1 = 1
+        <choose>
+            <when test="FStudentScoreID != null and FStudentScoreID!=''">
+                and tal.FKeyID = #{FStudentScoreID}
+            </when>
+            <otherwise>
+                and tal.FKeyID = 0
+            </otherwise>
+        </choose>
+        GROUP BY
+        taam.`FKeyID`, taam.`FMethodName`;  -- 移除 tacam.FMethodWeight
+    </select>
+
+<!--    <select id="getCoursestudentscore" parameterType="fun.server.model.customQuery.coursestudent.CoursestudentscoreCS"-->
+<!--            resultType="fun.server.model.customQuery.coursestudent.CoursestudentscoreData">-->
+<!--        SELECT-->
+<!--        taam.`FKeyID`,  &#45;&#45; 显示 taam.FKeyID-->
+<!--        taam.`FMethodName`,-->
+<!--        SUM(tacam.`FMethodWeight`)  AS FMethodWeight,  &#45;&#45; FMethodWeight 累加并乘以 100-->
+<!--        CONCAT(-->
+<!--        '[',-->
+<!--        GROUP_CONCAT(-->
+<!--        CONCAT(-->
+<!--        '{"name": "', tac.`FConditionName`, '", ',-->
+<!--        '"score": ', ROUND(tac.`FConditionScore` / cnt.`Count`, 2), ', ',-->
+<!--        '"description": "', tac.`FConditionValue`, '"}'-->
+<!--        )-->
+<!--        ORDER BY tac.`FConditionName` ASC  &#45;&#45; 按 FConditionName 升序排列-->
+<!--        SEPARATOR ','-->
+<!--        ),-->
+<!--        ']'-->
+<!--        ) AS Conditions,  &#45;&#45; 生成 JSON 数组-->
+<!--        GROUP_CONCAT(tac.`FKeyID` ORDER BY tac.`FConditionName` ASC SEPARATOR ',') AS ConditionIDs,  &#45;&#45; 按 FConditionName 升序排列-->
+<!--        GROUP_CONCAT(tac.`FConditionScore` ORDER BY tac.`FConditionName` ASC SEPARATOR ',') AS ConditionScores,  &#45;&#45; 按 FConditionName 升序排列-->
+<!--        ROUND(SUM(tac.`FConditionScore` / cnt.`Count`), 2) AS TotalScore-->
+<!--        FROM-->
+<!--        `t_ability_condition_assessment_method` tacam-->
+<!--        LEFT JOIN-->
+<!--        `t_ability_condition` tac ON tacam.`FConditionID` = tac.`FKeyID`-->
+<!--        LEFT JOIN-->
+<!--        `t_ability_assessment_method` taam ON tacam.`FMethodID` = taam.`FKeyID`-->
+<!--        LEFT JOIN-->
+<!--        `t_ability_level` tal ON tal.`FKeyID` = tacam.`FALID`-->
+<!--        LEFT JOIN (-->
+<!--        SELECT-->
+<!--        tac.`FConditionName`,-->
+<!--        COUNT(*) AS `Count`-->
+<!--        FROM-->
+<!--        `t_ability_condition_assessment_method` tacam-->
+<!--        LEFT JOIN-->
+<!--        `t_ability_condition` tac ON tacam.`FConditionID` = tac.`FKeyID`-->
+<!--        WHERE-->
+<!--        <choose>-->
+<!--            <when test="FStudentScoreID != null and FStudentScoreID!=''">-->
+<!--                tacam.`FALID` = #{FStudentScoreID}-->
+<!--            </when>-->
+<!--            <otherwise>-->
+<!--                tacam.`FALID` = 0-->
+<!--            </otherwise>-->
+<!--        </choose>-->
+
+<!--        GROUP BY-->
+<!--        tac.`FConditionName`-->
+<!--        ) cnt ON tac.`FConditionName` = cnt.`FConditionName`-->
+<!--        WHERE 1 = 1-->
+<!--        <choose>-->
+<!--            <when test="FStudentScoreID != null and FStudentScoreID!=''">-->
+<!--                and tal.FKeyID = #{FStudentScoreID}-->
+<!--            </when>-->
+<!--            <otherwise>-->
+<!--                and tal.FKeyID = 0-->
+<!--            </otherwise>-->
+<!--        </choose>-->
+<!--        GROUP BY-->
+<!--        taam.`FKeyID`, taam.`FMethodName`;  &#45;&#45; 移除 tacam.FMethodWeight-->
+<!--    </select>-->
+
+
+</mapper>

@@ -1,0 +1,663 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+    <!--/_only 独立样式 -->
+</head>
+
+<style>
+    /* 画廊容器 */
+    .gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 30px;
+        padding: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+
+    }
+
+
+
+    /* 图片项样式 */
+    .img-item {
+        position: relative;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+        margin: 8px;
+    }
+
+    .img-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    .thumbnail {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        border-bottom: 1px solid #eee;
+    }
+
+    .img-name {
+        padding: 15px;
+        text-align: center;
+        font-size: 16px;
+        color: #333;
+        font-family: Arial, sans-serif;
+    }
+
+    /* 删除按钮 */
+    .delete-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 28px;
+        height: 28px;
+        background: #ff4757;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        font-size: 18px;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    /* 新增编辑按钮样式 */
+    .edit-btn {
+        position: absolute;
+        top: 10px;
+        right: 45px; /* 与删除按钮保持间距 */
+        width: 28px;
+        height: 28px;
+        background: #2d98da;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        font-size: 18px;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .img-item:hover .edit-btn {
+        opacity: 1;
+    }
+
+    .img-item:hover .delete-btn {
+        opacity: 1;
+    }
+
+    /* 遮罩层样式 */
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.9);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .img-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        max-width: 90vw;
+        max-height: 90vh;
+    }
+
+    /* 控制工具栏 */
+    .controls-container {
+        display: flex;
+        gap: 15px;
+        padding: 12px 20px;
+        background: rgba(255,255,255,0.9);
+        border-radius: 30px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    /* 控制按钮 */
+    .rotate-btn {
+        width: 40px;
+        height: 40px;
+        background: #fff;
+        border: none;
+        border-radius: 50%;
+        font-size: 18px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .reset-btn {
+        width: 40px;
+        height: 40px;
+        background: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        font-size: 18px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .rotate-btn:hover {
+        background: #f1f1f1;
+        transform: scale(1.1);
+    }
+
+    .reset-btn:hover {
+        background: #45a049;
+        transform: scale(1.1);
+    }
+
+    /* 缩放图片 */
+    #zoomedImg {
+        max-width: 100%;
+        max-height: 70vh;
+        transition: transform 0.3s ease;
+        cursor: grab;
+        display: block;
+        margin: 0 auto;
+        border-radius: 8px;
+    }
+
+    /* 关闭按钮 */
+    .close-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        background: #ff4757;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        font-size: 24px;
+        cursor: pointer;
+    }
+
+
+
+    /* 空状态提示 */
+    .empty-state {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        padding: 2rem 3rem;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(8px);
+        animation: fadeIn 0.6s ease;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .empty-state::before {
+        content: "🖼️";
+        font-size: 3.5rem;
+        display: block;
+        margin-bottom: 1rem;
+        opacity: 0.8;
+    }
+
+    .empty-state p {
+        margin: 0;
+        font-size: 1.2rem;
+        color: #666;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+    }
+
+    /*************************全屏************************************/
+    /* 在控制容器添加全屏按钮 */
+    .controls-container {
+        position: relative; /* 为全屏提示定位 */
+    }
+
+    .fullscreen-btn {
+        width: 40px;
+        height: 40px;
+        background: #ff9f43;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        font-size: 18px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .fullscreen-btn:hover {
+        background: #ff7d33;
+        transform: scale(1.1);
+    }
+
+    /* 全屏样式调整 */
+    :fullscreen .img-container {
+        max-width: 95vw;
+        max-height: 95vh;
+    }
+
+    :fullscreen #zoomedImg {
+        max-height: 85vh;
+    }
+
+    :-webkit-full-screen .controls-container {
+        padding: 20px 30px;
+    }
+
+    /* 全屏专属样式 */
+    .fullscreen-active .close-btn {
+        display: none; /* 全屏时隐藏关闭按钮 */
+    }
+
+    .fullscreen-active .img-container {
+        padding: 2vh 2vw;
+    }
+
+    :fullscreen .controls-container {
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    /* 添加全屏状态指示 */
+    .overlay:fullscreen {
+        background: rgba(0,0,0,0.95);
+    }
+
+    .overlay:fullscreen .img-container {
+        border: 2px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+    }
+    /**************************end全屏************************************/
+</style>
+<body>
+<div class="page-container" style="padding: 2px;">
+    <div class="f-l text-l" id="adddiv" style="display: none;">
+        <button type="button" class="btn btn-default size-S my-btn" onclick="Values(1)"><i
+                class=" fa fa-plus"></i>
+            批量上传图片
+        </button>
+    </div>
+    <div class="f-r text-r">
+        <input type="text" class="input-text size-S form-text-FName" style="width:200px" placeholder="图片名称">
+        <button type="button" class="btn btn-default size-S my-btn btn-search-fun"><i class="Hui-iconfont">&#xe665;</i>
+            搜索
+        </button>
+    </div>
+    <div class="f-l" style="width: 100%; margin-top: 3px;">
+        <div class="empty-state" id="emptyState">
+            <p><span id="emptyStateName"></span></p>
+        </div>
+        <div class="gallery" id="gallery">
+<!--            &lt;!&ndash; 图片项 &ndash;&gt;-->
+<!--            <div class="img-item">-->
+<!--                <img src="D:\tupian.png" class="thumbnail" alt="图片1">-->
+<!--                <button class="delete-btn">×</button>-->
+<!--                <div class="img-name">图片1</div>-->
+<!--            </div>-->
+<!--            <div class="img-item">-->
+<!--                <img src="image2.jpg" class="thumbnail" alt="图片2">-->
+<!--                <button class="delete-btn">×</button>-->
+<!--                <div class="img-name">图片2</div>-->
+<!--            </div>-->
+<!--            &lt;!&ndash; 更多图片... &ndash;&gt;-->
+        </div>
+
+        <!-- 遮罩层 -->
+        <div class="overlay">
+            <div class="img-container">
+                <button class="close-btn" onclick="closeOverlay()">×</button>
+                <img id="zoomedImg" src="" draggable="false">
+                <div class="controls-container">
+                    <button class="rotate-btn" title="旋转-90°" onclick="rotate(-90)">↺</button>
+                    <button class="rotate-btn" title="旋转90°" onclick="rotate(90)">↻</button>
+                    <button class="reset-btn" title="复位" onclick="resetTransform()">⟲</button>
+                    <button class="fullscreen-btn" title="全屏显示" onclick="toggleFullscreen()">⤡</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+
+<script type="text/javascript">
+
+    var id = getQueryStringByName('tpid');//培养ID
+    var fmajorid = getQueryStringByName('fmajorid');//专业ID
+    var showtype = getQueryStringByName('showtype'); //显示类型
+
+    // 遮罩层交互
+    let scale = 1;
+    let rotation = 0;
+    let isDragging = false;
+    let startX, startY, translateX = 0, translateY = 0;
+
+    var chaxun=1;
+    // 业务代码
+    $(function () {
+
+        if (showtype == 1) {
+            $("#adddiv").show();
+        } else {
+            $("#adddiv").hide();
+        }
+        chaxun = 1;
+        // 自动检测内容
+        function checkContent() {
+            const gallery = document.getElementById('gallery');
+            const emptyState = document.getElementById('emptyState');
+
+            if (gallery && gallery.children.length > 0) {
+                gallery.style.display = 'grid';
+                emptyState.style.display = 'none';
+            } else {
+                gallery.style.display = 'none';
+                emptyState.style.display = 'block';
+                if(chaxun == 2){
+                    $("#emptyStateName").text("未查询到图片");
+                }else{
+                    $("#emptyStateName").text("未上传图片");
+                }
+            }
+        }
+
+        // 初始化检测
+        checkContent();
+        // 监听DOM变化（适用于动态加载内容）
+        const observer = new MutationObserver(checkContent);
+        observer.observe(gallery, { childList: true });
+
+        loadImages();
+
+
+
+        // 查询按钮点击事件
+        $('.btn-search-fun').on('click', function () {
+            chaxun = 2;
+            if($(".form-text-FName").val() == null || $(".form-text-FName").val() == ""){
+                chaxun = 1;
+            }
+            loadImages();
+
+            console.log(chaxun);
+        });
+
+    });
+
+    // 模拟异步加载数据
+    function loadImages() {
+        // const gallery = document.querySelector('.gallery');
+        var  gallery = $("#gallery");
+        gallery.empty();
+        //获取当前方案中的图片信息
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json;charset=UTF-8',
+            url: '/s/trainingprogramimage/querytrainingprogrammb',
+            data: JSON.stringify({
+                FTPID: id,
+                name:$(".form-text-FName").val()
+            }),
+            success: function (data) {
+                if (data.result == 'success') {
+                    // console.log("data.list:" + data.list);
+                    if(data.list != null && data.list != "" && data.list != 'undefined'){
+                        const jsonObj = JSON.parse(data.list);
+
+                        // 生成图片项
+                        jsonObj.forEach(item => {
+                            var fileUrl = YULANIP + '' + item.FRelativePath1;
+                            // console.log(fileUrl);
+                            const imgItem = document.createElement('div');
+                            imgItem.className = 'img-item';
+                            imgItem.innerHTML = `
+                            <img src="${fileUrl}" class="thumbnail" alt="${item.FName}">
+                            <div class="imageeditdiv" style="display: none;">
+                                <button class="delete-btn" onclick="delimage('${item.key}','${item.FName}')">×</button>
+                                <button class="action-btn edit-btn" onclick="updata('${item.key}')">✎</button>
+                            </div>
+                            <div class="img-name">${item.FName}</div>
+                        `;
+                            // gallery.appendChild(imgItem);
+                            gallery.append(imgItem);
+                            if(showtype ==1){
+                                $(".imageeditdiv").show();
+                            }else{
+                                $(".imageeditdiv").hide();
+                            }
+                        });
+                    }
+
+                    // 图片点击事件
+                    document.querySelectorAll('.img-item').forEach(item => {
+                        item.addEventListener('click', function(e) {
+                            if(e.target.classList.contains('delete-btn') || e.target.classList.contains('edit-btn') ) return;
+                            const imgSrc = this.querySelector('img').src;
+                            document.querySelector('#zoomedImg').src = imgSrc;
+                            document.querySelector('.overlay').style.display = 'flex';
+                            resetTransform();
+                        });
+                    });
+
+
+
+                    // 拖拽功能
+                    document.querySelector('#zoomedImg').addEventListener('mousedown', (e) => {
+                        isDragging = true;
+                        startX = e.clientX - translateX;
+                        startY = e.clientY - translateY;
+                        e.target.style.cursor = 'grabbing';
+                    });
+
+                    document.addEventListener('mousemove', (e) => {
+                        if (!isDragging) return;
+                        translateX = e.clientX - startX;
+                        translateY = e.clientY - startY;
+                        updateTransform();
+                    });
+
+                    document.addEventListener('mouseup', () => {
+                        isDragging = false;
+                        document.querySelector('#zoomedImg').style.cursor = 'grab';
+                    });
+
+                    // 缩放功能
+                    document.querySelector('#zoomedImg').addEventListener('wheel', (e) => {
+                        e.preventDefault();
+                        scale *= e.deltaY > 0 ? 0.9 : 1.1;
+                        updateTransform();
+                    });
+
+                    // 点击遮罩层背景关闭
+                    document.querySelector('.overlay').addEventListener('click', (e) => {
+                        if (e.target === document.querySelector('.overlay')) {
+                            closeOverlay();
+                        }
+                    });
+
+
+                    // 增强全屏状态监听
+                    document.addEventListener('fullscreenchange', () => {
+                        const overlay = document.querySelector('.overlay');
+                        if (!document.fullscreenElement && overlay.style.display === 'flex') {
+                            // 如果用户通过ESC退出全屏但仍在查看图片
+                            updateFullscreenButton();
+                        } else if (!document.fullscreenElement) {
+                            // 如果全屏关闭且遮罩层已隐藏
+                            resetTransform();
+                        }
+                    });
+                    document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
+                    // 添加键盘快捷键支持
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === 'f' && document.querySelector('.overlay').style.display === 'flex') {
+                            toggleFullscreen();
+                        }
+                    });
+
+                    // 全屏状态下的样式优化
+                    document.addEventListener('fullscreenchange', () => {
+                        document.querySelector('.overlay').classList.toggle('fullscreen-active');
+                    });
+
+
+
+                }
+                if (data.result == 'error') {
+                    toastr.error(data.error);
+                }
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+    }
+
+
+    function resetTransform() {
+        scale = 1;
+        rotation = 0;
+        translateX = translateY = 0;
+        updateTransform();
+    }
+
+    function updateTransform() {
+        const img = document.querySelector('#zoomedImg');
+        img.style.transform = `
+                translate(${translateX}px, ${translateY}px)
+                scale(${scale})
+                rotate(${rotation}deg)
+            `;
+    }
+
+    // 旋转功能
+    function rotate(degrees) {
+        rotation += degrees;
+        updateTransform();
+    }
+
+    // 关闭遮罩层
+    function closeOverlay() {
+        document.querySelector('.overlay').style.display = 'none';
+        // 强制退出全屏
+        if (document.fullscreenElement) {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) { /* Safari */
+                document.webkitExitFullscreen();
+            }
+        }
+
+        // 重置变换参数
+        resetTransform();
+    }
+
+
+    // 修改全屏切换函数
+    function toggleFullscreen() {
+        const container = document.querySelector('.img-container');
+
+        if (!document.fullscreenElement) {
+            // 进入全屏前确保遮罩层可见
+            document.querySelector('.overlay').style.display = 'flex';
+            if (container.requestFullscreen) {
+                container.requestFullscreen();
+            } else if (container.webkitRequestFullscreen) {
+                container.webkitRequestFullscreen();
+            }
+        } else {
+            // 退出全屏时保持遮罩层可见
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+        }
+    }
+    function updateFullscreenButton() {
+        const btn = document.querySelector('.fullscreen-btn');
+        btn.innerHTML = document.fullscreenElement ? '⤢' : '⤡';
+    }
+
+
+    // 新增或者修改点击事件
+    function Values(op, fKey) {
+        if (op == 1) { // 新增
+            // layer_show('上传图片', '/module/capability/trainingprogram/image/trainingprogramimage_up.html?op=1&FTPID=' + id + '&fmajorid=' + fmajorid, '1000', '400');
+            // console.log("ftpid:" + id +" fmajorid:" + fmajorid)
+            layer_show('批量上传','/module/capability/trainingprogram/image/trainingprogramimagemultiple.html?FTPID=' + id + '&fmajorid=' + fmajorid,'900','500');
+        }
+    }
+
+    function delimage(fkeyid,name){
+        // console.log("delimage:" +fkeyid + "," + name);
+        layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/trainingprogramimage/deltrainingprogramimage',
+                data: JSON.stringify({
+                    id: fkeyid
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        loadImages();
+                        toastr.success('删除成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error);
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+
+    }
+
+    function updata(fkeyid){
+        layer_show('修改图片名称','/module/capability/trainingprogram/image/trainingprogramimagenameedit.html?op=2&id=' + fkeyid,'600','200');
+    }
+</script>
+</body>
+</html>

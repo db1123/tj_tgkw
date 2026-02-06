@@ -1,0 +1,196 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+        <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+        <!--_only 独立样式 -->
+        <link rel="stylesheet" href="/javascript/gantt/css/normalize.css">
+        <link rel="stylesheet" href="/javascript/gantt/css/main.css">
+        <link rel="stylesheet" href="/javascript/gantt/src/mmGrid.css">
+        <link rel="stylesheet" href="/javascript/gantt/src/mmPaginator.css">
+        <link rel="stylesheet" href="/javascript/gantt/src/uliTreeGrid.css">
+        <link rel="stylesheet" href="/javascript/gantt/src/uliGantt.css">
+        <link rel="stylesheet" href="/javascript/gantt/src/splitter.css">
+        <link rel="stylesheet" href="/javascript/gantt/js/vendor/jquery-ui-1.9.2.custom/css/redmond/jquery-ui-1.9.2.custom.min.css">
+        <script src="/javascript/gantt/js/vendor/modernizr-2.6.2.min.js"></script>
+<!--        &lt;!&ndash;[if lt IE 9]>-->
+<!--        <script src="/javascript/gantt/js/vendor/html5shiv.js"></script>-->
+<!--        <script src="/javascript/gantt/src/style-shim.js"></script>-->
+<!--        <![endif]&ndash;&gt;-->
+    </head>
+    <body>
+        <div class="page-container" style="padding: 2px;">
+            <div class="f-l text-l">
+                <div id="ttoolbar">
+                    <!--                <button id="btnToday" class="button" >跳转到今天</button>-->
+                    <button id="btnMonth" class="button">显示月</button>
+                    <button id="btnWeek" class="button">显示周</button>
+                    <button id="btnDay" class="button">显示日</button>
+                </div>
+            </div>
+            <div class="f-l" style="width: 100%; margin-top: 3px;">
+                <div id="gantt"></div>
+            </div>
+        </div>
+<!--        <script src="/javascript/gantt/js/vendor/jquery-1.9.1.min.js"></script>-->
+        <script src="/javascript/gantt/js/vendor/jquery-migrate-1.2.1.min.js"></script>
+        <script src="/javascript/gantt/js/plugins.js"></script>
+        <script src="/javascript/gantt/src/mmGrid.js"></script>
+        <script src="/javascript/gantt/src/mmPaginator.js"></script>
+        <script src="/javascript/gantt/src/uliTreeGrid.js"></script>
+        <script src="/javascript/gantt/src/uliGantt.js"></script>
+        <script src="/javascript/gantt/src/jquery.cookie.js"></script>
+        <script src="/javascript/gantt/src/splitter.js"></script>
+        <script src="/javascript/gantt/src/ajaxQueue.js"></script>
+        <script src="/javascript/gantt/src/jquery.event.drag-2.2.js"></script>
+        <!--[if lte IE 8]>
+        <script src="/javascript/gantt/src/r2d3.js" charset="utf-8"></script>
+        <![endif]-->
+        <!--[if gte IE 9]><!-->
+        <script src="/javascript/gantt/src/d3.min.js"></script>
+        <!--<![endif]-->
+        <script src="/javascript/gantt/src/jquery.jeditable.js"></script>
+        <script src="/javascript/gantt/js/vendor/jquery-ui-1.9.2.custom/js/jquery-ui-1.9.2.custom.min.js"></script>
+        <script src="/javascript/gantt/js/vendor/jquery.jeditable.datepicker.js"></script>
+        <script type="text/javascript">
+            // 编辑框状态 1新建 2修改
+            var id = getQueryStringByName('id');
+            var paramlist=[];
+            // 业务代码
+            $(function () {
+
+                var items = []
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json;charset=UTF-8',
+                    url: '/s/projectPlan/queryprojectPlanGantt',
+                    data: JSON.stringify({
+                        id: id
+                    }),
+                    success: function (data) {
+                        if (data.result == 'success') {
+                            paramlist=[];
+                            // console.log(data.list);
+                            var cols = [
+                                {title:'计划名称', name:'name' ,width:30, lockDisplay: true, editor:{type:'text'} },
+                                {title:'状态', name:'status' ,width:30, editor:{type:'text'}, renderer:f_status },
+                                {title:'类型', name:'type', width:30, editor:{type:'text'}, renderer:f_type },
+                            ];
+                            var grid_settings = {
+                                height: 500
+                                , cols: cols
+                                , method: 'get'
+                                // 直接从array中加载数据
+                                , items: data.list
+                                // ajax方式加载数据
+                                , checkCol: false
+                                , fitColWidth: false
+                                , nowrap: true
+                                , multiSelect: false
+                                , fullWidthRows: false
+                                , treeColumn: 'name'  //第几列是树结点
+                                , idField: 'id'  //缺省就是使用id
+                                , clickableNodeNames: true  //单击结点名称自动切换展示，折叠状态
+                                , indexCol: false
+                                , editable: false    //可以直接编辑
+                                , cellEditUrl: function(value, settings){
+                                    return value;
+                                }
+
+                            }
+
+                            var gantt = $('#gantt').gantt(
+                                {grid: grid_settings
+                                    , gantt: {
+                                        data:[]
+                                        , scale:"week"
+                                        , todayLineFlag : true
+                                        , titleName:'name'
+                                        , group: function(d){
+                                            if(d.type == 2){
+                                                paramlist.push(d.no);
+                                            }
+                                            return d._isParent;
+                                        }
+                                        , color: function(d){
+                                            if (d.status == '3') return 'red';
+                                            else if (d.status == '2') return 'green';
+                                            return '';
+                                        }
+                                        , tooltipHtml: TooltipHtml
+                                        , today: new Date()
+                                        , ganttDrawAuto: true
+                                    }
+                                });
+                            var grid = $("#gantt").gantt('getGrid');
+                            $('#gantt').gantt("redraw", "month");
+                            // console.log("paramlist"+paramlist);
+                            // console.log("paramlist"+paramlist.length);
+                            if(paramlist.length>0){
+                                for (var i =0;i<paramlist.length;i++){
+                                    // console.log(paramlist[i]);
+                                    grid.mmGrid('set_notation', (paramlist[i]-1), 'name', 'warning', '里程碑');
+                                    grid.mmGrid('set_notation', (paramlist[i]-1), 'status', 'warning', '里程碑');
+                                    grid.mmGrid('set_notation', (paramlist[i]-1), 'type', 'warning', '里程碑');
+                                }
+                            }
+                        }
+                        if (data.result == 'error') {
+                            items=[];
+                            toastr.error(data.error);
+                        }
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+                var f_status = function(v){
+                    if (v=='1') return '未完成';
+                    else if(v=='2') return '按时完成';
+                    else if(v=='3') return '逾期完成';
+                }
+                var f_type = function(v){
+                    if (v=='1') return '阶段';
+                    else return '里程碑';
+                }
+                var f_percent = function(v){
+                    return v+'%';
+                }
+
+                function TooltipHtml(d, opts){
+                    var s = ['计划名称: '+d.title,
+                        '计划开始时间: '+d.begin_date,
+                        '计划完成时间: '+d.end_date,
+                        '实际开始时间: '+ (d.finish_begin_date || ''),
+                        '实际完成时间: '+ (d.finish_end_date || ''),
+                    ]
+                    return s.join('<br/>');
+                }
+                //甘特图处理
+                $('#btnToday').on('click', function(){
+                    $('#gantt').gantt("toToday");
+                });
+                $('#btnMonth').on('click', function(){
+                    $('#gantt').gantt("redraw", "month");
+                });
+                $('#btnWeek').on('click', function(){
+                    $('#gantt').gantt("redraw", "week");
+                });
+                $('#btnDay').on('click', function(){
+                    $('#gantt').gantt("redraw", "day");
+                });
+
+                // grid.mmGrid('set_notation', 1, 'name', 'warning', '里程碑');
+            });
+        </script>
+    </body>
+</html>

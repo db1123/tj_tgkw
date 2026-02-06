@@ -1,0 +1,384 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <!--/_only 独立样式 -->
+    <link rel="stylesheet" href="css/jsoneditor.min.css" />
+	<script src="css/jsoneditor.min.js"></script>
+    <style>	
+		 #FInputParameters, #FReturnParameters {
+		            border: solid 1px #ddd;
+		            resize: both;
+		            overflow: auto;
+		            min-width: 200px;
+		            min-height: 100px;
+		        }
+    </style>
+
+</head>
+<body>
+<article class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="interfaceForm">
+         <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>接口类型：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <select name="Finterfacetype" id="Finterfacetype" style="width: 100%;" placeholder="数据接口类型" ></select>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>接口名称：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="FName" id="FName"/>
+            </div>
+        </div>
+       
+       <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>接口调用成熟度：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="number" class="input-text" name="FMaturity" id="FMaturity" placeholder="格式：0.01-1的数字" style="width: 180px;" />
+            </div>
+        </div>
+         <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>输入参数：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <div class="input-group">
+                    <input type="text" id="FInputParametersText" class="input-text" readonly placeholder="点击按钮编辑JSON数据">
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-primary" onclick="openJsonEditor('input')">编辑</button>
+                    </span>
+                </div>
+                <input type="hidden" id="FInputParameters" name="FInputParameters">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>返回参数：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <div class="input-group">
+                    <input type="text" id="FReturnParametersText" class="input-text" readonly placeholder="点击按钮编辑JSON数据">
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-primary" onclick="openJsonEditor('output')">编辑</button>
+                    </span>
+                </div>
+                <input type="hidden" id="FReturnParameters" name="FReturnParameters">
+            </div>
+        </div>
+        
+          <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>数据匹配要求：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                 <textarea  placeholder='例：请列出该项目中的存在的主要功能、结构以及数据存储方式' id="FRequire" name="FRequire" rows="8" cols="30" class="input-text" style="width: 100%;height:120px; box-sizing: border-box; border: solid 1px #ddd;" ></textarea>
+            </div>
+        </div>
+        
+       <!--  <div class="toolbar-bottom-line"></div> -->
+        <div class="toolbar-bottom-btn" style=" bottom: auto;">
+            <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+            <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                   onclick="layer_close()"/>
+        </div>
+        <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+    </form>
+</article>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+
+<script type="text/javascript">
+    // 编辑框状态 1新建 2修改
+    var op = getQueryStringByName('op');
+    // 当前编辑的字段类型
+    var currentEditField = '';
+    // 当前弹窗索引
+    var currentLayerIndex = null;
+    // JSON编辑器实例
+    var jsonEditor = null;
+    
+    // 打开JSON编辑器弹窗
+    function openJsonEditor(fieldType) {
+        currentEditField = fieldType;
+        
+        // 获取当前值
+        var currentValue = fieldType === 'input' 
+            ? ($('#FInputParameters').val() || '{}') 
+            : ($('#FReturnParameters').val() || '{}');
+        
+        // 创建弹窗
+        currentLayerIndex = layer.open({
+            type: 1,
+            title: fieldType === 'input' ? '输入参数编辑' : '返回参数编辑',
+            content: `
+                <div style="padding: 20px;">
+                    <div id="jsonEditorContainer" style="width: 100%; height: 400px;"></div>
+                    <div class="mt-20 text-center">
+                        <button id="saveJsonBtn" class="btn btn-primary">确定</button>
+                        <button id="cancelJsonBtn" class="btn btn-default ml-20">取消</button>
+                    </div>
+                </div>
+            `,
+            area: ['100%', '100%'],
+            success: function(layero, index) {
+                // 创建JSON编辑器
+                var container = document.getElementById('jsonEditorContainer');
+                jsonEditor = new JSONEditor(container, {
+                    mode: 'code',
+                    theme: fieldType === 'input' ? 'ajv' : 'schema',
+                    onChange: function() {
+                        // 可以添加实时验证逻辑
+                    }
+                });
+                
+                // 设置初始值
+                try {
+                    jsonEditor.set(JSON.parse(currentValue));
+                } catch (e) {
+                    // 如果解析失败，设置为空对象
+                    jsonEditor.set({});
+                    layer.msg('当前数据格式不正确，已重置为默认值', {icon: 5});
+                }
+                
+                // 使用事件委托绑定按钮事件
+                $('#saveJsonBtn').on('click', function() {
+                    saveJsonData();
+                });
+                
+                $('#cancelJsonBtn').on('click', function() {
+                    layer.close(currentLayerIndex);
+                });
+            }
+        });
+    }
+    
+    // 保存JSON数据
+    function saveJsonData() {
+        try {
+            // 获取编辑器中的数据
+            var jsonData = jsonEditor.get();
+            var jsonString = JSON.stringify(jsonData, null, 2);
+            
+            // 更新主表单中的值
+            if (currentEditField === 'input') {
+                $('#FInputParameters').val(jsonString);
+                $('#FInputParametersText').val('已编辑的JSON数据');
+            } else if (currentEditField === 'output') {
+                $('#FReturnParameters').val(jsonString);
+                $('#FReturnParametersText').val('已编辑的JSON数据');
+            }
+            
+            // 关闭弹窗
+            layer.close(currentLayerIndex);
+        } catch (e) {
+            layer.msg('JSON格式错误: ' + e.message, {icon: 5});
+        }
+    }
+    
+    // 业务代码
+    $(function () {
+        //获取接口类型列表
+        $.ajax({
+             type: 'POST',
+             contentType: 'application/json',
+             url: '/s/interfacetype/queryInterfaceTypeALL', // 调用地址
+             async: false,
+             success: function (data) {
+                 var newObj2 = Object.assign([], data.zNodes);
+                 newObj2.push({id: 1, pId: 0, name: '全部', open: true});
+                 $('#Finterfacetype').select2ztree({
+                     textField: 'name',
+                     titleField: 'name',
+                     placeholder: '请选择接口类型',
+                     ztree: {
+                         setting: {
+                             view: {
+                                 dblClickExpand: false
+                             },
+                             data: {
+                                 simpleData: {
+                                     enable: true,
+                                     idKey: "id",
+                                     pIdKey: "pId",
+                                     rootPId: 0
+                                 }
+                             }
+                         },
+                         zNodes: newObj2
+                     },
+                     language: "zh-CN"
+                 });
+             },
+             error: function (e) {
+                 toastr.error(e.status);
+                 toastr.error(e.responseText);
+             }
+         });
+        
+
+        // 修改操作时读取表单信息
+        if (op == 2) {
+            var id = getQueryStringByName('id');
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/interface/queryinterfaceInfo', // 调用地址
+                data: JSON.stringify({
+                    id: id
+                }),
+                async: false,
+                success: function (data) {
+                    $('#FName').val(data.info.FName);
+                    $('#FInputParameters').val(data.info.FInputParameters);
+                    $('#FInputParametersText').val('已编辑的JSON数据');
+                    $('#FReturnParameters').val(data.info.FReturnParameters);
+                    $('#FReturnParametersText').val('已编辑的JSON数据');
+                    $('#FRequire').val(data.info.FRequire);
+                    $('#FMaturity').val(data.info.FMaturity);
+                    $("#Finterfacetype").select2ztree('val', [data.info.FtInterfaceTypeID]);
+                    $('#FKeyID').val(data.info.key);
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+            $("#fenjiceng").hide();
+        }else{
+            $("#fenjiceng").show();
+        }
+        // 检验数据
+        var userValidate = $('#interfaceForm').validate({
+            rules: {
+                FName: {
+                    required: true
+                },
+                FInputParameters: {
+                    required: true
+                },
+                FReturnParameters: {
+                    required: true
+                },
+                FRequire: {
+                    required: true
+                },
+                Finterfacetype: {
+                    required: true
+                },
+                FMaturity: {
+                    required: true,
+                    range:[0.01,1]
+                }
+                
+            },
+            messages: {
+                FName: {
+                    required: '*请输入数据接口名称'
+                },
+                Finterfacetype: {
+                    required: '*请选择数据接口模板'
+                },
+                FInputParameters: {
+                    required: '*请编辑接口输入参数'
+                },
+                FReturnParameters: {
+                    required: '*请编辑接口返回参数'
+                },
+                FRequire: {
+                    required: '*请输入返回要求'
+                },
+                FMaturity: {
+                    required: '*请输入接口提问成熟度'
+                }
+             
+            },
+            onfocusout: false, // 是否在获取焦点时验证
+            onkeyup: false, // 是否在敲击键盘时验证
+            focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+            focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+            success: 'valid',
+            submitHandler: function () {
+                // 获取参数
+                var data = form2Json('interfaceForm');
+                if (op == 1) { // 添加操作
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/interface/addinterface', // 调用地址
+                        data: JSON.stringify({
+                            FName: data.FName,
+                            FInputParameters: data.FInputParameters,
+                            FRequire: data.FRequire,
+                            FMaturity: data.FMaturity,
+                            Finterfacetype: data.Finterfacetype,
+                            FReturnParameters: data.FReturnParameters
+                        }),
+                        async: false,
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                parent.$('#mainTable').DataTable().ajax.reload(null, false);
+                                parent.toastr.success('添加成功！');
+                                layer_close();
+                            } else if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                } else {
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/interface/updateinterface', // 调用地址
+                        data: JSON.stringify({
+                            FKeyID: data.FKeyID,
+                            FName: data.FName,
+                            FInputParameters: data.FInputParameters,
+                            FRequire: data.FRequire,
+                            FMaturity: data.FMaturity,
+                            Finterfacetype: data.Finterfacetype,
+                            FReturnParameters: data.FReturnParameters
+                        }),
+                        async: false,
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                parent.$('#mainTable').DataTable().ajax.reload(null, false);
+                                parent.toastr.success('修改成功！');
+                                layer_close();
+                            } else if (data.result == 'fail') {
+                                toastr.warning('名称重复，请重新输入');
+                            } else if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

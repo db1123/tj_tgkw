@@ -1,0 +1,378 @@
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=5,IE=9" ><![endif]-->
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css">
+  <!-- Toastr -->
+  <link rel="stylesheet" href="/plugins/toastr/toastr.min.css">
+  <!-- mloading -->
+  <link rel="stylesheet" href="/plugins/mloading/jquery.mloading.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+  <!-- Select2 -->
+  <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+  <style type="text/css">
+    .select2-dropdown {
+      z-index: 10099;
+    }
+    .select2-container .select2-selection--single {
+      height: 25px;
+      line-height: 25px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+      line-height: 25px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+      height: 24px;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+      line-height: 18px;
+    }
+  </style>
+  <!-- CodeMirror -->
+  <link rel="stylesheet" href="/plugins/codemirror/lib/codemirror.css">
+  <link rel="stylesheet" href="/plugins/codemirror/theme/dracula.css">
+  <!-- tooltip -->
+  <link rel="stylesheet" href="/plugins/tooltip/tooltip.css">
+  <!-- XNDatepicker -->
+  <style>
+    .date-input{
+      line-height: 30px;
+      height: 30px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      position: relative;
+      padding: 0 6px;
+      font-size: 12px !important;
+    }
+  </style>
+
+  <!-- GraphEditor -->
+  <link rel="stylesheet" type="text/css" href="styles/grapheditor.css">
+  <!-- 自定义 -->
+  <link rel="stylesheet" type="text/css" href="styles/my.css">
+
+  <!-- 处理嵌入式参数 -->
+	<script type="text/javascript">
+		// 分析URL参数。支持的参数有：
+		// lang=xy: 指定用户界面的语言
+		// touch=1: 启用触摸式用户界面
+		// storage=local: 启用HTML5本地存储
+		// chrome=0: ChromeLess模式[居于Chrome Headless　做了一层封装，通过api调用操作chrome浏览器（点击，输入，打开网站等等）].
+    var urlParams = new Object();
+    urlParams = (function(url)
+		{
+			var result = new Object();
+			var idx = url.lastIndexOf('?');
+			if (idx > 0)
+			{
+				var params = url.substring(idx + 1).split('&');
+				for (var i = 0; i < params.length; i++)
+				{
+					idx = params[i].indexOf('=');
+					if (idx > 0)
+					{
+						result[params[i].substring(0, idx)] = params[i].substring(idx + 1);
+					}
+				}
+			}
+			return result;
+		})(window.location.href);
+		// 默认资源包含在GraphEditor资源中
+    mxLoadResources = false;
+    // 全局变量
+    var mainEditorUi; // 流程图UI组件
+    var AppOP = 0; // 状态 0编辑器 1引用组件
+    var nowFlowID = ''; // 当前打开流程图ID
+    var nowFlowName = ''; // 当前打开流程图名称
+    var nowFlowExplain = ''; // 当前打开流程图说明
+    var nowFlowSaveOp = 0; // 当前流程图是否保存 0未修改 1已改动
+    var nowFlowState = 0; // 当前打开流程图状态 0编辑 1提交 2提交(带模拟运行)
+    var nowSelectNode; // 当前选中节点
+    var nowNodeInputParameterData = []; // 递归获取的当前节点的祖先节点变量列表
+    var nowNodeInputParameterCount = {}; // 递归获取的当前节点的祖先节点变量列表时用来解决死循环问题的错误计数器
+    var projectEditState = 2; // 项目用流程图编辑状态 1检出 2保存(默认) 3编辑中
+    var adaptiveDesignState = 0; // 是否为自适应设计状态 0不是 1自适应设计状态
+    // 项目-全局变量
+    var mainXML = ''; // 主流程图XML
+    var saveXMLArray = []; // 顶级-二级-三级...
+    var projectPath = []; // 项目节点路径
+    var SideSimulationArray = []; // 节点数组
+    // 初始化系统参数
+    if (urlParams['tv']) {
+      AppOP = 1;
+      switch (urlParams['tv']) {
+        case 'one': // 提交
+          nowFlowState = 1;
+          break;
+      
+        case 'two': // 提交(带模拟运行)
+          nowFlowState = 2;
+          break;
+
+        case 'three': // 提交(可编辑属性)
+          nowFlowState = 3;
+          break;
+
+        case 'four': // 当前属性可编辑
+          nowFlowState = 4;
+          break;
+
+        case 'mini': // 快速浏览试图
+          nowFlowState = 99;
+          break;
+
+        default: // 编辑
+          nowFlowState = 0;
+          break;
+      }
+    } else { // 编辑
+      nowFlowState = 0;
+    }
+  </script>
+
+  <!-- GraphEditor -->
+  <script type="text/javascript" src="/javascript/flow/basic.js"></script>
+	<script type="text/javascript" src="js/Init.js"></script>
+	<script type="text/javascript" src="deflate/pako.min.js"></script>
+	<script type="text/javascript" src="deflate/base64.js"></script>
+  <script type="text/javascript" src="jscolor/jscolor.js"></script>
+	<script type="text/javascript" src="sanitizer/sanitizer.min.js"></script>
+	<script type="text/javascript" src="/plugins/mxgraph/mxClient.min.js"></script>
+	<script type="text/javascript" src="js/EditorUi.js"></script>
+	<script type="text/javascript" src="js/Editor.js"></script>
+  <script type="text/javascript">
+    if (nowFlowState == 0) document.write("<script type='text/javascript' src='js/Sidebar.js'><\/script>");
+  </script>
+  <script type="text/javascript">
+    if (nowFlowState == 0) document.write("<script type='text/javascript' src='js/Outline.js'><\/script>");
+  </script>
+	<script type="text/javascript" src="js/Graph.js"></script>
+  <script type="text/javascript">
+    if (nowFlowState == 0 || nowFlowState == 1 || nowFlowState == 2 || nowFlowState == 3 || nowFlowState == 4) document.write("<script type='text/javascript' src='js/Format.js'><\/script>");
+  </script>
+  <script type="text/javascript">
+    if (nowFlowState == 0 || nowFlowState == 1 || nowFlowState == 2 || nowFlowState == 3 || nowFlowState == 4) document.write("<script type='text/javascript' src='/javascript/flow/logic.js'><\/script>");
+    if (nowFlowState == 0 || nowFlowState == 1 || nowFlowState == 2 || nowFlowState == 3 || nowFlowState == 4) document.write("<script type='text/javascript' src='/javascript/flow/adaptiveDesign.js'><\/script>");
+  </script>
+	<script type="text/javascript" src="js/Shapes.js"></script>
+	<script type="text/javascript" src="/javascript/flow/actions.js"></script>
+	<script type="text/javascript" src="js/Actions.js"></script>
+  <script type="text/javascript">
+    if (nowFlowState == 0) document.write("<script type='text/javascript' src='js/Menus.js'><\/script>");
+  </script>
+  <script type="text/javascript">
+    if (nowFlowState == 0) document.write("<script type='text/javascript' src='js/Toolbar.js'><\/script>");
+  </script>
+  <script type="text/javascript">
+    if (nowFlowState == 0) document.write("<script type='text/javascript' src='js/Dialogs.js'><\/script>");
+  </script>
+  <script type="text/javascript">
+    if (nowFlowState == 0 || nowFlowState == 3) document.write("<script type='text/javascript' src='/javascript/flow/dialogs.js'><\/script>");
+  </script>
+  
+  <!-- math.js -->
+  <script src="/plugins/math.js"></script>
+  <!-- jQuery -->
+  <script src="/nui-ad/lib/jquery/1.9.1/jquery.min.js"></script>
+  <!-- jquery-validation -->
+  <script src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+  <script src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+  <script src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+  <!-- Toastr -->
+  <script src="/plugins/toastr/toastr.min.js"></script>
+  <!-- mloading -->
+  <script src="/plugins/mloading/jquery.mloading.js"></script>
+  <!-- DataTables -->
+  <script src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+  <script src="/javascript/DataTablesPublicParam.js"></script>
+  <script src="/nui-ad/lib/datatables/1.10.15/plugins/jszip.min.js"></script>
+  <script src="/nui-ad/lib/datatables/1.10.15/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+  <script src="/nui-ad/lib/datatables/1.10.15/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+  <script src="/nui-ad/lib/datatables/1.10.15/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+  <!-- Select2 -->
+  <script src="/plugins/select2/js/select2.full.min.js"></script>
+  <!-- CodeMirror -->
+  <script src="/plugins/codemirror/lib/codemirror.js"></script>
+  <script src="/plugins/codemirror/mode/javascript/javascript.js"></script>
+  <script src="/plugins/codemirror/addon/selection/active-line.js"></script>
+  <script src="/plugins/codemirror/addon/edit/matchbrackets.js"></script>
+  <!-- tooltip -->
+  <script src="/plugins/tooltip/tooltip.js"></script>
+  <!-- xndatepicker -->
+  <script src="/plugins/xndatepicker/moment.js"></script>
+  <script src="/plugins/xndatepicker/xndatepicker.js"></script>
+  <!-- 数字输入框 -->
+  <script src="/plugins/numberInput/numberInput.js"></script>
+  <!-- 功能代码 -->
+  <script src="/javascript/tools.js"></script>
+  <script src="/javascript/flow/examRun.js"></script>
+  <script src="/javascript/flow/flowAction.js"></script>
+  <script src="/javascript/flow/flowNodeAction.js"></script>
+  <script src="/javascript/flow/projectFlowAction.js"></script>
+  <!-- 权限控制 -->
+  <script type="text/javascript">
+    if (!getParentUrl()) {
+      window.location.href= '/module/login.html';
+    }
+  </script>
+  <!-- 自定义脚本 -->
+  <script type="text/javascript">
+    $.ajax({
+      type: 'POST',
+      contentType: 'application/json',
+      url: '/s/flow/queryScriptFile', // 调用地址
+      data: JSON.stringify({
+        type: 1,
+        state: 1
+      }),
+      async: false,
+      success: function(data) {
+        data.list.forEach((item)=>{
+          var oHead = document.getElementsByTagName('HEAD').item(0);
+          var oScript = document.createElement('script');
+          oScript.type = 'text/javascript';
+          oScript.charset = 'UTF-8';
+          oScript.src = item['f_path'];
+          oHead.appendChild(oScript);
+        });
+      },
+      error : function(e) {
+        toastr.error(e.status);
+        toastr.error(e.responseText);
+      }
+    });
+  </script>
+  
+</head>
+<body class="geEditor">
+  <!-- 开启遮罩 -->
+  <script type="text/javascript">
+    $('body').mLoading('show');
+  </script>
+  <!-- 其他代码 -->
+  <script type="text/javascript">
+    // 初始化Toastr
+    toastr.options = {  
+      closeButton: false,  // 是否显示关闭按钮（提示框右上角关闭按钮）
+      debug: false,  // 是否为调试；
+      progressBar: true,  // 是否显示进度条（设置关闭的超时时间进度条）
+      positionClass: "toast-top-center",  // 消息框在页面显示的位置
+      onclick: null,  // 点击消息框自定义事件
+      showDuration: "300",  // 显示动作时间
+      hideDuration: "1000",  // 隐藏动作时间
+      timeOut: "2000",  // 自动关闭超时时间
+      extendedTimeOut: "1000", // 设置当你鼠标滑入后的timeout，该timeout会更新关闭所需的timeout.
+      showEasing: "swing",  
+      hideEasing: "linear",  
+      showMethod: "fadeIn",  //显示的方式
+      hideMethod: "fadeOut"  //隐藏的方式
+    };
+    // 初始化tooltip
+    ToolTip.init({
+        delay: 50,
+        fadeDuration: 250,
+        fontSize: '1.0em',
+        theme: 'dark',
+        textColor: '#fff',
+        shadowColor: '#000',
+        fontFamily: "'Roboto-Medium', 'Roboto-Regular', Arial"
+    });
+		// 扩展EditorUi以根据后端的可用性更新I/O操作状态
+		(function()
+		{
+      var editorUiInit = EditorUi.prototype.init;
+      
+			EditorUi.prototype.init = function()
+			{
+				editorUiInit.apply(this, arguments);
+				// this.actions.get('export').setEnabled(false);
+				// 根据存储状态更新操作状态
+				// if (!Editor.useLocalStorage)
+				// {
+				// 	mxUtils.post(OPEN_URL, '', mxUtils.bind(this, function(req)
+				// 	{
+				// 		var enabled = req.getStatus() != 404;
+				// 		this.actions.get('open').setEnabled(enabled || Graph.fileSupport);
+				// 		this.actions.get('import').setEnabled(enabled || Graph.fileSupport);
+				// 		this.actions.get('save').setEnabled(enabled);
+				// 		this.actions.get('saveAs').setEnabled(enabled);
+				// 		this.actions.get('export').setEnabled(enabled);
+				// 	}));
+				// }
+			};
+			
+			// 添加所需的资源（禁用加载回退属性，仅当我们知道所有键都在特定于语言的文件中定义时才能使用）
+			mxResources.loadDefaultBundle = false;
+			var bundle = mxResources.getDefaultBundle(RESOURCE_BASE, mxLanguage) ||
+				mxResources.getSpecialBundle(RESOURCE_BASE, mxLanguage);
+
+			// 修复可能的异步请求
+			mxUtils.getAll([bundle, STYLE_PATH + '/default.xml'], function(xhr)
+			{
+        // 禁用浏览器自带右键菜单  
+        mxEvent.disableContextMenu(document.body);
+
+				// 向资源添加捆绑文本
+				mxResources.parse(xhr[0].getText());
+				
+				// 配置默认图形主题
+				var themes = new Object();
+				themes[Graph.prototype.defaultThemeName] = xhr[1].getDocumentElement(); 
+				
+				// 主框架
+        mainEditorUi = new EditorUi(new Editor(urlParams['chrome'] == '0', themes));
+
+        // 禁止悬挂边
+        mainEditorUi.editor.graph.setAllowDanglingEdges(false);
+
+        // 无需保存提交状态
+        EditorNoSaveNoSubmit();
+        mainEditorUi.actions.get('saveAs').setEnabled(false); // 禁用另存为
+
+        // 判断是否需要屏蔽所有编辑功能
+        var graph = mainEditorUi.editor.graph;
+        if (nowFlowState != 0) {
+          flowDisableFunctionAll();
+          graph.setEnabled(false);
+          mainEditorUi.refresh();
+          // 鼠标拖拽图层-开启
+				  graph.panningHandler.ignoreCell = true;
+        } else {
+          // 鼠标拖拽图层-关闭
+				  graph.panningHandler.ignoreCell = false;
+        }
+
+        // 判断是否需要开启模拟器
+        if (nowFlowState == 2 || nowFlowState == 3 || nowFlowState == 4) {
+          exam('view');
+        }
+
+        // 判断是否需要打开流程图
+        if (urlParams['f']) {
+          openFlowGraph(urlParams['f']);
+        }
+
+        // 判断是否调整编辑区域缩放比例
+        if (urlParams['z']) {
+          flowZoom(urlParams['z']);
+        }
+
+			}, function()
+			{
+				document.body.innerHTML = '<center style="margin-top:10%;">加载资源文件时出错，请检查浏览器控制台。</center>';
+			});
+		})();
+  </script>
+  <!-- 关闭遮罩 -->
+  <script type="text/javascript">
+    setTimeout(function(){
+      $('body').mLoading('hide');
+    }, 500);
+  </script>
+</body>
+</html>

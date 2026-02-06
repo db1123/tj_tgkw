@@ -1,0 +1,612 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+        <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+        <!--_only 独立样式 -->
+        <link rel="stylesheet" href="/plugins/select2/css/select2.min.css"/>
+        <link rel="stylesheet" href="/plugins/daterangepicker/daterangepicker.css">
+        <!--/_only 独立样式 -->
+    </head>
+    <body>
+        <article class="page-container">
+            <form action="" method="post" class="form form-horizontal" id="supplierForm">
+                <div class="row cl">
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5"><span class="c-red">*</span>公司名称：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <input type="text" class="input-text" name="f_name"/>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5"><span class="c-red">*</span>公司简称：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <input type="text" class="input-text" name="f_inspect"/>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">法人代表：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <input type="text" class="input-text" name="f_legal_person"/>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">营业执照号：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <input type="text" class="input-text" name="f_business_license_no"/>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">公司网址：</label>
+                    <div class="formControls col-xs-5 col-sm-5">
+                        <input type="text" class="input-text" name="f_web"/>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">企业类型：</label>
+                    <div class="formControls col-xs-2 col-sm-2 big">
+                        <select name="f_supplier_type" style="width: 100%;"></select>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">经营性质：</label>
+                    <div class="formControls col-xs-2 col-sm-2 big">
+                        <select name="f_supplier_run" style="width: 100%;"></select>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">国家：</label>
+                    <div class="formControls col-xs-2 col-sm-2 big">
+                        <select name="f_country" style="width: 100%;"></select>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">省份：</label>
+                    <div class="formControls col-xs-2 col-sm-2 big">
+                        <select name="f_province" style="width: 100%;"></select>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">城市：</label>
+                    <div class="formControls col-xs-2 col-sm-2 big">
+                        <select name="f_city" style="width: 100%;"></select>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">地区：</label>
+                    <div class="formControls col-xs-2 col-sm-2 big">
+                        <select name="f_region" style="width: 100%;"></select>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">注册地址：</label>
+                    <div class="formControls col-xs-5 col-sm-5">
+                        <input type="text" class="input-text" name="f_address"/>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">成立日期：</label>
+                    <div class="formControls col-xs-2 col-sm-2 big">
+                        <input type="text" class="input-text" name="f_date_of_establishment"/>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">注册资金：</label>
+                    <div class="formControls col-xs-2 col-sm-2 big">
+                        <input type="text" class="input-text" name="f_registered_capital"/>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">出货地址：</label>
+                    <div class="formControls col-xs-5 col-sm-5">
+                        <input type="text" class="input-text" name="f_shipping_address"/>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">工厂面积：</label>
+                    <div class="formControls col-xs-2 col-sm-2 big">
+                        <input type="text" class="input-text" name="f_factory_area"/>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">交付方式：</label>
+                    <div class="formControls col-xs-2 col-sm-2 big">
+                        <select name="f_supplier_delivery" style="width: 100%;"></select>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">业务联系人：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <input type="text" class="input-text" name="f_business_contact"/>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">联系电话：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <input type="text" class="input-text" name="f_contact_number"/>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">邮编：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <input type="text" class="input-text" name="f_zip_code"/>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">开票类型：</label>
+                    <div class="formControls col-xs-2 col-sm-2 big">
+                        <select name="f_supplier_invoice" style="width: 100%;"></select>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">行业类型：</label>
+                    <div class="formControls col-xs-2 col-sm-2 big">
+                        <select name="f_rankings_type" style="width: 100%;">
+                            <option value="1">国内</option>
+                            <option value="2">国际</option>
+                        </select>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">行业排名：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <input type="text" class="input-text" name="f_rankings"/>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">安全认证：</label>
+                    <div class="formControls col-xs-2 col-sm-2 big">
+                        <select name="f_safety_certification" style="width: 37%;">
+                            <option value="1">是</option>
+                            <option value="2">否</option>
+                        </select>
+                        <select name="f_safety_certification_type" style="width: 60%;">
+                            <option value="1">国内</option>
+                            <option value="2">国际</option>
+                        </select>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">质量标准：</label>
+                    <div class="formControls col-xs-2 col-sm-2 big">
+                        <select name="f_quality_executive_standard" style="width: 100%;"></select>
+                    </div>
+                </div>
+<!--                <div class="row cl">-->
+<!--                    <label class="form-label col-xs-10 col-sm-1 pl-10 pr-10">供应商入口信息：</label>-->
+<!--                </div>-->
+                <div class="row cl">
+
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">登录名称：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <input type="text" class="input-text" name="f_login"/>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">登录密码</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <input type="password" class="input-text" name="f_pass"/>
+                    </div>
+                </div>
+
+                <div class="toolbar-bottom-line"></div>
+                <div class="toolbar-bottom-btn">
+                    <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+                    <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                           onclick="layer_close()"/>
+                </div>
+                <input type="hidden" value="" name="f_key_id"/>
+                <input type="hidden" value="" id="f_islogin" name="f_islogin"/>
+            </form>
+        </article>
+
+        <script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/plugins/moment/moment.min.js"></script>
+        <script type="text/javascript" src="/plugins/daterangepicker/daterangepicker.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+        <script type="text/javascript">
+            // 编辑框状态 1新建 2修改
+            var op = getQueryStringByName('op');
+            // 业务代码
+            $(function () {
+                // 初始国家下拉列表
+                var selectSupplierCountry = $("#supplierForm select[name='f_country']").select2({
+                    placeholder: '请选择国家',
+                    ajax: {
+                        type: 'POST',
+                        url: "/s/supplier/queryCountry",
+                        dataType: 'json',
+                        data: function (params) {
+                            return {
+                                search: params.term,
+                            };
+                        },
+                        delay: 800,
+                        cache: true
+                    },
+                    language: "zh-CN"
+                });
+                selectSupplierCountry.on("select2:select", function (e) {
+                    if (e.params.data) {
+                        $.ajax({
+                            type: 'POST',
+                            contentType: 'application/json;charset=UTF-8',
+                            url: '/s/supplier/queryProvince',
+                            data: JSON.stringify({
+                                f_country_id: e.params.data.id
+                            }),
+                            async: false, // false代表只有在等待ajax执行完毕后才执行后续代码
+                            success: function (data) {
+                                if (data.result == 'success') {
+                                    $("#supplierForm select[name='f_province']").empty();
+                                    selectSupplierProvince = $("#supplierForm select[name='f_province']").select2({
+                                        data: data.results,
+                                        placeholder: '请选择省份',
+                                        language: "zh-CN"
+                                    });
+                                }
+                                if (data.result == 'error') {
+                                    toastr.error(data.error)
+                                }
+                            },
+                            error: function (e) {
+                                toastr.error(e.status);
+                                toastr.error(e.responseText);
+                            }
+                        });
+                    }
+                });
+                // 初始省份下拉列表
+                var selectSupplierProvince = $("#supplierForm select[name='f_province']").select2({
+                    placeholder: '请选择省份',
+                    language: "zh-CN"
+                });
+                selectSupplierProvince.on("select2:select", function (e) {
+                    if (e.params.data) {
+                        $.ajax({
+                            type: 'POST',
+                            contentType: 'application/json;charset=UTF-8',
+                            url: '/s/supplier/queryCity',
+                            data: JSON.stringify({
+                                f_province_id: e.params.data.id
+                            }),
+                            async: false, // false代表只有在等待ajax执行完毕后才执行后续代码
+                            success: function (data) {
+                                if (data.result == 'success') {
+                                    $("#supplierForm select[name='f_city']").empty();
+                                    selectSupplierCity = $("#supplierForm select[name='f_city']").select2({
+                                        data: data.results,
+                                        placeholder: '请选择城市',
+                                        language: "zh-CN"
+                                    });
+                                }
+                                if (data.result == 'error') {
+                                    toastr.error(data.error)
+                                }
+                            },
+                            error: function (e) {
+                                toastr.error(e.status);
+                                toastr.error(e.responseText);
+                            }
+                        });
+                    }
+                });
+                // 初始城市下拉列表
+                var selectSupplierCity = $("#supplierForm select[name='f_city']").select2({
+                    placeholder: '请选择城市',
+                    language: "zh-CN"
+                });
+                selectSupplierCity.on("select2:select", function (e) {
+                    if (e.params.data) {
+                        $.ajax({
+                            type: 'POST',
+                            contentType: 'application/json;charset=UTF-8',
+                            url: '/s/supplier/queryRegion',
+                            data: JSON.stringify({
+                                f_city_id: e.params.data.id
+                            }),
+                            async: false, // false代表只有在等待ajax执行完毕后才执行后续代码
+                            success: function (data) {
+                                if (data.result == 'success') {
+                                    $("#supplierForm select[name='f_region']").empty();
+                                    selectSupplierRegion = $("#supplierForm select[name='f_region']").select2({
+                                        data: data.results,
+                                        placeholder: '请选择地区',
+                                        language: "zh-CN"
+                                    });
+                                }
+                                if (data.result == 'error') {
+                                    toastr.error(data.error)
+                                }
+                            },
+                            error: function (e) {
+                                toastr.error(e.status);
+                                toastr.error(e.responseText);
+                            }
+                        });
+                    }
+                });
+                // 初始地区下拉列表
+                var selectSupplierRegion = $("#supplierForm select[name='f_region']").select2({
+                    placeholder: '请选择地区',
+                    language: "zh-CN"
+                });
+                // 初始企业类型下拉列表
+                var selectSupplierType = $("#supplierForm select[name='f_supplier_type']").select2({
+                    placeholder: '请选择企业类型',
+                    ajax: {
+                        type: 'POST',
+                        url: "/s/supplier/queryType",
+                        dataType: 'json',
+                        data: function (params) {
+                            return {
+                                search: params.term,
+                            };
+                        },
+                        delay: 800,
+                        cache: true
+                    },
+                    language: "zh-CN"
+                });
+                // 初始经营性质下拉列表
+                var selectSupplierRun = $("#supplierForm select[name='f_supplier_run']").select2({
+                    placeholder: '请选择经营性质',
+                    ajax: {
+                        type: 'POST',
+                        url: "/s/supplier/queryRun",
+                        dataType: 'json',
+                        data: function (params) {
+                            return {
+                                search: params.term,
+                            };
+                        },
+                        delay: 800,
+                        cache: true
+                    },
+                    language: "zh-CN"
+                });
+                // 初始交付方式下拉列表
+                var selectSupplierDelivery = $("#supplierForm select[name='f_supplier_delivery']").select2({
+                    placeholder: '请选择交付方式',
+                    ajax: {
+                        type: 'POST',
+                        url: "/s/supplier/queryDelivery",
+                        dataType: 'json',
+                        data: function (params) {
+                            return {
+                                search: params.term,
+                            };
+                        },
+                        delay: 800,
+                        cache: true
+                    },
+                    language: "zh-CN"
+                });
+                // 初始开票类型下拉列表
+                var selectSupplierInvoice = $("#supplierForm select[name='f_supplier_invoice']").select2({
+                    placeholder: '请选择开票类型',
+                    ajax: {
+                        type: 'POST',
+                        url: "/s/supplier/queryInvoice",
+                        dataType: 'json',
+                        data: function (params) {
+                            return {
+                                search: params.term,
+                            };
+                        },
+                        delay: 800,
+                        cache: true
+                    },
+                    language: "zh-CN"
+                });
+                // 初始行业类型下拉列表
+                var selectSupplierRankingsType = $("#supplierForm select[name='f_rankings_type']").select2({
+                    placeholder: '请选择行业类型',
+                    language: "zh-CN"
+                });
+                // 初始安全认证下拉列表
+                var selectSupplierSafetyCertification = $("#supplierForm select[name='f_safety_certification']").select2({
+                    placeholder: '请选择安全认证',
+                    language: "zh-CN"
+                });
+                // 初始安全认证类型下拉列表
+                var selectSupplierSafetyCertificationType = $("#supplierForm select[name='f_safety_certification_type']").select2({
+                    placeholder: '请选择安全认证类型',
+                    language: "zh-CN"
+                });
+                // 初始质量执行标准下拉列表
+                var selectSupplierQualityExecutiveStandard = $("#supplierForm select[name='f_quality_executive_standard']").select2({
+                    placeholder: '请选择质量执行标准',
+                    ajax: {
+                        type: 'POST',
+                        url: "/s/supplier/queryQuality",
+                        dataType: 'json',
+                        data: function (params) {
+                            return {
+                                search: params.term,
+                            };
+                        },
+                        delay: 800,
+                        cache: true
+                    },
+                    language: "zh-CN"
+                });
+                // 初始化成立日期
+                var daterangepickerSupplierDateEstablishment = $("#supplierForm input[name='f_date_of_establishment']").daterangepicker({
+                    minYear: 1949,
+                    singleDatePicker: true,
+                    showDropdowns: true,
+                    locale: DataTablesPublicLocale
+                }, function (start, end, label) {
+                });
+                // 修改操作时读取表单信息
+                if (op == 2) {
+                    $('body').mLoading('show');
+                    setTimeout(function () {
+                        var id = getQueryStringByName('id');
+                        $.ajax({
+                            type: 'POST',
+                            contentType: 'application/json',
+                            url: '/s/supplier/querySupplierInfo', // 调用地址
+                            data: JSON.stringify({
+                                id
+                            }),
+                            async: false,
+                            success: function (data) {
+                                $("#supplierForm input[name='f_key_id']").val(data.info.key);
+                                $("#supplierForm input[name='f_name']").val(data.info.f_name);
+                                $("#supplierForm input[name='f_inspect']").val(data.info.f_inspect);
+                                $("#supplierForm input[name='f_legal_person']").val(data.info.f_legal_person);
+                                $("#supplierForm input[name='f_business_license_no']").val(data.info.f_business_license_no);
+                                $("#supplierForm input[name='f_web']").val(data.info.f_web);
+                                var option = new Option(data.info.country_name, data.info.f_country, true, true);
+                                selectSupplierCountry.append(option);
+                                selectSupplierCountry.change();
+                                var option = new Option(data.info.province_name, data.info.f_province, true, true);
+                                selectSupplierProvince.append(option);
+                                selectSupplierProvince.change();
+                                var option = new Option(data.info.city_name, data.info.f_city, true, true);
+                                selectSupplierCity.append(option);
+                                selectSupplierCity.change();
+                                var option = new Option(data.info.region_name, data.info.f_region, true, true);
+                                selectSupplierRegion.append(option);
+                                selectSupplierRegion.change();
+                                $("#supplierForm input[name='f_address']").val(data.info.f_address);
+                                $("#supplierForm input[name='f_date_of_establishment']").val(data.info.f_date_of_establishment);
+                                $("#supplierForm input[name='f_registered_capital']").val(data.info.f_registered_capital);
+                                $("#supplierForm input[name='f_factory_area']").val(data.info.f_factory_area);
+                                $("#supplierForm input[name='f_shipping_address']").val(data.info.f_shipping_address);
+                                var option = new Option(data.info.supplier_type_name, data.info.f_supplier_type, true, true);
+                                selectSupplierType.append(option);
+                                selectSupplierType.change();
+                                var option = new Option(data.info.supplier_run_name, data.info.f_supplier_run, true, true);
+                                selectSupplierRun.append(option);
+                                selectSupplierRun.change();
+                                var option = new Option(data.info.supplier_delivery_name, data.info.f_supplier_delivery, true, true);
+                                selectSupplierDelivery.append(option);
+                                selectSupplierDelivery.change();
+                                $("#supplierForm input[name='f_business_contact']").val(data.info.f_business_contact);
+                                $("#supplierForm input[name='f_contact_number']").val(data.info.f_contact_number);
+                                $("#supplierForm input[name='f_zip_code']").val(data.info.f_zip_code);
+                                var option = new Option(data.info.supplier_invoice_name, data.info.f_supplier_invoice, true, true);
+                                selectSupplierInvoice.append(option);
+                                selectSupplierInvoice.change();
+                                $("#supplierForm select[name='f_rankings_type']").val(data.info.f_rankings_type).trigger('change');
+                                $("#supplierForm input[name='f_rankings']").val(data.info.f_rankings);
+                                $("#supplierForm select[name='f_safety_certification']").val(data.info.f_safety_certification).trigger('change');
+                                $("#supplierForm select[name='f_safety_certification_type']").val(data.info.f_safety_certification_type).trigger('change');
+                                var option = new Option(data.info.quality_executive_standard_name, data.info.f_quality_executive_standard, true, true);
+                                selectSupplierQualityExecutiveStandard.append(option);
+                                selectSupplierQualityExecutiveStandard.change();
+
+                                if(data.info.f_login == ""){
+                                    $("#f_islogin").val(2);//可以更改
+                                    $("#supplierForm input[name='f_login']").val(data.info.f_login);
+                                }else{
+                                    $("#f_islogin").val(1);//不可以更改
+                                    $("#supplierForm input[name='f_login']").val(data.info.f_login);
+                                    $("#supplierForm input[name='f_login']").attr('readonly', 'readonly');
+                                }
+                                $("#supplierForm input[name='f_pass']").val(data.info.f_pass);
+
+
+
+
+                            },
+                            error: function (e) {
+                                toastr.error(e.status);
+                                toastr.error(e.responseText);
+                            }
+                        });
+                        $('body').mLoading('hide');
+                    }, 200);
+                }
+                // 检验数据
+                $('#supplierForm').validate({
+                    rules: {
+                        f_name: {required: true},
+                        f_inspect: {required: true},
+                        f_login: {required: true},
+                        // f_legal_person: { required: true },
+                        // f_business_license_no: { required: true },
+                        // f_web: { required: true },
+                        // f_country: { required: true },
+                        // f_province: { required: true },
+                        // f_city: { required: true },
+                        // f_region: { required: true },
+                        // f_address: { required: true },
+                        // f_date_of_establishment: { required: true },
+                        // f_registered_capital: { required: true },
+                        // f_factory_area: { required: true },
+                        // f_shipping_address: { required: true },
+                        // f_supplier_type: { required: true },
+                        // f_supplier_run: { required: true },
+                        // f_supplier_delivery: { required: true },
+                        // f_business_contact: { required: true },
+                        // f_contact_number: { required: true },
+                        // f_zip_code: { required: true },
+                        // f_supplier_invoice: { required: true },
+                        // f_rankings_type: { required: true },
+                        // f_rankings: { required: true },
+                        // f_safety_certification: { required: true },
+                        // f_safety_certification_type: { required: true },
+                        // f_quality_executive_standard: { required: true }
+                    },
+                    messages: {
+                        f_name: {required: '*请输入公司名称'},
+                        f_inspect: {required: '*请输入公司简称'},
+						f_login: {required: '*请输入供应商登录名称'},
+                        // f_legal_person: { required: '*请输入法人代表' },
+                        // f_business_license_no: { required: '*请输入营业执照号' },
+                        // f_web: { required: '*请输入公司网址' },
+                        // f_country: { required: '*请选择国家' },
+                        // f_province: { required: '*请选择省份' },
+                        // f_city: { required: '*请选择城市' },
+                        // f_region: { required: '*请选择地区' },
+                        // f_address: { required: '*请输入注册地址' },
+                        // f_date_of_establishment: { required: '*请输入成立日期' },
+                        // f_registered_capital: { required: '*请输入注册资金' },
+                        // f_factory_area: { required: '*请输入工厂面积' },
+                        // f_shipping_address: { required: '*请输入出货地址' },
+                        // f_supplier_type: { required: '*请选择企业类型' },
+                        // f_supplier_run: { required: '*请选择经营性质' },
+                        // f_supplier_delivery: { required: '*请选择交付方式' },
+                        // f_business_contact: { required: '*请输入业务联系人' },
+                        // f_contact_number: { required: '*请输入联系电话' },
+                        // f_zip_code: { required: '*请输入邮编' },
+                        // f_supplier_invoice: { required: '*请选择开票类型' },
+                        // f_rankings_type: { required: '*请选择行业类型' },
+                        // f_rankings: { required: '*请输入行业排名' },
+                        // f_safety_certification: { required: '*请选择' },
+                        // f_safety_certification_type: { required: '*请选择' },
+                        // f_quality_executive_standard: { required: '*请选择质量执行标准' }
+                    },
+                    onfocusout: false, // 是否在获取焦点时验证
+                    onkeyup: false, // 是否在敲击键盘时验证
+                    focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+                    focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+                    success: 'valid',
+                    submitHandler: function () {
+                        // 获取参数
+                        var data = form2Json('supplierForm');
+                        // 执行
+                        if (op == 1) { // 添加操作
+                            $.ajax({
+                                type: 'POST',
+                                contentType: 'application/json',
+                                url: '/s/supplier/addSupplier', // 调用地址
+                                data: JSON.stringify(data),
+                                async: false,
+                                success: function (data) {
+                                    if (data.result == 'success') {
+                                        parent.$('#supplierTable').DataTable().ajax.reload(null, false);
+                                        parent.toastr.success('添加成功！');
+                                        layer_close();
+                                    } else if (data.result == 'error') {
+                                        toastr.error(data.error);
+                                    }
+                                },
+                                error: function (e) {
+                                    toastr.error(e.status);
+                                    toastr.error(e.responseText);
+                                }
+                            });
+                        } else {
+                            $.ajax({
+                                type: 'POST',
+                                contentType: 'application/json',
+                                url: '/s/supplier/updateSupplier', // 调用地址
+                                data: JSON.stringify(data),
+                                async: false,
+                                success: function (data) {
+                                    if (data.result == 'success') {
+                                        parent.$('#supplierTable').DataTable().ajax.reload(null, false);
+                                        parent.toastr.success('修改成功！');
+                                        layer_close();
+                                    } else if (data.result == 'error') {
+                                        toastr.error(data.error);
+                                    }
+                                },
+                                error: function (e) {
+                                    toastr.error(e.status);
+                                    toastr.error(e.responseText);
+                                }
+                            });
+                        }
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>

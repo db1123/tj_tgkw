@@ -1,0 +1,344 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type="login";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/verify/css/verify.css" />
+    <style type="text/css">
+        label.error { top: 10px; }
+        .mloading-icon{margin-bottom: -18px;}
+    </style><!--/_only 独立样式 -->
+  
+    <!-- 引入外部资源 -->
+    <script src="/nui-ad/login/3.4.17"></script>
+    <link href="/nui-ad/login/fonts/font-awesome.min.css" rel="stylesheet">
+    <script src="/nui-ad/login/chart.umd.min.js"></script>
+  
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0F3460', // 深色调主色，体现严谨专业
+                        secondary: '#1A73E8', // 辅助蓝色
+                        accent: '#E94560', // 强调色
+                        neutral: '#F8F9FA',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .bg-gradient-academic {
+                background: linear-gradient(135deg, #0F3460 0%, #16213E 100%);
+            }
+            .text-balance {
+                text-wrap: balance;
+            }
+            .input-focus {
+                @apply focus:border-secondary focus:ring-2 focus:ring-secondary/20 focus:outline-none transition-all duration-300;
+            }
+            .btn-hover {
+                @apply hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-300;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans text-gray-800">
+    <!-- 主容器 - 左右结构 -->
+    <div class="w-full max-w-6xl mx-auto p-4">
+        <!-- 卡片容器 -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col md:flex-row mt-8">
+            <!-- 左侧：平台简介 - 深色调体现严谨性 -->
+            <div class="bg-gradient-academic text-white p-8 md:p-12 md:w-1/2 flex flex-col justify-center">
+                <div class="mb-8">
+                
+                 	<img src="../images/renai_logo.png" width="160px;">
+                    <div class="flex items-center mb-6">
+                       <!--  <div class="bg-white/10 p-3 rounded-lg mr-4">
+                            <i class="fa fa-database text-2xl"></i>
+                        </div> -->
+                      
+                        <h1 class="text-2xl md:text-3xl font-bold" id="header">教学多元数据管理系统平台</h1>
+                    </div>
+                    <p class="text-white/80">Teaching Multi-data Management System Platform</p>
+                </div>
+                
+                <div class="space-y-6 text-balance">
+                    <div class="flex items-start">
+                        <div class="bg-white/10 p-2 rounded-full mt-0.5 mr-4 flex-shrink-0">
+                            <i class="fa fa-check text-sm"></i>
+                        </div>
+                        <p class="text-white/90">实现优化集成专业管理</p>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-white/10 p-2 rounded-full mt-0.5 mr-4 flex-shrink-0">
+                            <i class="fa fa-check text-sm"></i>
+                        </div>
+                        <p class="text-white/90">构建多专业跨领域知识图谱</p>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-white/10 p-2 rounded-full mt-0.5 mr-4 flex-shrink-0">
+                            <i class="fa fa-check text-sm"></i>
+                        </div>
+                        <p class="text-white/90">学院平台课程提质增效</p>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-white/10 p-2 rounded-full mt-0.5 mr-4 flex-shrink-0">
+                            <i class="fa fa-check text-sm"></i>
+                        </div>
+                        <p class="text-white/90">AI赋能复合应用型人才培养</p>
+                    </div>
+                </div>
+                
+                <div id="footer" class="mt-12 pt-6 border-t border-white/10">
+                    <p class="text-sm text-white/70">© 2025 天津仁爱学院 数智传媒与设计艺术学院-教学多元数据管理系统平台</p>
+                </div>
+            </div>
+            
+            <!-- 右侧：登录系统 -->
+            <div class="p-8 md:p-12 md:w-1/2 flex flex-col">
+                <div class="mb-8 md:mb-12">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">用户登录</h2>
+                    <p class="text-gray-500">请输入您的账号信息登录系统</p>
+                </div>
+                
+                <form id="LoginForm" method="post" class="flex-1">
+                    <div class="mb-6">
+                        <label for="FLogin" class="block text-gray-700 text-sm font-medium mb-2">教工号</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                <i class="fa fa-user text-xl"></i>
+                            </span>
+                            <input name="FLogin" type="text" placeholder="请输入教师工号" 
+                                   class="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 input-focus text-base">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label for="FPass" class="block text-gray-700 text-sm font-medium mb-2">密码</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                <i class="fa fa-lock text-xl"></i>
+                            </span>
+                            <input name="FPass" type="password" placeholder="请输入密码" 
+                                   class="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 input-focus text-base">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <div id="checkCode"></div>
+                    </div>
+                <!--     
+                    <div class="mb-8">
+                        <label for="online" class="inline-flex items-center text-gray-700 font-medium">
+                            <input type="checkbox" name="online" id="online" value="" 
+                                   class="w-4 h-4 text-secondary focus:ring-secondary border-gray-300 rounded">
+                            <span class="ml-2">使我保持登录状态</span>
+                        </label>
+                    </div> -->
+                    
+                    <div class="space-y-3">
+                        <button type="submit" 
+                                class="w-full bg-primary text-white font-medium py-3 px-4 rounded-lg btn-hover">
+                            <i class="fa fa-sign-in mr-2"></i> 登录
+                        </button>
+						<a href="register.html" class="w-full bg-gray-100 text-gray-700 font-medium py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors inline-block text-center">
+						    <i class="fa fa-refresh mr-2"></i> 注册新用户
+						</a>
+						 <button type="button" onclick="window.location.href='/module/changepw.html'"
+                             style="float: right;color: dodgerblue;font-style: italic;" >
+                            <i class="fa fa-sign-in mr-2"></i> 修改密码
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="/plugins/verify/js/verify.min.js"></script>
+    <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+    <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+    <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+   <!--  <script src="/nui-ad/login/jquery.min.js"></script> -->
+    <script src="/nui-ad/login/toastr.min.js"></script>
+    <link href="/nui-ad/login/toastr.min.css" rel="stylesheet">
+    
+    <script type="text/javascript">
+        // 初始化参数
+        document.title = WEB_TITLE;
+        document.getElementById("footer").innerHTML =  FOOTER_TEXT;
+        document.getElementById("header").innerHTML = WEB_TITLE;
+
+        // 初始化变量
+        var code = getRandomNum(1000000000, 9999999999);
+        var oCode = null;
+        
+        // 生成随机数的辅助函数
+        function getRandomNum(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        
+        // 辅助函数：将表单数据转换为JSON对象
+        function form2Json(formId) {
+            var jsonData = {};
+            var formArray = $("#" + formId).serializeArray();
+            $.each(formArray, function() {
+                if (jsonData[this.name]) {
+                    if (!jsonData[this.name].push) {
+                        jsonData[this.name] = [jsonData[this.name]];
+                    }
+                    jsonData[this.name].push(this.value || '');
+                } else {
+                    jsonData[this.name] = this.value || '';
+                }
+            });
+            return jsonData;
+        }
+
+        // 初始化提示框
+        toastr.options = {
+           /*  "positionClass": "toast-center-center",
+            "timeOut": "2000",
+            "preventDuplicates": true,
+            "progressBar": true */
+		    	"closeButton": "false", // 是否显示关闭按钮（提示框右上角关闭按钮）
+	            "debug": "false", // 是否为调试
+	            "progressBar": "true", // 是否显示进度条（设置关闭的超时时间进度条）
+	            "positionClass": "toast-top-center", // 消息框在页面显示的位置
+	            "onclick": "null",// 点击消息框自定义事件
+	            "showDuration": "300", // 显示动作时间
+	            "hideDuration": "1000", // 隐藏动作时间
+	            "timeOut": "3000",// 自动关闭超时时间
+	            "extendedTimeOut": "1000", // 设置当你鼠标滑入后的timeout，该timeout会更新关闭所需的timeout
+	            "showEasing": "swing",
+	            "hideEasing": "linear",
+	            "showMethod": "fadeIn", // 显示的方式
+	            "hideMethod": "fadeOut", //隐藏的方式
+        };
+
+        // 业务代码
+        $(function(){
+            // 登录表单-检验数据
+            $('#LoginForm').validate({
+                rules: {
+                    FPass: {
+                        required: true,
+                        minlength: 6
+                    },
+                    FLogin: {
+                        required: true
+                    }
+                },
+                messages: {
+                    FLogin: {
+                        required: "请输入教工号"
+                    },
+                    FPass: {
+                        required: "请输入密码",
+                        minlength: "密码长度不能少于6个字符"
+                    }
+                },
+                errorElement: "div",
+                errorPlacement: function(error, element) {
+                    // 错误信息放置在输入框下方
+                    error.addClass("text-red-500 text-xs mt-1");
+                    error.insertAfter(element);
+                },
+                highlight: function(element) {
+                    $(element).addClass("border-red-500");
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass("border-red-500");
+                },
+                onfocusout: false, // 是否在获取焦点时验证
+                onkeyup: false, // 是否在敲击键盘时验证
+                focusInvalid: false, // 提交表单后，（第一个）未通过验证的表单获得焦点
+                focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+                success: 'valid',
+                submitHandler: function(){
+                    if (oCode == null) {
+                        toastr.warning('请先完成验证');
+                    } else {
+                        $("body").mLoading("show");
+                        var formData = form2Json('LoginForm');
+                        formData['code'] = code;
+                        formData['oCode'] = oCode;
+                        $.ajax({
+                            type: 'POST',
+                            contentType: 'application/json',
+                            url: '/s/entry/login', // 调用地址
+                            data: JSON.stringify(formData),
+                            success: function(data) {
+                                if (data.result == "success") {
+                                    localStorage.setItem('simulation_dmsnid', data.simulation_dmsnid);
+                                    window.location.href= '/module/main.html';
+                                } else {
+                                    toastr.error(data.result);
+                                    $("body").mLoading("hide");
+                                }
+                            },
+                            error: function(e) {
+                                toastr.error(e.status);
+                                toastr.error(e.responseText);
+                                $("body").mLoading("hide");
+                            }
+                        });
+                    }
+                }
+            });
+            // 验证码
+            $('#checkCode').slideVerify({
+                type: 1, // 类型
+                vOffset: 5, // 误差量，根据需求自行调整
+                barSize: {
+                    width: '100%',
+                    height: '40px',
+                },
+                ready: function() {},
+                success: function() {
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/entry/oCode', // 调用地址
+                        async: false,
+                        data: JSON.stringify({
+                            code
+                        }),
+                        success: function(data) {
+                            if (data.result == "success") {
+                                oCode = data.oCode;
+                            } else {
+                                toastr.error(data.result);
+                            }
+                        },
+                        error: function(e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                },
+                error: function() {
+                    alert('验证失败！');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

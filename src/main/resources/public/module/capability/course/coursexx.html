@@ -1,0 +1,439 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+        <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+        <!--_only 独立样式 -->
+        <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+        <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+        <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+        <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+        <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+        <!--/_only 独立样式 -->
+    </head>
+    <style>
+        /* CSS 样式 */
+        .custom-checkbox {
+            display: block;
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 18px;
+            user-select: none;
+        }
+
+        .custom-checkbox-input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .custom-checkbox-checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 25px;
+            width: 25px;
+            background-color: #eee;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .custom-checkbox:hover .custom-checkbox-input ~ .custom-checkbox-checkmark {
+            background-color: #ccc;
+        }
+
+        .custom-checkbox-input:checked ~ .custom-checkbox-checkmark {
+            background-color: #2196F3;
+        }
+
+        .custom-checkbox-checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+            left: 9px;
+            top: 5px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg);
+        }
+
+        .custom-checkbox-input:checked ~ .custom-checkbox-checkmark:after {
+            display: block;
+        }
+    </style>
+    <body>
+        <div class="page-container" style="padding: 2px;">
+            <div class="f-r text-l" style="display:none;" id="editxxdiv">
+                <button type="button" class="btn btn-default size-S my-btn" id="editxx"  ><i
+                        class=" fa fa-edit"></i> 编辑信息
+                </button>
+            </div>
+
+            <div class="f-l" style="width: 100%; margin-top: 3px;">
+                <article class="page-container">
+                    <form action="" method="post" class="form form-horizontal" id="courseForm">
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" ><span class="c-red">*</span>课程编号：</label>
+                            <div class="formControls col-xs-2 col-sm-2">
+                                <label class="form-label" id="FNo" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-1 col-sm-1" style="font-weight: bold;" ><span class="c-red">*</span>课程名称：</label>
+                            <div class="formControls col-xs-2 col-sm-2">
+                                <label class="form-label" id="FName" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-1 col-sm-1" style="font-weight: bold;" >英文名称：</label>
+                            <div class="formControls col-xs-2 col-sm-2">
+                                <label class="form-label" id="FYWName" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" ><span class="c-red">*</span>课程类别：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FType" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" ><span class="c-red">*</span>课程性质：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FCNature" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" ><span class="c-red">*</span>周学时：</label>
+                            <div class="formControls col-xs-2 col-sm-2">
+                                <label class="form-label" id="FWeeklyStudyHours" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-1 col-sm-1" style="font-weight: bold;" ><span class="c-red">*</span>理论学时：</label>
+                            <div class="formControls col-xs-2 col-sm-2">
+                                <label class="form-label" id="FTheoreticalStudyHours" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-1 col-sm-1" style="font-weight: bold;" ><span class="c-red">*</span>实践学时：</label>
+                            <div class="formControls col-xs-2 col-sm-2">
+                                <label class="form-label" id="FPracticalStudyHours" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" ><span class="c-red">*</span>总学时：</label>
+                            <div class="formControls col-xs-2 col-sm-2">
+                                <label class="form-label" id="FTotalHours" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-1 col-sm-1" style="font-weight: bold;" ><span class="c-red">*</span>建议学分：</label>
+                            <div class="formControls col-xs-2 col-sm-2">
+                                <label class="form-label" id="FCredits" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-1 col-sm-1" style="font-weight: bold;" >课程类型：</label>
+                            <div class="formControls col-xs-2 col-sm-2">
+                                <label class="form-label" id="FJCZYK" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >建议学年：</label>
+                            <div class="formControls col-xs-2 col-sm-2">
+                                <label class="form-label" id="FJYXNXQ" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-1 col-sm-1" style="font-weight: bold;" >建议学期：</label>
+                            <div class="formControls col-xs-2 col-sm-2">
+                                <label class="form-label" id="FJYXQ" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-1 col-sm-1" style="font-weight: bold;" >开课学期：</label>
+                            <div class="formControls col-xs-2 col-sm-2">
+                                <label class="form-label" id="FKKXQ" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >开课秋季：</label>
+                            <div class="formControls col-xs-2 col-sm-2">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" class="custom-checkbox-input" name="FKKQJ" id="FKKQJ" disabled="disabled">
+                                    <span class="custom-checkbox-checkmark"></span>
+                                </label>
+                            </div>
+                            <label class="form-label col-xs-1 col-sm-1" style="font-weight: bold;" >开课春季：</label>
+                            <div class="formControls col-xs-2 col-sm-2">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" class="custom-checkbox-input" name="FKKCJ" id="FKKCJ" disabled="disabled">
+                                    <span class="custom-checkbox-checkmark"></span>
+                                </label>
+                            </div>
+                            <label class="form-label col-xs-1 col-sm-1" style="font-weight: bold;" >短学期：</label>
+                            <div class="formControls col-xs-2 col-sm-2">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" class="custom-checkbox-input" name="FDXQ" id="FDXQ" disabled="disabled">
+                                    <span class="custom-checkbox-checkmark"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >实践周数：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FSJZS" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >是否停课：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FIstk" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >合格分数：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FPassScore" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >满分：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FFullScore" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >适用专业：</label>
+                            <div class="formControls col-xs-8 col-sm-10">
+                                <label class="form-label" id="FMajor" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >先修课程：</label>
+                            <div class="formControls col-xs-8 col-sm-10">
+                                <label class="form-label" id="FPrerequisites" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >教学基本要求：</label>
+                            <div class="formControls col-xs-8 col-sm-10">
+                                <label class="form-label" id="FTeachingRequirements" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >课程简介：</label>
+                            <div class="formControls col-xs-8 col-sm-10">
+                                <label class="form-label" id="FCon" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >开课单位：</label>
+                            <div class="formControls col-xs-8 col-sm-10">
+                                <label class="form-label" id="FKKDW" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >版本号：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FEdition" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >是否有效：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FValid" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+                    </form>
+                </article>
+            </div>
+        </div>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+        <script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+        <script src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+        <script type="text/javascript">
+            var id = getQueryStringByName('id');
+            var fstate = getQueryStringByName('fstate');
+            var ftype = getQueryStringByName('ftype');
+            var showtype = getQueryStringByName('showtype');
+            var isrole ;//是否是负责人
+            // 业务代码
+            $(function () {
+                if(ftype ==null || ftype == ''){
+                    $("#editxxdiv").attr("style", "display:none;"); //显示
+                }else{
+                    if(showtype == 1){
+                        if(ftype ==1) {
+                            $("#editxxdiv").attr("style", "display:block;"); //显示
+                        }else if(ftype ==2 ){
+                            $("#editxxdiv").attr("style", "display:none;");  //隐藏
+                        }
+                    }else{
+                        $("#editxxdiv").attr("style", "display:none;");  //隐藏
+                    }
+
+                }
+                showxx();
+
+                $("#editxx").removeClass('disabled'); //移除多个样式
+                // 编辑信息点击事件
+                $('#editxx').on('click', function () {
+                    var index = parent.layer.open({
+                        type: 2,
+                        area: ['1000px', '700px'],
+                        fix: false, //不固定
+                        shade: 0.4,
+                        title: '修改课程信息',
+                        content: 'courseedit.html?op=2&id=' + id+'&ftype=2'
+                        ,end : function() {
+                            showxx();
+                        }
+                    });
+                    parent.layer.full(index);
+                });
+
+            });
+
+            function showxx() {
+                //显示基本信息
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    url: '/s/course/querycourseInfo', // 调用地址
+                    data: JSON.stringify({
+                        id: id
+                    }),
+                    async: false,
+                    success: function (data) {
+                        $('#FName').text(data.info.FName);
+                        $('#FNo').text(data.info.FNo);
+                        $('#FCon').text(data.info.FCon);
+                        $('#FPassScore').text(data.info.FPassScore);
+                        $('#FFullScore').text(data.info.FFullScore);
+                        $('#FKKXQ').text(data.info.FKKXQ);
+
+
+                        $('#FYWName').text(data.info.FYWName);
+                        $('#FSJZS').text(data.info.FSJZS);
+                        if(data.info.FIstk = 1){
+                            $('#FIstk').text("否");
+                        }else if(data.info.FIstk = 1){
+                            $('#FIstk').text("是");
+                        }else{
+                            $('#FIstk').text("");
+                        }
+
+
+                        $('#FAbilityID').text(data.info.FAbilityName);
+                        $('#FAbilityLevelID').text(data.info.FAbilityLevelName);
+
+                        $('#FTotalHours').text(data.info.FTotalHours);
+                        $('#FCredits').text(data.info.FCredits);
+
+                        $('#FTeachingRequirements').text(data.info.FTeachingRequirements);
+                        $('#FKeyID').text(data.info.key);
+
+                        $("#FCNature").text(data.info.FCNatureName);
+                        $("#FType").text(data.info.FTypeName);
+
+
+                        $('#FWeeklyStudyHours').text(data.info.FWeeklyStudyHours);
+                        $('#FTheoreticalStudyHours').text(data.info.FTheoreticalStudyHours);
+                        $('#FPracticalStudyHours').text(data.info.FPracticalStudyHours);
+
+                        if(data.info.FKKQJ==1){
+                            $('#FKKQJ').prop('checked', true);
+                        }else{
+                            $('#FKKQJ').prop('checked', false);
+                        }
+
+                        if(data.info.FKKCJ==1){
+                            $('#FKKCJ').prop('checked', true);
+                        }else{
+                            $('#FKKCJ').prop('checked', false);
+                        }
+
+                        if(data.info.FDXQ==1){
+                            $('#FDXQ').prop('checked', true);
+                        }else{
+                            $('#FDXQ').prop('checked', false);
+                        }
+                        $('#FJYXNXQ').text(data.info.FJYXNXQ);
+
+                        $('#FEdition').text(data.info.FEdition);
+                        if(data.info.FValid == 1){
+                            $('#FValid').text("有效");
+                        }else if(data.info.FValid == 0){
+                            $('#FValid').text("无效");
+                        }else{
+                            $('#FValid').text("");
+                        }
+
+                        if(data.info.FJYXNXQ == '1'){
+                            $('#FJYXNXQ').text("1年");
+                        }else  if(data.info.FJYXNXQ == '2'){
+                            $('#FJYXNXQ').text("2年");
+                        }else  if(data.info.FJYXNXQ == '3'){
+                            $('#FJYXNXQ').text("3年");
+                        }else  if(data.info.FJYXNXQ == '4'){
+                            $('#FJYXNXQ').text("4年");
+                        }else {
+                            $('#FJYXNXQ').text(data.info.FJYXNXQ);
+                        }
+
+                        $('#FJYXQ').text(data.info.FJYXQ);
+
+                        if(data.info.FJCZYK  ==1 ){
+                            $('#FJCZYK').text("基础课");
+                        }else if(data.info.FJCZYK  == 2 ){
+                            $('#FJCZYK').text("专业课");
+                        }else{
+                            $('#FJCZYK').text("");
+                        }
+                        let majorlist = '';
+                        if(data.info.majorlist){
+                            $.each(data.info.majorlist, function(index, item) {
+                                majorlist = majorlist +  item.name + ",";
+                            });
+                        }
+                        if (majorlist.length > 0){
+                            majorlist = majorlist.substring(0,majorlist.length-1);
+                        }
+
+                        let prerequisitelist = '';
+                        if(data.info.prerequisitelist){
+                            $.each(data.info.prerequisitelist, function(index, item) {
+                                prerequisitelist = prerequisitelist +  item.name + ",";
+                            });
+                        }
+
+
+                        if (prerequisitelist.length > 0){
+                            prerequisitelist = prerequisitelist.substring(0,prerequisitelist.length-1);
+                        }
+
+                        let kkdwlist = '';
+                        if(data.info.kkdwlist){
+                            $.each(data.info.kkdwlist, function(index, item) {
+                                kkdwlist = kkdwlist +  item.name + ",";
+                            });
+                        }
+
+
+                        if (kkdwlist.length > 0){
+                            kkdwlist = kkdwlist.substring(0,kkdwlist.length-1);
+                        }
+
+                        // $('#FMajor').text(data.info.FMajor);
+                        // $('#FPrerequisites').text(data.info.FPrerequisites);
+                        // $('#FKKDW').text(data.info.FKKDWName);
+                        $('#FMajor').text(majorlist);
+                        $('#FPrerequisites').text(prerequisitelist);
+                        $('#FKKDW').text(kkdwlist);
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+            }
+        </script>
+    </body>
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+
+    <script type="text/javascript" src="/module/capability/ability/huaxiang/js/jQuery.Huifold.js"></script>
+</head>
+<style type="text/css">
+    .popup {
+        display: none;
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 27%;
+        background-color: #fff;
+        box-shadow: -2px 0px 10px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        overflow-y: auto;
+        padding: 20px;
+    }
+
+    .popup.active {
+        display: block;
+    }
+
+    .close-btn {
+        float: right;
+        font-size: 24px;
+        font-weight: bold;
+        text-decoration: none;
+        color: #333;
+    }
+
+    .close-btn:hover {
+        color: #000;
+    }
+
+    .rowtop{
+        margin-top: 10px;
+    }
+</style>
+<style>
+    /* 为树形结构容器添加样式 */
+    .tree-container ul {
+        list-style-type: none;
+        padding-left: 20px;
+    }
+    .tree-container li {
+        cursor: pointer;
+        position: relative;
+    }
+    .tree-container li::before {
+        /*content: '▶';*/
+        content:'▼';
+        position: absolute;
+        left: -15px;
+        top: 0;
+        font-size: 12px;
+        transition: transform 0.2s;
+    }
+    .tree-container li.open::before {
+        transform: rotate(-90deg);
+    }
+    .tree-container ul ul {
+        display: none;
+    }
+    .tree-container ul ul.open {
+        display: block;
+    }
+    /* 隐藏没有子节点的箭头 */
+    .tree-container li.no-child::before {
+        content: '';
+    }
+</style>
+<body>
+<div class="page-container">
+    <div id="huaxiang">
+
+    </div>
+    <div id="right-popup" class="popup">
+        <a href="" id="close-popup-btn" class="close-btn">&times;</a>
+        <h4>能力详情</h4>
+        <div class="row cl rowtop">
+            <label class="form-label col-xs-5 col-sm-5" style="font-weight: bold;"><span
+                    style="color: #0e90d2;">【能力类型】：</span></label>
+            <div class="formControls col-xs-7 col-sm-7">
+                <label class="form-label" id="FTypeName" style="width: 100%;text-align: left;"></label>
+            </div>
+        </div>
+        <div class="row cl rowtop">
+            <label class="form-label col-xs-5 col-sm-5" style="font-weight: bold;"><span
+                    style="color: #0e90d2;">【能力名称】：</span></label>
+            <div class="formControls col-xs-7 col-sm-7">
+                <label class="form-label" id="FName"
+                       style="width: 100%;text-align: left;"></label>
+            </div>
+        </div>
+        <div class="row cl rowtop">
+            <label class="form-label col-xs-5 col-sm-5" style="font-weight: bold;"><span
+                    style="color: #0e90d2;">【能力描述】：</span></label>
+            <div class="formControls col-xs-7 col-sm-7">
+                <label class="form-label" id="FNote"
+                       style="width: 100%;text-align: left;"></label>
+            </div>
+        </div>
+<!--        <div>-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;</div>-->
+        <h4>能力树</h4>
+<!--        <div id="nenglidengji">-->
+
+<!--        </div>-->
+        <div id="tree1" class="tree-container"></div>
+    </div>
+</div>
+<script type="text/javascript">
+    var ftype = getQueryStringByName('ftype');//1=全部 2=个人
+    var userid;
+    // 业务代码
+    $(function () {
+        if (ftype == 2) {
+            userid = getQueryStringByName('userid');
+        }
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/abilitytree/getabilityhuaxiang', // 调用地址
+            data: JSON.stringify({
+                ftype: ftype,
+                userid: userid
+            }),
+            async: false,
+            success: function (data) {
+                var html = "";
+                var html1 = "";
+                var huaxiang = $("#huaxiang");
+                huaxiang.empty();
+                html = `<ul id="Huifold1" class="Huifold">`;
+                for (var i = 0; i < data.type_Array.length; i++) {
+                    html1 += `<li class="item">`;
+                    html1 += `    <h4>` + data.type_Array[i].FName + `<b>+</b></h4>`;
+                    html1 += `    <div class="info"> `;
+                    html1 += `        <div class="Hui-tags-has">`;
+                    for (var j = 0; j < data.ability_Array.length; j++) {
+                        if (data.ability_Array[j].i == i) {
+                            html1 += `        <span onclick="selectinfo(\'`+data.ability_Array[j].key+`\')">` + data.ability_Array[j].FName + `</span>`;
+                        } else {
+                            continue;
+                        }
+                    }
+                    html1 += `        </div>`;
+                    html1 += `    </div>`;
+                    html1 += `</li>`;
+                }
+                html += html1 + `</ul>`;
+                huaxiang.append(html);
+
+                $("#Huifold1").Huifold({
+                    item: '.item',
+                    titCell: 'h4',
+                    mainCell: '.info',
+                    type: 3,
+                    trigger: 'click',
+                    className: "selected",
+                    speed: "first",
+                    openKeys: data.openKeys //[0, 1, 2] data.openKeys
+                });
+
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+    });
+
+    function selectinfo(fkeyid) {
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/abilitytree/queryabilityConditionAssessmentMethodInfohua', // 调用地址
+            data: JSON.stringify({
+                id: fkeyid
+            }),
+            async: false,
+            success: function (data) {
+                $("#FName").text(data.info.FName);
+                $("#FNote").text(data.info.FNote);
+                $("#FTypeName").text(data.info.FTypeName);
+
+                // if (data.info.abilityLevel.length > 0) {
+                //     var html1 ="";
+                //     for (var i = 0; i < data.info.abilityLevel.length; i++) {
+                //         html1 +=` <div class="row cl">
+                //                     <label class="form-label col-xs-3 col-sm-3" style="font-weight: bold;"><span
+                //                         class="c-red">*</span>名称：</label>
+                //                     <div class="formControls col-xs-3 col-sm-3">
+                //                         <label class="form-label" style="width: 100%;text-align: left;">`+data.info.abilityLevel[i].FName+`</label>
+                //                     </div>
+                //                     <label class="form-label col-xs-3 col-sm-3" style="font-weight: bold;"><span
+                //                         class="c-red">*</span>难度积分：</label>
+                //                     <div class="formControls col-xs-3 col-sm-3">
+                //                         <label class="form-label" style="width: 100%;text-align: left;">`+data.info.abilityLevel[i].FPoints+`</label>
+                //                     </div>
+                //                 </div>`
+                //         html1 +=`<div class="row cl rowtop">
+                //                     <label class="form-label col-xs-4 col-sm-3" style="font-weight: bold;"><span
+                //                             class="c-red">*</span>描述：</label>
+                //                     <div class="formControls col-xs-8 col-sm-9">
+                //                         <label class="form-label" id="FNote"
+                //                                style="width: 100%;text-align: left;">`+data.info.abilityLevel[i].FNote+`</label>
+                //                     </div>
+                //                 </div>`
+                //         html1 +=`<div style="height: 1px; background-color: #000; margin: 20px 0;"></div>`;
+                //     }
+                //     var nenglidengji = $("#nenglidengji");
+                //     nenglidengji.empty();
+                //     nenglidengji.append(html1);
+                // }
+
+                // 树 1 的数据
+                const nodes1 = data.info.abilityLevel;
+
+
+                // 构建并渲染树 1
+                const tree1 = buildTree(nodes1);
+                const treeContainer1 = document.getElementById('tree1');
+                treeContainer1.innerHTML = `<ul>${renderTree(tree1)}</ul>`;
+                // 添加点击事件
+                document.querySelectorAll('.tree-container li').forEach(li => {
+                    li.addEventListener('click', function (event) {
+                        event.stopPropagation();
+                        const ul = this.querySelector('ul');
+                        if (ul) {
+                            ul.classList.toggle('open');
+                            this.classList.toggle('open');
+                        }
+                    });
+                });
+                var popup = document.getElementById('right-popup');
+                popup.classList.add('active');
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var closePopupBtn = document.getElementById('close-popup-btn');
+        var popup = document.getElementById('right-popup');
+
+        closePopupBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            popup.classList.remove('active');
+        });
+    });
+
+    // 定义树节点类
+    class TreeNode {
+        constructor(id, fid, value,FPoints,FNote,level,FConditionType,FConditionValue,FConditionScore,FMethodWeight,FScoreMin,FScoreMax) {
+            this.id = id; // 节点的唯一标识
+            this.fid = fid; // 父节点的 id
+            this.value = value; // 节点的值
+            this.FPoints = FPoints; // 节点的值
+            this.FNote = FNote; // 节点的值
+            this.level = level; // 节点的值
+            this.FConditionType = FConditionType; // 节点的值
+            this.FConditionValue = FConditionValue; // 节点的值
+            this.FConditionScore = FConditionScore; // 节点的值
+            this.FMethodWeight = FMethodWeight; // 节点的值
+            this.FScoreMin = FScoreMin; // 节点的值
+            this.FScoreMax = FScoreMax; // 节点的值
+            this.children = []; // 子节点数组
+        }
+
+        addChild(node) {
+            this.children.push(node);
+        }
+    }
+
+    // 构建树的函数
+    function buildTree(nodes, rootId = 0) {
+
+        const treeMap = {}; // 用于存储所有节点的映射
+        let root = null; // 根节点
+
+        // 将所有节点存储到 treeMap 中
+        nodes.forEach(node => {
+            treeMap[node.id] = new TreeNode(node.id, node.fid, node.value,node.FPoints,node.FNote,node.level,node.FConditionType,node.FConditionValue,node.FConditionScore,node.FMethodWeight,node.FScoreMin,node.FScoreMax);
+        });
+
+        // 构建树结构
+        nodes.forEach(node => {
+
+            const currentNode = treeMap[node.id];
+
+
+            if (node.fid === rootId) {
+                root = currentNode; // 找到根节点
+
+            } else {
+                const parentNode = treeMap[node.fid];
+                if (parentNode) {
+                    parentNode.addChild(currentNode); // 将当前节点添加到父节点的 children 中
+                }
+            }
+        });
+
+        return root;
+    }
+
+    // 递归生成树的 HTML
+    function renderTree(node) {
+
+        let html = `<li data-id="${node.id}" data-fid="${node.fid}" class="${node.children.length > 0 ? '' : 'no-child'}">`;
+            //类型: ${node.FConditionType},
+            if(node.level == 2)
+                html +=`<span style="color: #0e90d2;">【考核条件】：</span> ${node.value} (权重: ${node.FMethodWeight}%),(满足条件的分数: ${node.FConditionScore},描述: ${node.FNote})`;
+            else if(node.level == 4)
+                html +=`<span style="color: #0e90d2;">【考核子条件】：</span> ${node.value} (权重: ${node.FMethodWeight}%),(满足条件的分数: ${node.FConditionScore},描述: ${node.FNote})`;
+            else if(node.level == 3)
+                html +=`<span style="color: #0e90d2;">【考核方式】：</span>${node.value} (权重: ${node.FMethodWeight}%)`;
+            else if(node.level == 1)
+                html +=`<span style="color: #0e90d2;">【能力水平】：</span>${node.value} (能力积分: ${node.FPoints},水平最低分数: ${node.FScoreMin},水平最高分数: ${node.FScoreMax})`;
+            else if(node.level == 0)
+                html +=`<span style="color: #0e90d2;">【能力】：</span>${node.value}`;
+
+        if (node.children.length > 0) {
+            html += '<ul class="open">';
+            node.children.forEach(child => {
+                html += renderTree(child);
+            });
+            html += '</ul>';
+        }
+
+        html += '</li>';
+        return html;
+    }
+
+</script>
+</body>
+</html>

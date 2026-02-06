@@ -1,0 +1,500 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+    <!--/_only 独立样式 -->
+</head>
+<style type="text/css">
+    .open-work-control2 {
+        cursor: pointer;
+    }
+
+    .open-work-control3 {
+        cursor: pointer;
+    }
+
+    .open-work-control4 {
+        cursor: pointer;
+    }
+</style>
+<body>
+
+<div class="page-container">
+    <div class="f-l" style="width: 99.8%; margin-top: 3px;">
+        <div class="row cl">
+            <div class="col-md-8 col-sm-8 col-xs-8">
+                <div style="height: 20px;"></div>
+                <div class="panel panel-default">
+                    <div class="panel-header"> 能力等级考核条件&nbsp;
+                        <div class="f-r text-l">
+                            <button type="button" class="btn btn-default size-S my-btn" onclick="dengjitiaojian(1)"><i
+                                    class=" fa fa-plus"></i>
+                                新增能力等级考核条件
+                            </button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <span id="mxname2" style="color: #0e90d2;font-size: 15px;"></span>
+                        <!--                        <table id="mainTablelevelCondition" class="display compact" style="width: 99.8%;"></table>-->
+                        <table class="table table-striped table-bordered table-hover" id="treetable"
+                               style="width: 98%"></table>
+                    </div>
+                </div>
+            </div>
+            <div  id="WaitLst" class="col-md-4 col-sm-4 col-xs-4">
+                <div style="height: 20px;"></div>
+                <div class="panel panel-default">
+                    <div class="panel-header"> 能力等级考核方式&nbsp;
+                        <div class="f-r text-l">
+                            <button type="button" class="btn btn-default size-S my-btn" onclick="kaohefangshi(1)"><i
+                                    class=" fa fa-plus"></i>
+                                新增能力等级考核方式
+                            </button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <span id="mxname3" style="color: #0e90d2;font-size: 15px;"></span>
+                        <table id="mainTablelevelConditionAssessment" class="display compact"
+                               style="width: 99.8%;"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<script src="/module/capability/ability/js/dataTables.treeGrid.js"></script>
+<script type="text/javascript">
+    var abilityid = getQueryStringByName('abilityid');//
+    var mainTable;
+    var mainTablelevel;
+    var mainTablelevelCondition;
+    var abilityName = parent.abilityName;
+    var ConditionID;
+    var ConditionName;
+
+    var LevelID;
+    var LevelName = parent.LevelName;
+    var tree;
+    var LevelNames = parent.LevelNames;
+    let remarkShowLength =15;
+    var dataTable = null;
+    var fpname;
+    var LevelID = getQueryStringByName('LevelID');
+    var FType;
+    // 业务代码
+    $(function () {
+
+
+        $(window).scroll(function () {
+
+            var scrollHeight = document.documentElement.scrollTop;
+
+            if (scrollHeight == 0)
+                $("#WaitLst").css({top: scrollHeight + "px"}).show(); //WaitList 是 div ID
+            else
+                $("#WaitLst").css({top: scrollHeight - 15 + "px"}).show(); //WaitList 是 div ID
+
+
+        });
+        $('#mxname2').text("能力等级：" + LevelNames);
+        $.fn.dataTable.ext.errMode = 'throw';
+        dataTable = $('#treetable').DataTable({
+            /**
+             l - Length changing 改变每页显示多少条数据的控件
+             f - Filtering input 即时搜索框控件
+             t - The Table 表格本身
+             i - Information 表格相关信息控件
+             p - Pagination 分页控件
+             r - pRocessing 加载等待显示信息
+             **/
+            "dom": "tr",
+            "ordering": false, //禁用排序
+            "processing": true,
+            "serverSide": true,
+            "destroy": true,
+            //"data":data.datalist,
+            "ajax": {
+                async: false,
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/abilityconditions/showTAbilityConditionTree', // 调用地址
+                data: function (d) {
+                    return JSON.stringify($.extend({}, d, {
+                        FALID: LevelID,
+                    }));
+                },
+                dataSrc: function (json) {
+                    return json.datalist2 ? json.datalist2.data : [];
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+
+            },
+            createdRow: function( row, data, dataIndex ) {
+                if(data.FNote.length > remarkShowLength){//只有超长，才有td点击事件
+                    $(row).children('td').eq(4).attr('onclick','javascript:changeShowRemarks(this);');
+                    $(row).children('td').eq(4).css('word-wrap','break-word');
+                    $(row).children('td').eq(4).css('white-space','normal');
+                    $(row).children('td').eq(4).css('word-break','break-all');
+                }
+                $(row).children('td').eq(4).attr('content',data.FNote);
+            },
+            "columns": [
+                {
+                    className: '',
+                    title: "选择",
+                    data: function (item) {
+                        return '<input onclick="xuanzhong(\'' + item.key + '\')" type="radio" name="csradio" id="r' + item.key + '"  value="' + item.key + '">';
+                    }, "width": 10
+                },
+                {
+                    className: 'treegrid-control',
+
+                    title: "展开/收缩",
+
+                    data: function (item) {
+                        if (item.children != null && item.children.length > 0) {
+                            return '<span><i class="fa fa-plus" ></i></span>';
+                        }
+                        return '';
+
+                    }, "width": 40
+                },
+                {"data": "FConditionName", "title": '条件名称', "width": 80, class: 'open-work-control4'},
+
+                {"data": "FConditionScore", "title": '条件达标的分数', "width": 60, class: 'open-work-control4'},
+                {
+                    "data": "FNote", "title": '条件说明', "width": 80, class: 'open-work-control4',
+                    render: function (data, type, full, row) {
+                        if (data.length > remarkShowLength) {//只有超长，才有td点击事件
+                            return getPartialRemarksHtml(data);//显示部分信息
+                        } else {
+                            return data;
+                        }
+                    }
+                },
+                {"data": "FMethodWeight2", "title": '当前条件权重(%)', "width": 30, class: 'open-work-control4'},
+
+                {"data": "FMethodWeight", "title": '下级条件总权重(%)', "width": 30, class: 'open-work-control4'},
+                {
+                    title: '操作',
+                    data: 'FState',
+                    width: 90,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        var tiaojian ='<button type="button" class="btn  size-MINI" title="添加子级条件" onclick="tiaojianziji(\'' + row.key + '\',\'' + row.FConditionName + '\',\'' + row.FType + '\')"><i class="fa fa-indent" aria-hidden="true" ></i></button> ';
+                        var bianji ='<button type="button" class="btn btn-secondary size-MINI" title="编辑" onclick="dengjitiaojian(2,\'' + row.key + '\',\'' + row.FType + '\')"><i class="fas fa-edit"></i></button> ';
+                        var del ='<button type="button" class="btn btn-danger size-MINI" title="删除" onclick="onClickBtnuserlcDel(\'' + row.key + '\',\'' + row.FConditionName + '\',\'' + row.FType + '\')"><i class="fas fa-trash"></i></button>';
+
+                        if(row.FType ==1){
+                            return  tiaojian+bianji+del;
+                        }else{
+                            return  bianji+del;
+                        }
+                    }
+                }
+            ],
+            "columnDefs": [
+                {
+                    "defaultContent": "",
+                    "targets": "_all"
+                }
+            ],
+            language: DataTablesLanguage
+        });
+        tree = new $.fn.dataTable.TreeGrid(dataTable, {
+            left: 15,
+            expandAll: false,
+            expandIcon: '<span><i class="fa fa-plus" ></i></span>',
+            collapseIcon: '<span><i class="fa fa-minus" ></i></span>'
+        });
+        // tree.expandAll();
+        // $('#mainTablelevel tbody').on('click', 'tr td.open-work-control3', function () {
+        //
+        //     if (!$(this).parent().hasClass('selected')) { // 处理点击行样式
+        //         mainTablelevel.$('tr.selected').removeClass('selected');
+        //         $(this).parent().addClass('selected');
+        //     }
+        //     var data = mainTablelevel.row(this).data(); // 获取点击行数据
+        //
+        //     LevelID = data.key;
+        //     LevelName = data.FName;
+        //     ConditionID = null;
+        //     ConditionName = null;
+        //     $('#mxname2').text("能力等级：" + data.FName);
+        //     $('#mxname3').text("");
+        //     // $('#mainTablelevelCondition').DataTable().ajax.reload(null, false);
+        //     dataTable.ajax.reload();
+        //     $('#mainTablelevelConditionAssessment').DataTable().ajax.reload(null, false);
+        // });
+
+
+        var mainTablelevelConditionAssessment = $('#mainTablelevelConditionAssessment').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/abilityconditionassessmentmethod/queryabilityconditionassessmentmethod', // 调用地址
+                data: function (d) {
+                    return JSON.stringify($.extend({}, d, {
+                        page: d.start / d.length + 1, // 当前页
+                        results: d.length, // 每页显示条数
+                        FALID: LevelID,
+                        ConditionID: ConditionID,
+                        dataall: 1
+                    }));
+                },
+                dataSrc: function (json) {
+                    json.recordsFiltered = json.total;  // 总行数
+                    json.recordsTotal = json.page; // 当前页数
+                    return json.list;
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+            },
+            columns: [
+                {title: '条件名称', data: 'FConditionName', orderable: false,},
+                {title: '考核方式', data: 'FMethodName', orderable: false,},
+                {title: '权重(%)', data: 'FMethodWeight', orderable: false,},
+                {
+                    title: '操作',
+                    data: 'FState',
+                    width: 90,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<button type="button" class="btn btn-secondary size-MINI" onclick="kaohefangshi(2,\'' + row.key + '\')"><i class="fas fa-edit"></i>编辑</button> ' +
+                            '<button type="button" class="btn btn-danger size-MINI" onclick="onClickBtnuserfsDel(\'' + row.key + '\',\'' + row.FMethodName + '\',\'' + row.FConditionName + '\')"><i class="fas fa-trash"></i>删除</button>';
+                    }
+                }
+            ],
+            scrollY: 150 + 'px',
+            scrollX: true,
+            paging: true, // 是否开启本地分页
+            pageLength: 20, // 改变初始化页长度（每页多少条数据）
+            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+            lengthChange: false, // 是否允许维度改变表格每页显示的记录数
+            searching: false, // 是否允许Datatables开启本地搜索
+            ordering: false, // 是否允许Datatables开启排序
+            info: true, // 控制是否显示表格左下角的信息
+            language: DataTablesLanguage
+        });
+
+
+        $('#treetable tbody').on('click', 'tr td.open-work-control4', function () {
+
+            if (!$(this).parent().hasClass('selected')) { // 处理点击行样式
+                dataTable.$('tr.selected').removeClass('selected');
+                $(this).parent().addClass('selected');
+            }
+            var data = dataTable.row(this).data(); // 获取点击行数据
+
+            if (!$("#r" + data.key).prop('checked')) {
+                $("#r" + data.key).prop('checked', true);//全选
+            }
+            // else{
+            //     $("#r" + data.key).prop('checked', false);//全选
+            // }
+            ConditionID = data.key;
+            ConditionName = data.FConditionName;
+            FType = data.FType;
+            // console.log(ConditionID);
+            $('#mxname3').text("能力等级考核条件：" + data.FConditionName);
+            $('#mainTablelevelConditionAssessment').DataTable().ajax.reload(null, false);
+        });
+
+        // 查询按钮点击事件
+        $('.btn-search-fun').on('click', function () {
+            $('#mainTable').DataTable().ajax.reload(null, false);
+        });
+
+    });
+
+
+    function reloadtiaojiantable() {
+        $('#mainTablelevel').DataTable().ajax.reload(null, false);
+        // $('#mainTablelevelCondition').DataTable().ajax.reload(null, false);
+        dataTable.ajax.reload();
+    }
+
+    function reloadkaohetable() {
+        // $('#mainTablelevelCondition').DataTable().ajax.reload(null, false);
+        dataTable.ajax.reload();
+        if (!$("#r" + ConditionID).prop('checked')) {
+            $("#r" + ConditionID).prop('checked', true);//全选
+        }
+        $('#mainTablelevelConditionAssessment').DataTable().ajax.reload(null, false);
+    }
+
+
+    function dengjitiaojian(op, fkeyid,ftype) {
+        if (LevelID) {
+            if (op == 1) {
+                layer_show('新增能力等级考核条件信息', '/module/capability/ability/tiaojianedit.html?op=1&FAbilityID=' + abilityid + '&FAbilityLevelID=' + LevelID+'&showtype=1' , '800', '500');
+            } else {
+                if(ftype==1){
+                    layer_show('修改能力等级考核条件信息', '/module/capability/ability/tiaojianedit.html?op=2&FAbilityID=' + abilityid + '&FAbilityLevelID=' + LevelID + '&id=' + fkeyid+'&showtype=1' , '800', '500');
+                }else{
+                    layer_show('修改能力等级考核条件子级信息', '/module/capability/ability/abilityCondition/tiaojianedit2.html?op=2&id=' + fkeyid+'&showtype=1' , '800', '500');
+                }
+
+            }
+
+        } else {
+            toastr.error('请选择能力等级后再添加！');
+        }
+    }
+
+    function kaohefangshi(op, fkeyid) {
+        if (ConditionID) {
+            if (op == 1) {
+                layer_show('新增能力等级考核方式信息', '/module/capability/ability/kaohefangshiedit.html?op=1&FAbilityLevelID=' + LevelID + '&FAbilityConditionID=' + ConditionID +'&ftype=' + FType+'&showtype=1' , '800', '500');
+            } else {
+                layer_show('修改能力等级考核方式信息', '/module/capability/ability/kaohefangshiedit.html?op=2&FAbilityLevelID=' + LevelID + '&FAbilityConditionID=' + ConditionID + '&id=' + fkeyid +'&ftype=' + FType+'&showtype=1' , '800', '500');
+            }
+        } else {
+            toastr.error('请选择能力考核条件后再添加！');
+        }
+    }
+
+    function tiaojianziji(fkeyid,name,ftype){
+        fpname = name;
+        var index = layer.open({
+            type: 2,
+            area: ['1200px', '600px'],
+            fix: false, //不固定
+            shade: 0.4,
+            title: '新增能力等级考核条件子级信息',
+            content: '/module/capability/ability/abilityCondition/abilityconditiontree.html?op=1&FCID=' + fkeyid+'&ftypes=' +ftype+'&showtype=1'
+            , end: function () {
+                reloadkaohetable();
+            }
+        });
+        // layer_show('新增能力等级考核条件子级信息', '/module/capability/ability/abilityCondition/abilityconditiontree.html?op=1&FCID=' + fkeyid+'&ftypes=' +ftype, '1200', '600');
+    }
+
+
+    function onClickBtnuserlcDel(id, name,ftype) {
+        var url = "";
+        if(ftype ==1){
+            url ='/s/abilitycondition/delabilityCondition';
+        }else{
+            url ='/s/abilityconditions/delabilityConditions';
+        }
+        //考核条件删除
+        layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: url,
+                data: JSON.stringify({
+                    id: id
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        // $('#mainTablelevelCondition').DataTable().ajax.reload(null, false);
+                        dataTable.ajax.reload();
+                        $('#mainTablelevelConditionAssessment').DataTable().ajax.reload(null, false);
+                        ConditionID = null;
+                        ConditionName = null;
+                        $('#mxname3').text("");
+                        toastr.success('删除成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error);
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+
+    function onClickBtnuserfsDel(id, name, name2) {
+        //考核方式删除
+        layer.confirm('<b>' + name2 + '-->' + name + '</b><br />确定要删除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/abilityconditionassessmentmethod/delabilityConditionAssessmentmethod',
+                data: JSON.stringify({
+                    id: id
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#mainTablelevelConditionAssessment').DataTable().ajax.reload(null, false);
+                        toastr.success('删除成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error);
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+
+
+    //切换显示备注信息，显示部分或者全部
+    function changeShowRemarks(obj) {//obj是td
+        var content = $(obj).attr("content");
+        if (content != null && content != '') {
+            if ($(obj).attr("isDetail") == 'true') {//当前显示的是详细备注，切换到显示部分
+                //$(obj).removeAttr('isDetail');//remove也可以
+                $(obj).attr('isDetail', false);
+                $(obj).html(getPartialRemarksHtml(content));
+            } else {//当前显示的是部分备注信息，切换到显示全部
+                $(obj).attr('isDetail', true);
+                $(obj).html(getTotalRemarksHtml(content));
+            }
+        }
+    }
+
+    //部分备注信息
+    function getPartialRemarksHtml(remarks) {
+        if (remarks.length > 0) {
+            return remarks.substr(0, remarkShowLength) + '&nbsp;&nbsp;<a href="javascript:void(0);" ><b>展开</b></a>';
+        }
+    }
+
+    //全部备注信息
+    function getTotalRemarksHtml(remarks) {
+        return remarks + '&nbsp;&nbsp;<a href="javascript:void(0);" ><b>收起</b></a>';
+    }
+
+
+</script>
+</body>
+</html>

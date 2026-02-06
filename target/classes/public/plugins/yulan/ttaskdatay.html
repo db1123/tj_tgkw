@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=GBK">
+        <meta http-equiv="X-UA-Compatible" content="IE=10">
+        <title></title>
+    </head>
+    <body>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+
+        <script type="text/javascript" src="/nui-ad/lib/jquery/1.9.1/jquery.min.js"></script>
+
+        <div id="yulandiv">
+        </div>
+        <span id="ss"></span>
+        <script type="text/javascript">
+            var id = getQueryStringByNames('id');//交付物id
+
+            $(function () {
+                var yulandiv = $("#yulandiv");
+                yulandiv.empty();
+                var html="";
+
+                urls = '/s/taskdata/queryttaskdatafurl'
+
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    url:urls , // 调用地址
+                    data: JSON.stringify({
+                        id: id
+                    }),
+                    async: false,
+                    success: function (data) {
+                        // alert(data.info.fileurl);
+                        //<OBJECT ID="ocx" CLSID="{9F5EA40D-ABBD-4ABD-AD1B-6155A142DB1E}" TYPE="application/x-itst-activex" width=85% height=85%>
+                        //<OBJECT id=\"AutoVueX2\" classid=\"clsid:B6FCC215-D303-11D1-BC6C-0000C078797F\"\n" +  "                type=\"application/x-oleobject\" align=\"baseline\" border=\"1\" WIDTH=\"906\" height=\"600\">
+                        html +=" <OBJECT id=\"AutoVueX2\" classid=\"clsid:B6FCC215-D303-11D1-BC6C-0000C078797F\"\n" +
+                            "                type=\"application/x-oleobject\" align=\"baseline\" border=\"1\" WIDTH=\"906\" height=\"600\">";
+                        // html+="<OBJECT ID=\"ocx\" CLSID=\"{9F5EA40D-ABBD-4ABD-AD1B-6155A142DB1E}\" TYPE=\"application/x-itst-activex\" width=85% height=85%>";
+                        html +="<PARAM id=\"paramid\" name=\"SRC\" value=\"http://39.102.232.225:9196/"+data.info.fileurl+"\">";
+                        html +="<PARAM name=\"ShowMainToolBar\" value=\"1\">";
+                        html +=" <PARAM name=\"ShowAuxiToolBar\" value=\"1\">";
+                        html +=" <PARAM name=\"ShowStatusBar\" value=\"1\">";
+                        html +=" <PARAM name=\"ShowScrollBars\" value=\"1\">";
+                        html +=" <PARAM name=\"EnablePopupMenu\" value=\"1\">";
+                        html +=" </OBJECT>";
+                        yulandiv.append(html);
+                    },
+                    error: function (e) {
+                        //toastr.error(e.status);
+                        //toastr.error(e.responseText);
+                    }
+                });
+            });
+
+            function getQueryStringByNames(name) {
+                var result = location.search.match(new RegExp("[\?\&]" + name+ "=([^\&]+)","i"));
+                if (result == null || result.length < 1){
+                    return "";
+                }
+                return result[1];
+            }
+        </script>
+    </body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+        <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+        <!--_only 独立样式 -->
+        <!--/_only 独立样式 -->
+    </head>
+    <style type="text/css">
+        legend {
+            width: 5%;
+            margin-bottom: 5px;
+            font-size: 12px;
+            line-height: 40px;
+            border: 0;
+            border-bottom: 0px solid #e5e5e5
+        }
+
+    </style>
+    <body>
+        <div class="page-container" style="padding: 2px;">
+            <div class="f-l" style="width: 100%; margin-top: 3px;">
+                <div class="panel panel-default">
+                    <div class="panel-header">文件名称：<strong class="xmname"></strong></div>
+                    <div class="panel-body">
+                        <div id="tab_demo" class="HuiTab">
+                            <div class="tabBar clearfix">
+                                <span onclick="getValue(0);">基本信息</span>
+                                <span onclick="getValue(1);">审核流程图</span>
+                                <span onclick="getValue(2);">审核过程</span>
+                                <div id="flowspandiv" style="display: none;">
+                                    <span onclick="getValue(3);">工作流历史信息</span>
+                                </div>
+                            </div>
+                            <div class="tabCon">
+                                <fieldset  id="fieldset1">
+                                    <legend>基本信息</legend>
+                                    <iframe width="100%;" height="100%;" frameborder="0" id="jbxx"></iframe>
+                                </fieldset>
+                            </div>
+                            <div class="tabCon">
+                                <iframe width="100%;" height="100%;" frameborder="0" id="flow"></iframe>
+                            </div>
+                            <div class="tabCon">
+                                <iframe width="100%;" height="100%;" frameborder="0" id="guocheng"></iframe>
+                            </div>
+                            <div class="tabCon" id="flowdiv" style="display: none;">
+                                <iframe width="100%;" height="100%;" frameborder="0" id="flowolddata"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <script type="text/javascript">
+            var id = getQueryStringByName('id');//交付物ID
+            var ftype = getQueryStringByName('ftype');// 1= 有工作流 2=没有工作流
+            var xmname = parent.xmname;//文件名称
+            var showtype = getQueryStringByName('showtype'); //显示类型 1=我的交付物 ，2=全部交付物
+            var subdatatype = getQueryStringByName('subdatatype');//交付物ID
+            var sudataflowid = getQueryStringByName('sudataflowid');//交付物流程ID
+            var ftaskid = getQueryStringByName('ftaskid');//交付物任务ID
+            var fprojectid = getQueryStringByName('fprojectid');//交付物项目ID
+            var FNodeID = getQueryStringByName('FNodeID');//交付物节点ID
+            var FProjectPlanID = getQueryStringByName('FProjectPlanID');//交付物计划ID
+            // 业务代码
+            $
+            (function () {
+                $(".xmname").text(xmname);
+                var tab = $("#tab_demo").Huitab({
+                    index: 0
+                });
+                $('#jbxx').attr('src', 'mysubdatajbxx.html?id=' + id+'&ftype=1&showtype='+showtype);
+                if(document.body.clientHeight > 600){
+                    $("#fieldset1").height(document.body.clientHeight-50);
+                    $('.tabCon').height(document.body.clientHeight-50);
+                }else {
+                    $("#fieldset1").height(document.body.clientHeight-80);
+                    $('.tabCon').height(document.body.clientHeight-80);
+                }
+
+                if(ftype ==1){
+                    $("#flowdiv").attr("style", "display:block;"); //显示
+                    $("#flowspandiv").attr("style", "display:block;"); //显示
+
+                }else{
+                    $("#flowdiv").attr("style", "display:none;"); //隐藏
+                    $("#flowspandiv").attr("style", "display:none;"); //隐藏
+                }
+            });
+
+            function getValue(obj) {
+                var value = obj;
+                if (value == 0) {
+
+                    $('#jbxx').attr('src', 'mysubdatajbxx.html?id=' + id+"&ftype=1"+'&showtype='+showtype);
+                } else if (value == 1) {
+                    $('#flow').attr('src', 'mysubdataflow.html?id=' + id+'&showtype='+showtype );
+                } else if (value == 2) {
+                    $('#guocheng').attr('src', 'mysubdatashprocess.html?id=' + id+'&showtype='+showtype );
+                }else if(value ==3 ){
+
+                    $('#flowolddata').attr('src', 'mysubdataflowhistorytab.html?id='+sudataflowid+'&type='+subdatatype+'&ftaskid='+ftaskid+'&fprojectid='+fprojectid+'&FNodeID='+FNodeID+'&FProjectPlanID='+FProjectPlanID);
+                }
+                if(document.body.clientHeight > 600){
+                    $("#fieldset1").height(document.body.clientHeight-50);
+                    $('.tabCon').height(document.body.clientHeight-50);
+                }else {
+                    $("#fieldset1").height(document.body.clientHeight-80);
+                    $('.tabCon').height(document.body.clientHeight-80);
+                }
+            }
+
+        </script>
+    </body>
+</html>

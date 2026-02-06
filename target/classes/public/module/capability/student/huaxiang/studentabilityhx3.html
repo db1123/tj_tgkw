@@ -1,0 +1,724 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+
+    <script type="text/javascript" src="/module/capability/ability/huaxiang/js/jQuery.Huifold.js"></script>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/metroStyle/metroStyle.css" type="text/css">
+</head>
+
+
+<style type="text/css">
+    .popup {
+        display: none;
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 47vw;
+        /*width: 27%;*/
+        background-color: #fff;
+        box-shadow: -2px 0px 10px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        overflow-y: auto;
+        padding: 20px;
+    }
+
+    .popup.active {
+        display: block;
+    }
+
+    .close-btn {
+        float: right;
+        font-size: 24px;
+        font-weight: bold;
+        text-decoration: none;
+        color: #333;
+    }
+
+    .close-btn:hover {
+        color: #000;
+    }
+
+
+    .container {
+        display: flex; /* 使用 Flexbox 布局 */
+        align-items: center; /* 垂直居中对齐 */
+        margin-left: -10px;
+    }
+
+    .vertical-line {
+        width: 5px; /* 竖线的宽度 */
+        height: 15px; /* 竖线的高度 */
+        background-color: blue; /* 竖线的颜色 */
+        margin-right: 5px; /* 竖线与文字之间的右边距 */
+    }
+
+    .text {
+        font-size: 16px; /* 文字大小 */
+    }
+
+    .rowtop {
+        margin-top: 10px;
+    }
+
+
+</style>
+<style>
+    /*.ztree-container {*/
+    /*    display: flex;*/
+    /*    flex-wrap: wrap;*/
+    /*    justify-content: space-between;*/
+    /*}*/
+
+
+    .ztree-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        width: 100%;
+        max-height: 40vh; /* 根据需要调整高度 */
+        overflow: auto;
+        margin-top: 15px;
+        /*border: 1px solid #e8e8e8;*/
+    }
+    .ztree-wrapper {
+        width: 100%;
+        height: 65vh;
+        margin-bottom: 20px;
+        /*border: 1px solid #e8e8e8;*/
+        border-radius: 4px;
+        padding: 15px;
+        box-sizing: border-box;
+        /*background: white;*/
+        /*box-shadow: 0 1px 3px rgba(0,0,0,0.1);*/
+    }
+    .ztree-title {
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-align: center;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #f0f0f0;
+        color: #333;
+    }
+    /*.ztree {*/
+    /*    height: 65vh;*/
+    /*    overflow-y: auto;*/
+    /*    overflow-x: hidden;*/
+    /*}*/
+    .ztree {
+        min-width: 100%;
+        width: auto;
+        white-space: nowrap;
+        padding: 10px;
+    }
+
+    /* 高亮样式 */
+    .highlight {
+        color: #ff4d4f;
+        font-weight: bold;
+    }
+    @media (max-width: 768px) {
+        .ztree-wrapper {
+            width: 100%;
+        }
+    }
+</style>
+<body>
+<div class="page-container">
+    <div class="panel panel-default">
+        <div class="panel-header">
+            <div class="container">
+                <div class="vertical-line"></div>
+                <div class="text">学生信息</div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div id="studentinfo">
+                <div class="row cl rowtop">
+                    <label class="form-label col-xs-2 col-sm-2" style="font-weight: bold;">学生学号：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <label class="form-label" id="xmFNo" style="width: 100%;text-align: left;"></label>
+                    </div>
+                    <label class="form-label col-xs-2 col-sm-2" style="font-weight: bold;">学生姓名：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <label class="form-label" id="xmFName" style="width: 100%;text-align: left;"></label>
+                    </div>
+                    <label class="form-label col-xs-2 col-sm-2" style="font-weight: bold;">性别：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <label class="form-label" id="xmFSex" style="width: 100%;text-align: left;"></label>
+                    </div>
+
+                </div>
+                <div class="row cl rowtop">
+                    <label class="form-label col-xs-2 col-sm-2" style="font-weight: bold;">身份证号：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <label class="form-label" id="xmFIDNumber" style="width: 100%;text-align: left;"></label>
+                    </div>
+                    <label class="form-label col-xs-2 col-sm-2" style="font-weight: bold;">联系电话：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <label class="form-label" id="xmFTel" style="width: 100%;text-align: left;"></label>
+                    </div>
+                    <label class="form-label col-xs-2 col-sm-2" style="font-weight: bold;">电子邮箱：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <label class="form-label" id="xmFEmail" style="width: 100%;text-align: left;"></label>
+                    </div>
+                </div>
+                <div class="row cl rowtop">
+                    <label class="form-label col-xs-2 col-sm-2" style="font-weight: bold;">出生日期：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <label class="form-label" id="xmFBirthday" style="width: 100%;text-align: left;"></label>
+                    </div>
+                    <label class="form-label col-xs-2 col-sm-2" style="font-weight: bold;">入学时间：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <label class="form-label" id="xmFStartSchoolDate" style="width: 100%;text-align: left;"></label>
+                    </div>
+                    <label class="form-label col-xs-2 col-sm-2" style="font-weight: bold;">毕业时间：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <label class="form-label" id="xmFEndSchoolDate" style="width: 100%;text-align: left;"></label>
+                    </div>
+
+                </div>
+                <div class="row cl rowtop">
+                    <label class="form-label col-xs-2 col-sm-2" style="font-weight: bold;">专业：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <label class="form-label" id="xmFMajor" style="width: 100%;text-align: left;"></label>
+                    </div>
+                    <label class="form-label col-xs-2 col-sm-2" style="font-weight: bold;">学历：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <label class="form-label" id="xmFEducation" style="width: 100%;text-align: left;"></label>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1" style="font-weight: bold;">政治面目：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <label class="form-label" id="xmFPolitical" style="width: 100%;text-align: left;"></label>
+                    </div>
+                </div>
+                <div class="row cl rowtop">
+                    <label class="form-label col-xs-2 col-sm-2" style="font-weight: bold;">住址：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <label class="form-label" id="xmFAddr" style="width: 100%;text-align: left;"></label>
+                    </div>
+                    <label class="form-label col-xs-2 col-sm-2" style="font-weight: bold;">能力积分：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <label class="form-label" id="xmFPoints" style="width: 100%;text-align: left;"></label>
+                    </div>
+                    <label class="form-label col-xs-2 col-sm-2" style="font-weight: bold;">工作状态：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <label class="form-label" id="xmFWorkState" style="width: 100%;text-align: left;"></label>
+                    </div>
+                </div>
+                <div class="row cl rowtop">
+                    <label class="form-label col-xs-2 col-sm-2" style="font-weight: bold;">班级：</label>
+                    <div class="formControls col-xs-10 col-sm-10">
+                        <label class="form-label" id="xmFClassName" style="width: 100%;text-align: left;"></label>
+                    </div>
+                </div>
+                <div class="row cl rowtop">
+                    <label class="form-label col-xs-2 col-sm-2" style="font-weight: bold;">奖励荣誉：</label>
+                    <div class="formControls col-xs-10 col-sm-10">
+                        <label class="form-label" id="xmFHonor" style="width: 100%;text-align: left;"></label>
+                    </div>
+                </div>
+                <div class="row cl rowtop">
+                    <label class="form-label col-xs-2 col-sm-2" style="font-weight: bold;">惩罚记录：</label>
+                    <div class="formControls col-xs-10 col-sm-10">
+                        <label class="form-label" id="xmFPunish" style="width: 100%;text-align: left;"></label>
+                    </div>
+                </div>
+                <div class="row cl rowtop">
+                    <label class="form-label col-xs-2 col-sm-2" style="font-weight: bold;">健康记录：</label>
+                    <div class="formControls col-xs-10 col-sm-10">
+                        <label class="form-label" id="xmFHealth" style="width: 100%;text-align: left;"></label>
+                    </div>
+                </div>
+                <div class="row cl rowtop">
+                    <label class="form-label col-xs-2 col-sm-2" style="font-weight: bold;">备注：</label>
+                    <div class="formControls col-xs-10 col-sm-10">
+                        <label class="form-label" id="xmFNote" style="width: 100%;text-align: left;"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default" style="margin-top: 20px;">
+        <div class="panel-header">
+            <div class="container">
+                <div class="vertical-line"></div>
+                <div class="text">学生能力</div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div id="huaxiang">
+            </div>
+            <div style="display: none;" id="wundiv">
+                暂无能力信息
+            </div>
+        </div>
+    </div>
+
+    <div id="right-popup" class="popup">
+        <a href="" id="close-popup-btn" class="close-btn">&times;</a>
+        <h4>能力详情</h4>
+<!--        <div class="row cl rowtop">-->
+<!--            <label class="form-label col-xs-5 col-sm-5" style="font-weight: bold;"><span-->
+<!--                    style="color: #0e90d2;">【能力类型】：</span></label>-->
+<!--            <div class="formControls col-xs-7 col-sm-7">-->
+<!--                <label class="form-label" id="FTypeName" style="width: 100%;text-align: left;"></label>-->
+<!--            </div>-->
+<!--        </div>-->
+        <div class="row cl rowtop">
+            <label class="form-label col-xs-5 col-sm-5" style="font-weight: bold;"><span
+                    style="color: #0e90d2;">【条件名称】：</span></label>
+            <div class="formControls col-xs-7 col-sm-7">
+                <label class="form-label" id="FName"
+                       style="width: 100%;text-align: left;"></label>
+            </div>
+        </div>
+        <div class="row cl rowtop">
+            <label class="form-label col-xs-5 col-sm-5" style="font-weight: bold;"><span
+                    style="color: #0e90d2;">【条件描述】：</span></label>
+            <div class="formControls col-xs-7 col-sm-7">
+                <label class="form-label" id="FNote"
+                       style="width: 100%;text-align: left;"></label>
+            </div>
+        </div>
+        <h4>学生能力详情</h4>
+        <div id="nenglidengji">
+
+        </div>
+
+        <h4>能力树</h4>
+        <div id="ztree-container" class="ztree-container">
+            <!-- ZTree树形结构将在这里动态生成 -->
+
+
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/fuzzysearch.js"></script>
+<script type="text/javascript">
+    var ftype = getQueryStringByName('ftype');//1=全部 2=个人
+    var userid;
+    var fileurl;
+    var filename;
+    var studentname;
+
+    var treeData;
+
+    var searchInput;
+    // 业务代码
+    $(function () {
+        if (ftype == 2) {
+            userid = getQueryStringByName('userid');
+        }
+
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/tstudent/querytstudentInfo', // 调用地址
+            data: JSON.stringify({
+                id: userid
+            }),
+            async: false,
+            success: function (data) {
+                $("#xmFName").text(data.info.FName);
+                studentname = data.info.FName;
+                $("#xmFNo").text(data.info.FNo);
+                if (data.info.FSex == 0) {
+                    $("#xmFSex").text("男");
+                } else if (data.info.FSex == 1) {
+                    $("#xmFSex").text("女");
+                }
+                $("#xmFBirthday").text(data.info.FBirthday);
+                $("#xmFIDNumber").text(data.info.FIDNumber);
+                $("#xmFTel").text(data.info.FTel);
+                $("#xmFEmail").text(data.info.FEmail);
+                $("#xmFStartSchoolDate").text(data.info.FStartSchoolDate);
+                $("#xmFEndSchoolDate").text(data.info.FEndSchoolDate);
+                $("#xmFMajor").text(data.info.FMajor);
+                $("#xmFEducation").text(data.info.FEducation);
+                $("#xmFPolitical").text(data.info.FPolitical);
+                $("#xmFAddr").text(data.info.FAddr);
+                $("#xmFHonor").text(data.info.FHonor);
+                $("#xmFPunish").text(data.info.FPunish);
+                $("#xmFHealth").text(data.info.FHealth);
+                $("#xmFNote").text(data.info.FNote);
+                if (data.info.FWorkState == 0) {
+                    $("#xmFWorkState").text("未工作");
+                } else if (data.info.FWorkState == 1) {
+                    $("#xmFWorkState").text("已工作");
+                }
+                $("#xmFPoints").text(data.info.FPoints);
+                $("#xmFClassName").text(data.info.FClassName);
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+
+
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/tstudent/getstudentabilityhuaxiang_dd', // 调用地址
+            data: JSON.stringify({
+                ftype: ftype,
+                userid: userid
+            }),
+            async: false,
+            success: function (data) {
+                var html = "";
+                var html1 = "";
+                var huaxiang = $("#huaxiang");
+                huaxiang.empty();
+                html = `<ul id="Huifold1" class="Huifold">`;
+                var iscz = 0;
+                if(data.type_Array){
+                    for (var i = 0; i < data.type_Array.length; i++) {
+                        html1 += `<li class="item">`;
+                        html1 += `    <h4>` + data.type_Array[i].FName + `<b>+</b></h4>`;
+                        html1 += `    <div class="info"> `;
+                        html1 += `        <div class="Hui-tags-has">`;
+                        for (var j = 0; j < data.ability_Array.length; j++) {
+                            if (data.ability_Array[j].i == i) {
+                                iscz = 0;
+                                // for (var k = 0; k < data.studentability_Array.length; k++) {
+                                //     if (data.studentability_Array[k].FAbilityID == data.ability_Array[j].key) {
+                                //         html1 += `        <span style="color: #0c912b" onclick="selectinfo(\'` + data.ability_Array[j].key + `\',\'` + data.ability_Array[j].FName + `\',\'` + data.studentability_Array[k].FAbilityLevelName + `\',\'` + data.studentability_Array[k].key + `\')"> <strong>` + data.ability_Array[j].FName + "(" + data.studentability_Array[k].FAbilityLevelName + ")" + `</strong></span>`;
+                                //         iscz = 1;
+                                //         break;
+                                //     }
+                                // }
+                                // if (iscz == 0)
+                                if(data.ability_Array[j].FSPName){
+                                    html1 += `        <span  class="label label-success radius" onclick="selectinfo(\'` + data.ability_Array[j].key + `\',\'` + data.ability_Array[j].FName + `\','',\'`+data.ability_Array[j].studentabilityID+`\',\'`+data.ability_Array[j].levelConditID+`\')"><strong>` + data.ability_Array[j].FName + "(" + data.ability_Array[j].FSPName + ")" + `</strong></span>`;
+                                }else{
+                                    html1 += `        <span  class="label label-success radius" onclick="selectinfo(\'` + data.ability_Array[j].key + `\',\'` + data.ability_Array[j].FName + `\','',\'`+data.ability_Array[j].studentabilityID+`\',\'`+data.ability_Array[j].levelConditID+`\')">` + data.ability_Array[j].FName + `</span>`;
+                                }
+
+
+                            } else {
+                                continue;
+                            }
+                        }
+                        html1 += `        </div>`;
+                        html1 += `    </div>`;
+                        html1 += `</li>`;
+                    }
+                    html += html1 + `</ul>`;
+                    huaxiang.append(html);
+
+
+                    $("#Huifold1").Huifold({
+                        item: '.item',
+                        titCell: 'h4',
+                        mainCell: '.info',
+                        type: 3,
+                        trigger: 'click',
+                        className: "selected",
+                        speed: "first",
+                        openKeys: data.openKeys //[0, 1, 2] data.openKeys
+                    });
+                    $("#wundiv").hide();
+                }else{
+                    $("#wundiv").show();
+                }
+
+               
+
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+    });
+
+    function selectinfo(fkeyid, name,levelname,studentabid,levelConditID) {
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/tstudent/queryabilityInfohua', // 调用地址
+            data: JSON.stringify({
+                id: fkeyid,
+                userid: userid,
+                type: 2, // 1-服务器 2-本机
+                ip: YULANIP,
+                studentabid:studentabid
+            }),
+            async: false,
+            success: function (data) {
+                // if(levelname){
+                //     $("#FName").text(data.info.FName + "("+levelname+")");
+                // }else{
+                //     $("#FName").text(data.info.FName);
+                // }
+                $("#FName").text(name);
+                $("#FNote").text(data.info.FNote);
+                $("#FTypeName").text(data.info.FTypeName);
+                var html1 = "";
+                if(data.info.studentwhq == 1){
+                    html1 += `<div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-3" style="font-weight: bold;">能力状态：</label>
+                                    <div class="formControls col-xs-8 col-sm-9">
+                                        <label class="form-label" id="FNote"
+                                               style="width: 100%;text-align: left;">` + data.info.studentFState + `</label>
+                                    </div>
+                                </div>`
+                    html1 += `<div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-3" style="font-weight: bold;">获取方式：</label>
+                                    <div class="formControls col-xs-8 col-sm-9">
+                                        <label class="form-label" id="FNote"
+                                               style="width: 100%;text-align: left;">` + data.info.studentFMode + `</label>
+                                    </div>
+                                </div>`
+                    html1 += `<div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-3" style="font-weight: bold;">获取时间：</label>
+                                    <div class="formControls col-xs-8 col-sm-9">
+                                        <label class="form-label" id="FNote"
+                                               style="width: 100%;text-align: left;">` + data.info.studentFDate + `</label>
+                                    </div>
+                                </div>`
+                    html1 += `<div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-3" style="font-weight: bold;">能力描述：</label>
+                                    <div class="formControls col-xs-8 col-sm-9">
+                                        <label class="form-label" id="FNote"
+                                               style="width: 100%;text-align: left;">` + data.info.studentFAbilityInf + `</label>
+                                    </div>
+                                </div>`
+
+
+                    if (data.info.studentfj == 1) {
+                        fileurl = data.info.studentFUrl;
+                        filename = studentname + "_" + name + "_证书附件";
+                        html1 += `<div class="row cl " onclick="xiazai()">
+                                    <label class="form-label col-xs-4 col-sm-3" style="font-weight: bold;">证书附件：</label>
+                                    <div class="formControls col-xs-8 col-sm-9">
+                                        <label class="form-label" id="FNote"
+                                               style="width: 100%;text-align: left;color: #0e90d2;cursor: pointer;">证书附件下载</label>
+                                    </div>
+                                </div>`
+                    }
+                }else{
+                    html1 += `<div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-3" style="font-weight: bold;">能力状态：</label>
+                                    <div class="formControls col-xs-8 col-sm-9">
+                                        <label class="form-label" id="FNote"
+                                               style="width: 100%;text-align: left;">未获取</label>
+                                    </div>
+                                </div>`
+                    html1 += `<div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-3" style="font-weight: bold;">获取方式：</label>
+                                    <div class="formControls col-xs-8 col-sm-9">
+                                        <label class="form-label" id="FNote"
+                                               style="width: 100%;text-align: left;">未获取</label>
+                                    </div>
+                                </div>`
+                    html1 += `<div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-3" style="font-weight: bold;">获取时间：</label>
+                                    <div class="formControls col-xs-8 col-sm-9">
+                                        <label class="form-label" id="FNote"
+                                               style="width: 100%;text-align: left;">未获取</label>
+                                    </div>
+                                </div>`
+                    html1 += `<div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-3" style="font-weight: bold;">能力描述：</label>
+                                    <div class="formControls col-xs-8 col-sm-9">
+                                        <label class="form-label" id="FNote"
+                                               style="width: 100%;text-align: left;">未获取</label>
+                                    </div>
+                                </div>`
+                }
+                var nenglidengji = $("#nenglidengji");
+                nenglidengji.empty();
+                nenglidengji.append(html1);
+
+
+                selectinfotree(levelConditID);
+
+                var popup = document.getElementById('right-popup');
+                popup.classList.add('active');
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+
+    }
+
+    function selectinfotree(fkeyid){
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json;charset=UTF-8',
+            url: '/s/courseabilitycondition/querycourseabilityConditionTree',
+            data: JSON.stringify({
+                id: fkeyid
+            }),
+            success: function (data) {
+                if (data.result == 'success') {
+                    searchInput = data.searchInput;
+                    $('#searchInput').text(data.searchInput);
+                    treeData = data.treeDataall;
+                    // 初始化生成所有树
+                    generateZTrees(treeData);
+                    searchNodes();
+                }
+                if (data.result == 'error') {
+                    toastr.error(data.error);
+                }
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+    }
+
+    // 生成ZTree树形结构
+    function generateZTrees(data) {
+        const container = $('#ztree-container');
+        container.empty();
+
+        data.forEach((tree, index) => {
+            const wrapper = $('<div class="ztree-wrapper"></div>');
+            const title = $('<div class="ztree-title">' + tree.name + '</div>');
+            const treeDiv = $('<ul id="tree' + index + '" class="ztree"></ul>');
+
+            wrapper.append(title);
+            wrapper.append(treeDiv);
+            container.append(wrapper);
+
+            // zTree配置
+            const setting = {
+                view: {
+                    showLine: true,
+                    selectedMulti: false,
+                    fontCss: function(treeId, treeNode) {
+                        return treeNode.highlight ? {color:"#ff4d4f", "font-weight":"bold"} : {};
+                    }
+                },
+                data: {
+                    simpleData: {
+                        enable: true,
+                        idKey: "id",
+                        pIdKey: "pId",
+                        rootPId: 0
+                    }
+                },
+                callback: {
+                    onClick: function(event, treeId, treeNode) {
+                        console.log(treeNode);
+                    }
+                }
+            };
+
+            // 初始化zTree
+            $.fn.zTree.init(treeDiv, setting, tree.nodes);
+        });
+    }
+
+    // 在所有树中搜索
+    function searchNodes() {
+        const keyword =searchInput ; //$('#searchInput').val().trim();
+        if (!keyword) {
+            toastr.error('请输入考核条件');
+            return;
+        }
+
+        const container = $('#ztree-container');
+        const trees = container.find('.ztree-wrapper');
+        let found = false;
+
+        trees.each(function(index) {
+            const treeObj = $.fn.zTree.getZTreeObj('tree' + index);
+            const nodes = treeObj.getNodes();
+
+            // 先取消之前的高亮
+            treeObj.cancelSelectedNode();
+            const allNodes = treeObj.transformToArray(nodes);
+            allNodes.forEach(node => {
+                node.highlight = false;
+                treeObj.updateNode(node);
+            });
+
+            // 搜索匹配的节点
+            const matchedNodes = treeObj.getNodesByParamFuzzy("name", keyword);
+            if (matchedNodes.length > 0) {
+                found = true;
+                matchedNodes.forEach(node => {
+                    node.highlight = true;
+                    treeObj.updateNode(node);
+                    treeObj.selectNode(node);
+                    treeObj.expandNode(node.getParentNode(), true, true, true);
+                });
+            }
+        });
+
+        if (!found) {
+            toastr.error('未找到匹配的节点');
+        } else {
+            // 滚动到第一个匹配的节点
+            const firstTree = $.fn.zTree.getZTreeObj('tree0');
+            const firstMatched = firstTree.getNodesByParam("highlight", true);
+            if (firstMatched && firstMatched.length > 0) {
+                firstTree.selectNode(firstMatched[0]);
+                firstTree.scrollIntoView(firstMatched[0]);
+            }
+        }
+    }
+    function xiazai() {
+        if (fileurl) {
+            $("body").mLoading("show");
+            setTimeout(function () {
+                $('.mloading-text').html('正在获取文件信息...');
+                var newLink = document.createElement('a');
+                newLink.href = fileurl; // 设置 href 属性为文件链接
+                newLink.download = filename; // 设置 download 属性为文件名
+                newLink.style.display = 'none'; // 隐藏链接
+                setTimeout(function () {
+                    $('.mloading-text').html('获取完成准备下载...');
+                    document.body.appendChild(newLink);
+                    newLink.click();
+                    // $("#downloadspan").trigger("click");
+                    setTimeout(function () {
+                        $(newLink).remove();
+                        setTimeout(function () {
+                            $("body").mLoading("hide");
+                        }, 1000);
+                    }, 1000);
+
+                }, 1000);
+            }, 1000);
+
+        } else {
+            toastr.error("未获取到附件链接，请刷新重试！");
+        }
+
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var closePopupBtn = document.getElementById('close-popup-btn');
+        var popup = document.getElementById('right-popup');
+
+        closePopupBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            popup.classList.remove('active');
+        });
+    });
+
+
+</script>
+</body>
+</html>

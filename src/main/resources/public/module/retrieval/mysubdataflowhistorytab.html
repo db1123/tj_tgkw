@@ -1,0 +1,117 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+        <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+        <!--/_only 独立样式 -->
+    </head>
+    <body>
+        <div class="page-container" style="padding: 2px;">
+            <div class="f-l text-l">
+                <button type="button" class="btn btn-secondary-outline radius" id="huibao" onclick="huibao()">
+                    工作汇报
+                </button>
+
+                <button type="button" class="btn btn-secondary-outline radius" id="jiaofuwu" onclick="jiaofuwu()">
+                    交付物
+                </button>
+                <button type="button" class="btn btn-secondary-outline radius" id="yichang" onclick="yichang()">
+                    节点异常申请
+                </button>
+                <button type="button" class="btn btn-secondary-outline radius" id="biangeng" onclick="biangeng()">
+                    计划时间变更
+                </button>
+            </div>
+            <div class="f-l" style="width: 100%; margin-top: 3px;">
+                <div id="iframediv">
+                    <iframe width="100%;" height="100%;" frameborder="0" id="plan" ></iframe>
+                </div>
+            </div>
+
+        </div>
+        <script type="text/javascript">
+            var mainId = getQueryStringByName('id');//交付物流程ID
+            var type = getQueryStringByName('ftype');//交付物类型
+            var ftaskid = getQueryStringByName('ftaskid');//交付物任务ID
+            var fprojectid = getQueryStringByName('fprojectid');//交付物项目ID
+            var FNodeID = getQueryStringByName('FNodeID');//交付物节点ID
+            var FProjectPlanID = getQueryStringByName('FProjectPlanID');//交付物计划ID
+            // 业务代码
+            $(function () {
+                huibao();
+                if(document.body.clientHeight > 600){
+                    $('#iframediv').height(document.body.clientHeight-50);
+                }else {
+                    $('#iframediv').height(document.body.clientHeight-80);
+                }
+
+            });
+            function huibao() {
+                $("#huibao").css("background","#3BB4F2");
+                $("#huibao").css("color","#FFFFFF");
+
+
+
+                $("#jiaofuwu").css("background","#FFFFFF");
+                $("#jiaofuwu").css("color","#3BB4F2");
+                $("#yichang").css("background","#FFFFFF");
+                $("#yichang").css("color","#3BB4F2");
+                $("#biangeng").css("background","#FFFFFF");
+                $("#biangeng").css("color","#3BB4F2");
+
+                $('#plan').attr('src', '/module/flow/executeFlow/edit/workReport/list.html?view=1&selectType=1&type='+type+'&mainId='+mainId);
+            }
+
+            function jiaofuwu() {
+
+                $("#jiaofuwu").css("color","#FFFFFF");
+                $("#jiaofuwu").css("background","#3BB4F2");
+
+                $("#huibao").css("background","#FFFFFF");
+                $("#huibao").css("color","#3BB4F2");
+                $("#yichang").css("background","#FFFFFF");
+                $("#yichang").css("color","#3BB4F2");
+                $("#biangeng").css("background","#FFFFFF");
+                $("#biangeng").css("color","#3BB4F2");
+                $('#plan').attr('src', '/module/mytask/mytasksubdatatab.html?id='+ftaskid+'&FProjectID='+fprojectid+'&showtype=3&executetype=2&FNodeID='+FNodeID+'&ftype=3&FProjectPlanID='+FProjectPlanID);
+            }
+
+            function yichang() {
+
+                $("#yichang").css("color","#FFFFFF");
+                $("#yichang").css("background","#3BB4F2");
+
+                $("#huibao").css("background","#FFFFFF");
+                $("#huibao").css("color","#3BB4F2");
+                $("#jiaofuwu").css("background","#FFFFFF");
+                $("#jiaofuwu").css("color","#3BB4F2");
+                $("#biangeng").css("background","#FFFFFF");
+                $("#biangeng").css("color","#3BB4F2");
+
+                $('#plan').attr('src', '/module/flow/executeFlow/edit/abnormal/list.html?view=1&selectType=1&type='+type+'&mainId='+mainId);
+            }
+
+            function biangeng() {
+
+                $("#biangeng").css("color","#FFFFFF");
+                $("#biangeng").css("background","#3BB4F2");
+
+                $("#huibao").css("background","#FFFFFF");
+                $("#huibao").css("color","#3BB4F2");
+                $("#jiaofuwu").css("background","#FFFFFF");
+                $("#jiaofuwu").css("color","#3BB4F2");
+                $("#yichang").css("background","#FFFFFF");
+                $("#yichang").css("color","#3BB4F2");
+
+                $('#plan').attr('src', '/module/flow/executeFlow/edit/scheduleTime/list.html?view=1&selectType=1&type='+type+'&mainId='+mainId);
+            }
+        </script>
+    </body>
+</html>

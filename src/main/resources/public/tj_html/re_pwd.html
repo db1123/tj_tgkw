@@ -1,0 +1,221 @@
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>找回密码 - 科技互联</title>
+  <!-- <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script> -->
+    <script src="js/3.4.16"></script>
+  <script src="js/iconify.min.js"></script>
+  <style>
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    @keyframes scan {
+      0% {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+
+      100% {
+        transform: translateY(100%);
+        opacity: 0;
+      }
+    }
+
+    .scan-line {
+      animation: scan 3s linear infinite;
+    }
+  </style>
+</head>
+
+<body class="bg-[#0f172a] text-slate-200 font-sans min-h-screen flex items-center justify-center p-4">
+  <!-- 背景光效 -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-24 -left-24 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl"></div>
+  </div>
+
+  <!-- 主容器 -->
+  <div class="w-full max-w-[420px] bg-slate-900/80 backdrop-blur-xl border border-slate-710/50 rounded-3xl shadow-2xl overflow-hidden relative z-10 p-8">
+
+    <!-- 品牌标识 -->
+    <div class="flex flex-col items-center mb-8">
+      <div class="w-16 h-16 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20 mb-4">
+        <span class="iconify text-3xl text-white" data-icon="heroicons:shield-check-solid"></span>
+      </div>
+      <h1 class="text-2xl font-bold text-white tracking-tight">找回密码</h1>
+      <p class="text-slate-400 text-sm mt-2">请选择验证方式以重置您的密码</p>
+    </div>
+
+    <!-- 方式切换 -->
+    <div class="flex bg-slate-800/50 p-1 rounded-xl mb-8 border border-slate-700/50">
+      <button id="tab-email" onclick="switchTab('email')" class="flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 bg-blue-600 text-white shadow-lg">邮箱找回</button>
+      <button id="tab-phone" onclick="switchTab('phone')" class="flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 text-slate-400 hover:text-white">短信找回</button>
+    </div>
+
+    <!-- 表单区域 -->
+    <form id="recovery-form" onsubmit="handleSubmit(event)" class="space-y-5">
+
+      <!-- 邮箱输入组 -->
+      <div id="group-email" class="space-y-5">
+        <div class="relative">
+          <span class="iconify absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl" data-icon="heroicons:envelope"></span>
+          <input type="email" id="input-email" placeholder="请输入注册邮箱" class="w-full bg-slate-800/50 border border-slate-700 rounded-xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500">
+        </div>
+      </div>
+
+      <!-- 手机输入组 (默认隐藏) -->
+      <div id="group-phone" class="space-y-5 hidden">
+        <div class="relative">
+          <span class="iconify absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl" data-icon="heroicons:phone"></span>
+          <input type="tel" id="input-phone" placeholder="请输入绑定的手机号" class="w-full bg-slate-800/50 border border-slate-700 rounded-xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500">
+        </div>
+      </div>
+
+      <!-- 验证码组 -->
+      <div class="relative flex gap-3">
+        <div class="relative flex-1">
+          <span class="iconify absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl" data-icon="heroicons:key"></span>
+          <input type="text" id="input-code" placeholder="输入验证码" class="w-full bg-slate-800/50 border border-slate-700 rounded-xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500">
+        </div>
+        <button type="button" onclick="sendCode()" id="btn-send" class="px-4 py-3.5 bg-slate-800 border border-slate-700 hover:border-blue-500 text-blue-400 text-sm font-medium rounded-xl whitespace-nowrap transition-all">
+          获取验证码
+        </button>
+      </div>
+
+      <!-- 提交按钮 -->
+      <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-4 rounded-xl shadow-xl shadow-blue-500/20 transform active:scale-[0.98] transition-all mt-4">
+        立即验证
+      </button>
+    </form>
+
+    <!-- 底部链接 -->
+    <div class="mt-8 text-center text-sm">
+      <a href="#" class="text-slate-400 hover:text-white transition-colors flex items-center justify-center gap-1">
+        <span class="iconify" data-icon="heroicons:arrow-left"></span>
+        返回登录
+      </a>
+    </div>
+  </div>
+
+  <!-- 弹窗提示 -->
+  <div id="toast" class="fixed top-8 left-1/2 -translate-x-1/2 z-50 px-6 py-3 bg-slate-800 border border-blue-500/50 text-white rounded-full shadow-2xl transform transition-all duration-300 opacity-0 -translate-y-10 pointer-events-none flex items-center gap-2">
+    <span class="iconify text-blue-400" id="toast-icon" data-icon="heroicons:check-circle"></span>
+    <span id="toast-msg">提示信息</span>
+  </div>
+
+  <script>
+    let currentMode = 'email'; // 默认为邮箱模式
+
+    function switchTab(mode) {
+      currentMode = mode;
+      const tabEmail = document.getElementById('tab-email');
+      const tabPhone = document.getElementById('tab-phone');
+      const groupEmail = document.getElementById('group-email');
+      const groupPhone = document.getElementById('group-phone');
+
+      if (mode === 'email') {
+        tabEmail.className = 'flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 bg-blue-600 text-white shadow-lg';
+        tabPhone.className = 'flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 text-slate-400 hover:text-white';
+        groupEmail.classList.remove('hidden');
+        groupPhone.classList.add('hidden');
+      } else {
+        tabPhone.className = 'flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 bg-blue-600 text-white shadow-lg';
+        tabEmail.className = 'flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 text-slate-400 hover:text-white';
+        groupPhone.classList.remove('hidden');
+        groupEmail.classList.add('hidden');
+      }
+    }
+
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+      const toastIcon = document.getElementById('toast-icon');
+
+      toastMsg.innerText = msg;
+      toastIcon.setAttribute('data-icon', isError ? 'heroicons:exclamation-triangle' : 'heroicons:check-circle');
+      toastIcon.className = isError ? 'iconify text-red-400' : 'iconify text-blue-400';
+
+      toast.classList.remove('opacity-0', '-translate-y-10');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', '-translate-y-10');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+      }, 3000);
+    }
+
+    function sendCode() {
+      const btn = document.getElementById('btn-send');
+      let value = '';
+
+      if (currentMode === 'email') {
+        value = document.getElementById('input-email').value;
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          showToast('请输入有效的邮箱地址', true);
+          return;
+        }
+      } else {
+        value = document.getElementById('input-phone').value;
+        if (!/^1[3-9]\d{9}$/.test(value)) {
+          showToast('请输入有效的手机号码', true);
+          return;
+        }
+      }
+
+      // 模拟验证码发送
+      let count = 60;
+      btn.disabled = true;
+      btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+      const timer = setInterval(() => {
+        btn.innerText = `重新获取(${count}s)`;
+        count--;
+        if (count < 0) {
+          clearInterval(timer);
+          btn.disabled = false;
+          btn.classList.remove('opacity-50', 'cursor-not-allowed');
+          btn.innerText = '获取验证码';
+        }
+      }, 1000);
+
+      showToast('验证码已发送，请查收');
+    }
+
+    function handleSubmit(e) {
+      e.preventDefault();
+      const code = document.getElementById('input-code').value;
+
+      if (!code) {
+        showToast('请输入验证码', true);
+        return;
+      }
+
+      if (code.length < 4) {
+        showToast('验证码不正确', true);
+        return;
+      }
+
+      showToast('验证通过！正在跳转重置页面...');
+      setTimeout(() => {
+        alert('后端验证模拟成功！下一步将跳转至：reset_password.html');
+      }, 1000);
+    }
+  </script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<body style="margin: 0; padding: 0;">
+<link rel="stylesheet" type="text/css" href="/plugins/toastr/toastr.min.css"/>
+<!-- 功能代码 开始 -->
+<script type="text/javascript" src="/nui-ad/lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="/plugins/toastr/toastr.min.js"></script>
+<script type="text/javascript" src="/javascript/tools.js"></script>
+<script type="text/javascript">
+    var accessInfo;
+    var ippp = getQueryStringByName('ip');
+    // 单点登录
+    $.ajax({
+        type: 'POST',
+        contentType: 'application/json',
+        url: '/s/entry/singleSignOn', // 调用地址
+        data: JSON.stringify({
+            login: getQueryStringByName('l'),
+            pass: getQueryStringByName('p')
+        }),
+        async: false,
+        success: function (data) {
+            if (data.result == "success") {
+                localStorage.setItem('simulation_dmsnid', data.simulation_dmsnid);
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    url: '/s/tpermissionGroup/queryaccesscontroll',
+                    data: JSON.stringify({
+                        FMenID: getQueryStringByName('menid'),
+                        FUserID:data.FUserID
+                    }),
+                    async: false,
+                    success: function (data) {
+                        if (data.result == "success") {
+                            accessInfo = data.accessInfo;
+                        } else {
+                            var newHref = ippp + "/module/access404.html";
+                            // 加载功能页
+                            window.location.href = newHref;
+                        }
+                    },
+                    error: function (e) {
+                        console.log(e.status);
+                        console.log(e.responseText);
+                    }
+                });
+                if (!accessInfo) {
+                    var newHref = ippp + "/module/access404.html";
+                    // 加载功能页
+                    window.location.href = newHref;
+                }else{
+                    // 加载功能页
+                    window.location.href = getQueryStringByName('url') + "&accessInfo="+ accessInfo;
+                }
+            } else {
+                toastr.error(data.result);
+            }
+        },
+        error: function (e) {
+            toastr.error(e.status);
+            toastr.error(e.responseText);
+        }
+    });
+</script>
+<!-- 功能代码 结束 -->
+</body>
+</html>

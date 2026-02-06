@@ -1,0 +1,484 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<!--_global 公共配置文件 -->
+<script language="javascript">var golbal_type="admin";</script>
+<script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+<!--_only 独立样式 -->
+<link rel="stylesheet" href="/plugins/select2/css/select2.min.css" />
+<link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css" />
+<link rel="stylesheet" href="/plugins/codemirror/lib/codemirror.css" />
+<link rel="stylesheet" href="/plugins/codemirror/theme/dracula.css" />
+<link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css" />
+<link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css" />
+<link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css" />
+<!--/_only 独立样式 -->
+</head>
+<body>
+<form action="" method="post" class="form form-horizontal" id="JSCodeForm">
+  <div class="my-layer-context">
+    <div class="row cl" style="padding: 10px 20px;">
+      <div class="col-xs-12 col-sm-4">
+        <label class="form-label" style="text-align: left;"><span class="c-red">*</span>类型：</label>
+        <div class="formControls big">
+          <select name="f_type" style="width: 100%;"><option></option></select>
+        </div>
+        <label class="form-label" style="text-align: left;"><span class="c-red">*</span>参数符号：</label>
+        <div class="formControls">
+          <input type="text" class="input-text" name="f_title" />
+        </div>
+        <label class="form-label" style="text-align: left;"><span class="c-red">*</span>参数名：</label>
+        <div class="formControls">
+          <input type="text" class="input-text" name="f_subtitle" />
+        </div>
+        <label class="form-label" style="text-align: left;">裕量：</label>
+        <div class="formControls">
+          <input type="text" class="input-text" name="f_min_margin" placeholder="最小值" style="width: 100px; height: 27px;" />
+          ~
+          <input type="text" class="input-text" name="f_max_margin" placeholder="最大值" style="width: 100px; height: 27px;" />
+        </div>
+        <label class="form-label" style="text-align: left;">单位：</label>
+        <div class="formControls big">
+          <select name="f_value_unit" style="width: 80px;"><option></option></select>
+        </div>
+        <label class="form-label" style="text-align: left;">成本(万元)：</label>
+        <div class="formControls">
+          <input type="text" class="input-text" name="f_kosten" />
+        </div>
+        <label class="form-label" style="text-align: left;">重要度：</label>
+        <div class="formControls">
+          <input type="text" class="input-text" name="f_bedeutung" />
+        </div>
+        <label class="form-label" style="text-align: left;">图：</label>
+        <div class="formControls">
+          <div class="avatar-view">
+            <img src="/images/bg.jpeg" id="f_img" onclick="openImg()">
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-8">
+        <div class="f-l text-l">
+          <button type="button" class="btn btn-default size-S my-btn" onclick="ModelValues(1)"><i class=" fa fa-plus"></i> 添加</button>
+        </div>
+        <div class="f-l" style="width: 100%; margin-top: 1px;">
+          <table id="paramTable" class="display compact" style="width: 99.8%;"></table>
+          <label class="col-form-label" id="calculationFunctionHead" style="font-size: 15px; font-weight: 600; padding: 0;">
+            function()&nbsp;{<span style="font-weight: 600; color: red;">↓↓↓请编写方法主体（用return返回结果）↓↓↓</span>}
+          </label>
+          <textarea name="f_calculation"></textarea>
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-4"></div>
+      <div class="col-xs-12 col-sm-8">
+        <label class="form-label" style="text-align: left;">说明：</label>
+        <div class="formControls">
+          <iframe id="f_memo" frameborder=0 scrolling="no" src="editJSCode_UEditor.html" style="width:100%;height:720px;"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+  <input type="hidden" value="" name="f_key_id" />
+  <div class="my-layer-button">
+    <div class="toolbar-bottom-line"></div>
+    <div class="toolbar-bottom-btn">
+      <input class="btn btn-success-outline radius mr-20" type="button" value="&nbsp;&nbsp;测试运行&nbsp;&nbsp;" onclick="JSCodeExamRun()" />
+      <input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;" />
+      <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;" onclick="layer_close()" />
+    </div>
+  </div>
+</form>
+
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script type="text/javascript" src="/plugins/codemirror/lib/codemirror.js"></script>
+<script type="text/javascript" src="/plugins/codemirror/mode/javascript/javascript.js"></script>
+<script type="text/javascript" src="/plugins/codemirror/addon/selection/active-line.js"></script>
+<script type="text/javascript" src="/plugins/codemirror/addon/edit/matchbrackets.js"></script>
+<script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript" src="/javascript/ReturnData.js"></script>
+<script type="text/javascript">
+// 编辑框状态 1新建 2修改
+var op = getQueryStringByName('op');
+// 代码编辑器-javascript
+var calculationCodeMirror;
+// 业务代码
+$(function(){
+  // 初始化类型树形下拉框
+  $.ajax({
+    type: 'POST',
+    contentType: 'application/json',
+    url: '/s/paramType/queryParamTypeALL', // 调用地址
+    async: false,
+    success: function(data) {
+      $("#JSCodeForm select[name='f_type']").select2ztree({
+        textField : 'name',
+        titleField : 'name',
+        placeholder: '请选择类型',
+        ztree: {
+          setting: {
+            view: {
+              dblClickExpand: false
+            },
+            data: {
+              simpleData: {
+                enable: true,
+                idKey: "id",
+                pIdKey: "pId",
+                rootPId: 0
+              }
+            }
+          },
+          zNodes: data.zNodes
+        },
+        language: "zh-CN"
+      });
+    },
+    error : function(e) {
+      toastr.error(e.status);
+      toastr.error(e.responseText);
+    }
+  });
+  // 初始化单位下拉列表
+  $("#JSCodeForm select[name='f_value_unit']").select2({
+    placeholder: '单位',
+    ajax: {
+      type:'POST',
+      url: "/s/unit/queryUnitSelect",
+      dataType: 'json',
+      data: function (params) {
+        return {
+          search: params.term,
+        };
+      },
+      delay: 800,
+      cache: true
+    },
+    language: "zh-CN"
+  });
+  // 封装表格-参数表
+  $('#paramTable').DataTable({
+    data: [],
+    columns: [
+      {
+        width: 40,
+        title: '变量名',
+        data: 'f_variable_name'
+      },
+      { title: '类型', data: 'f_type', width: 180, render: function (data, type, row) {return row.type_name} },
+      {
+        title: '分类',
+        data: 'f_classify',
+        width: 60,
+        render: function (data, type, row) {
+          switch (data) {
+            case 1:
+              return '普通节点';
+              break;
+          
+            case 2:
+              return '标准SQL';
+              break;
+
+            case 3:
+              return '自定义SQL';
+              break;
+
+            case 4:
+              return 'JS代码';
+              break;
+
+            case 5:
+              return 'URL引用';
+              break;
+
+            default:
+              return '无';
+              break;
+          }
+        }
+      },
+      { title: '参数符号', data: 'f_title' },
+      { title: '参数名', data: 'f_subtitle' },
+      {
+        data: 'key',
+        width: 35,
+        orderable: false,
+        render: function (data, type, row) {
+          var temp = '';
+          temp = '<button type="button" class="btn btn-secondary size-MINI" onclick="ModelValues(2, \''+data+'\')">改</button>';
+          temp += '<button type="button" class="btn btn-danger size-MINI" onclick="onClickModelBtnDel(\''+row.key+'\',\''+row.f_title+'\')">删</button>';
+          return temp;
+        }
+      }
+    ],
+    paging: false, // 是否开启本地分页
+    lengthChange: false, // 是否允许用户改变表格每页显示的记录数
+    searching: false, // 是否允许Datatables开启本地搜索
+    ordering: false, // 是否允许Datatables开启排序
+    info: false, // 控制是否显示表格左下角的信息
+    language: DataTablesLanguage
+  });
+  // * 初始化代码编辑器-javascript *
+  calculationCodeMirror = CodeMirror.fromTextArea($("#JSCodeForm textarea[name='f_calculation']")[0], {
+    lineNumbers: true,// 是否显示行号
+    mode: 'javascript', // 编辑器语言
+    theme: 'dracula', // 编辑器主题
+    matchBrackets: true, // 匹配括号
+    styleActiveLine: true // 设置光标所在行高亮
+  });
+  calculationCodeMirror.setSize('auto','260px');
+  // 修改操作时读取表单信息
+  if (op == 2) {
+    var id = getQueryStringByName('id');
+    $.ajax({
+      type: 'POST',
+      contentType: 'application/json',
+      url: '/s/param/queryParamInfo', // 调用地址
+      data: JSON.stringify({
+        id
+      }),
+      async: false,
+      success: function(data) {
+        $("#JSCodeForm select[name='f_type']").select2ztree('val', [data.info.f_type]);
+        $("#JSCodeForm input[name='f_title']").val(data.info.f_title);
+        $("#JSCodeForm input[name='f_subtitle']").val(data.info.f_subtitle);
+        $("#JSCodeForm input[name='f_min_margin']").val(data.info.f_min_margin);
+        $("#JSCodeForm input[name='f_max_margin']").val(data.info.f_max_margin);
+        $("#JSCodeForm input[name='f_kosten']").val(data.info.f_kosten);
+        $("#JSCodeForm input[name='f_bedeutung']").val(data.info.f_bedeutung);
+        var valueUnitOption = new Option(data.info.f_value_unit, data.info.f_value_unit, true, true);
+        $("#JSCodeForm select[name='f_value_unit']").append(valueUnitOption);
+        if (data.info.f_img && data.info.f_img != '') {
+          $("#f_img").attr('src', data.info.f_img);
+        }
+        $("#JSCodeForm input[name='f_key_id']").val(data.info.key);
+        document.getElementById("f_memo").onload = function() {
+          if (data.info.f_memo) {
+            $('#f_memo')[0].contentWindow.ue.ready(function() {
+              $('#f_memo')[0].contentWindow.ue.setContent(data.info.f_memo);
+            });
+          }
+        };
+        // 重新构建table
+        var paramTable = $('#paramTable').dataTable();
+        var paramJsonData = data.info.models;
+        if (paramJsonData.length > 0) {
+          paramTable.fnAddData(paramJsonData, true);
+          // 获取参数字符串
+          var paramStr = getFunctionParamStrs(paramTable);
+          $('#calculationFunctionHead').html('function(<span style="font-weight: 600; font-size: 15px; color: red;">' + paramStr + '</span>)&nbsp;{<span style="font-weight: 600; color: red;">↓↓↓请编写方法主体（用return返回结果）↓↓↓</span>}');
+        }
+        // 代码编辑器赋值
+        calculationCodeMirror.setValue(data.info.f_calculation);
+      },
+      error : function(e) {
+        toastr.error(e.status);
+        toastr.error(e.responseText);
+      }
+    });
+  }
+  // 检验数据
+  $('#JSCodeForm').validate({
+    rules: {
+      f_type: {
+        required: true
+      },
+      f_title: {
+        required: true
+      }
+    },
+    messages: {
+      f_type: {
+        required: '*请选择类型'
+      },
+      f_title: {
+        required: '*请输入标题'
+      }
+    },
+    onfocusout: false, // 是否在获取焦点时验证
+    onkeyup: false, // 是否在敲击键盘时验证
+    focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+    focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+    success: 'valid',
+    submitHandler:function(){
+      if (calculationCodeMirror.getValue() == '') {
+        toastr.error('请填写 javascript 函数');
+      } else {
+        // 获取参数
+        var JsonData = form2Json('JSCodeForm');
+        JsonData['models'] = JSON.stringify($('#paramTable').dataTable().fnGetData());
+        JsonData['f_calculation'] = calculationCodeMirror.getValue();
+        JsonData['f_classify'] = 4;
+        if ($('#f_img')[0].src.indexOf('images/bg.jpeg') < 0) {
+          JsonData['f_img'] = $('#f_img')[0].src;
+        } else {
+          JsonData['f_img'] = '';
+        }
+        JsonData['f_memo'] = $('#f_memo')[0].contentWindow.ue.getContent();
+        // 执行
+        if (op == 1) { // 添加操作
+          $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/param/addParam', // 调用地址
+            data: JSON.stringify(JsonData),
+            async: false,
+            success: function(data) {
+              if (data.result == 'success') {
+                parent.$('#paramTable').DataTable().ajax.reload(null, false);
+                parent.toastr.success('添加成功！');
+                layer_close();
+              } else if (data.result == 'error') {
+                toastr.error(data.error);
+              }
+            },
+            error : function(e){
+              toastr.error(e.status);
+              toastr.error(e.responseText);
+            }
+          });
+        }else {
+          $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/param/updateParam', // 调用地址
+            data: JSON.stringify(JsonData),
+            async: false,
+            success: function(data) {
+              if (data.result == 'success') {
+                parent.$('#paramTable').DataTable().ajax.reload(null, false);
+                parent.toastr.success('修改成功！');
+                layer_close();
+              } else if (data.result == 'error') {
+                toastr.error(data.error);
+              }
+            },
+            error : function(e){
+              toastr.error(e.status);
+              toastr.error(e.responseText);
+            }
+          });
+        }
+      }
+    }
+  });
+});
+// 删除按钮点击事件
+function onClickModelBtnDel(id, name) {
+  layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function(index){
+    var index;
+    var data = $('#paramTable').dataTable().fnGetData();
+    for (var i=0; i<data.length; i++) {
+      if (id == data[i]['key']) {
+        index = i;
+      }
+    }
+    $('#paramTable').dataTable().fnDeleteRow(index);
+    RefreshParamVariableName(); // 刷新变量名
+    layer.close(layer.index);
+	});
+}
+// 刷新标题参数变量名称
+function RefreshParamVariableName() {
+  var paramStr = getFunctionParamStrs($('#paramTable').dataTable());
+  $('#calculationFunctionHead').html('function(<span style="font-weight: 600; font-size: 15px; color: red;"> ' + paramStr + ' </span>)&nbsp;{<span style="font-weight: 600; color: red;">↓↓↓请编写方法主体（用return返回结果）↓↓↓</span>}');
+}
+// 参数导入
+function ModelValues(op, fKey) {
+  if (op == 1) { // 新增
+    layer_show('新增参数信息','editJSCodeModel.html?op=1','900','500');
+  } else { // 修改
+    layer_show('修改参数信息','editJSCodeModel.html?op=2&id='+fKey,'900','500');
+  }
+}
+// 测试运行
+function JSCodeExamRun() {
+  // 判断是否继续执行
+  if(calculationCodeMirror.getValue() == '') {
+    toastr.error('请填写 JavaScript代码');
+  } else {
+    $('body').mLoading('show');
+    setTimeout(function(){
+      // 获取表单数据
+      var JsonData = form2Json('JSCodeForm');
+      JsonData['f_calculation'] = calculationCodeMirror.getValue();
+      JsonData['f_classify'] = 4;
+      // 获取参数表
+      var paramData = $('#paramTable').dataTable().fnGetData();
+      // 获取计算数据
+      JsonData['models'] = paramData;
+      // 执行
+      var data = getJSCodeData(JsonData);
+      if (data) {
+        var variableNames = data.variableNames;
+        var variableValues = data.variableValues;
+        var returnData = data.returnData;
+        parent.layer.open({
+          title: '执行结果展示',
+          content: 
+            '<div id="paramModal-param" class="row cl" style="margin-top: 0;"></div>' +
+            '<div style="margin-top: 10px;">' +
+              '<div class="Huialert Huialert-info">' +
+                '<h5><i class="fas fa-info"></i> <b>返回值:</b></h5>' +
+                '<div style="height: 100px; overflow-x: hidden; overflow-y: auto;">' +
+                  '<div id="return-value"></div>' +
+                '</div>' +
+              '</div>' +
+            '</div>',
+          area: ['100%', '100%'],
+          scrollbar: true,
+        });
+        // 参数列表面板
+        for (var i=0; i<variableNames.length; i++) {
+          var variableName = variableNames[i];
+          parent.$('#paramModal-param').append(
+            '<div class="col-xs-12 col-sm-3">' +
+              '<div class="panel panel-default">' +
+                '<div class="panel-header"><i class="fas fa-globe"></i> ' + variableName + '</div>' +
+                '<div class="panel-body" style="overflow-x: hidden; overflow-y: auto; height: 220px;">' +
+                  '<div id="param-' + variableName + '"></div>' +
+                '</div>' +
+              '</div>' +
+            '</div>'
+          );
+          parent.$('#param-' + variableName).JSONView(variableValues[variableName], {collapsed: true, nl2br: true});
+        }
+        // 执行结果面板
+        alert(returnData);
+        if (isJSON(returnData) == true) {
+          parent.$('#return-value').JSONView(returnData, {collapsed: true, nl2br: true});
+        } else {
+          parent.$('#return-value').html(String(returnData));
+        }
+      }
+      $('body').mLoading('hide');
+    }, 200);
+  }
+}
+// 打开图片编辑器
+function openImg() {
+  parent.imgViewCon = $('#f_img');
+  parent.layer.open({
+		type: 2,
+		area: ['1100px', '590px'],
+		fix: true, //不固定
+		shade: 0.4,
+		title: '图片编辑器',
+		content: '/plugins/cropper/index.html'
+	});
+}
+</script>
+</body>
+</html>

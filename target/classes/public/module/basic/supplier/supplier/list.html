@@ -1,0 +1,192 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<!--_global 公共配置文件 -->
+<script language="javascript">var golbal_type="admin";</script>
+<script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+<!--_only 独立样式 -->
+<link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css" />
+<!--/_only 独立样式 -->
+</head>
+<body>
+<div class="page-container" style="padding: 2px;">
+  <div class="f-l text-l">
+    <button type="button" class="btn btn-default size-S my-btn" onclick="SupplierValues(1)"><i class=" fa fa-plus"></i> 新增</button>
+  </div>
+  <div class="f-r text-r">
+    <input type="text" class="input-text size-S supplier-form-text-name" style="width:300px" placeholder="输入公司名称" />
+    <button type="button" class="btn btn-default size-S my-btn supplier-btn-search-fun"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+  </div>
+	<div class="f-l table-panel">
+    <table id="supplierTable" class="display compact" style="width: 99.8%;"></table>
+	</div>
+</div>
+
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+// 业务代码
+$(function(){
+  // 企业-表格
+  $('#supplierTable').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: {
+      type: 'POST',
+      contentType: 'application/json',
+      url: '/s/supplier/querySupplier', // 调用地址
+      data: function ( d ) {
+        return JSON.stringify( $.extend( {}, d, {
+          page: d.start/d.length+1, // 当前页
+          results: d.length, // 每页显示条数
+          name: $('.supplier-form-text-name').val()
+        } ) );
+      },
+      dataSrc: function (json) {
+        json.recordsFiltered = json.total;  // 总行数
+        json.recordsTotal = json.page; // 当前页数
+        return json.list;
+      },
+      error: function (xhr, status, error) {
+        toastr.error(xhr);
+      }
+    },
+    columns: [
+      { title: '企业名称', data: 'f_name' },
+      {
+        title: '附属',
+        data: 'key',
+        width: 26,
+        orderable: false,
+        render: function (data, type, row) {
+          return '<span class="dropDown">'+
+                    '<a class="dropDown_A" style="width: 30px; text-align: center;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+                      '<i class="fas fa-bars"></i><i class="fa fa-caret-down" style="padding-left: 2px;"></i></a>'+
+                    '<ul class="dropDown-menu menu radius box-shadow">'+
+                      '<li><a href="#" onclick="onClickSupplierBtnOpen(\'管理体系认证维护\',\'../supplierCertificate/list.html\',\''+data+'\')">管理体系认证维护</a>'+
+                      '<li><a href="#" onclick="onClickSupplierBtnOpen(\'生产能力维护\',\'../supplierThroughput/list.html\',\''+data+'\')">生产能力维护</a>'+
+                      '<li><a href="#" onclick="onClickSupplierBtnOpen(\'生产设备维护\',\'../supplierProductionEquipment/list.html\',\''+data+'\')">生产设备维护</a>'+
+                      '<li><a href="#" onclick="onClickSupplierBtnOpen(\'检测设备维护\',\'../supplierTestingEquipment/list.html\',\''+data+'\')">检测设备维护</a>'+
+                      '<li><a href="#" onclick="onClickSupplierBtnOpen(\'信用管理\',\'../supplierCredit/list.html\',\''+data+'\')">信用管理</a>'+
+                    '</ul>'+
+                  '</span>';
+        }
+      },
+      {
+        title: '状态控制',
+        data: 'f_state',
+        width: 60,
+        orderable: false,
+        render: function (data, type, row) {
+          if (data == 1) {
+            return '<button type="button" class="btn btn-success size-MINI" onclick="onClickSupplierBtnState(\''+row.key+'\','+row.f_state+',\''+row.f_name+'\')"><i class="fas fa-toggle-on mr-2"></i>启用</button>';
+          } else {
+            return '<button type="button" class="btn btn-warning size-MINI" onclick="onClickSupplierBtnState(\''+row.key+'\','+row.f_state+',\''+row.f_name+'\')"><i class="fas fa-toggle-off mr-2"></i>禁用</button>';
+          }
+        }
+      },
+      {
+        title: '操作',
+        data: 'f_state',
+        width: 90,
+        orderable: false,
+        render: function (data, type, row) {
+          return '<button type="button" class="btn btn-secondary size-MINI" onclick="SupplierValues(2,\''+row.key+'\')"><i class="fas fa-edit mr-2"></i>编辑</button>' +
+                 '<button type="button" class="btn btn-danger size-MINI" onclick="onClickSupplierBtnDel(\''+row.key+'\',\''+row.f_name+'\')"><i class="fas fa-trash mr-2"></i>删除</button>';
+        }
+      }
+    ],
+    scrollY: (document.body.clientHeight-96) + 'px',
+    scrollX: true,
+    paging: true, // 是否开启本地分页
+    pageLength: 20, // 改变初始化页长度（每页多少条数据）
+    pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+    lengthChange: false, // 是否允许流程项目改变表格每页显示的记录数
+    searching: false, // 是否允许Datatables开启本地搜索
+    ordering: true, // 是否允许Datatables开启排序
+    info: true, // 控制是否显示表格左下角的信息
+    language: DataTablesLanguage
+  });
+  // 查询按钮点击事件
+  $('.supplier-btn-search-fun').on('click', function(){
+    $('#supplierTable').DataTable().ajax.reload(null, false);
+  });
+});
+// 新增或者修改点击事件
+function SupplierValues(op, fKey) {
+  if (op == 1) { // 新增
+    layer_show('新增供应商信息','edit.html?op=1','','');
+  } else { // 修改
+    layer_show('修改供应商信息','edit.html?op=2&id='+fKey,'','');
+  }
+}
+// 子功能弹窗点击事件
+function onClickSupplierBtnOpen(title, url, id) {
+  layer_show(title,url+'?id='+id,'1000','580');
+}
+// 状态按钮点击事件
+function onClickSupplierBtnState(id, state, name) {
+  var text = '';
+  if (state == 1) {
+    text = '<b>' + name + '</b><br />确定要&nbsp;<b>禁用</b>&nbsp;吗?';
+  } else {
+    text = '<b>' + name + '</b><br />确定要&nbsp;<b>启用</b>&nbsp;吗?';
+  }
+  layer.confirm(text, function(index){
+		$.ajax({
+      type: 'POST',
+      contentType: 'application/json;charset=UTF-8',
+      url: '/s/supplier/stateSupplier',
+      data: JSON.stringify({
+        id: id,
+        state: state
+      }),
+      success: function(data) {
+        if(data.result == 'success'){
+          $('#supplierTable').DataTable().ajax.reload(null, false);
+          toastr.success('状态改变成功！');
+          layer.close(layer.index);
+        }if(data.result == 'error') {
+          toastr.error(data.error)
+        }
+      },
+      error: function(e){
+        toastr.error(e.status);
+        toastr.error(e.responseText);
+      }
+    });		
+	});
+}
+// 删除按钮点击事件
+function onClickSupplierBtnDel(id, name) {
+  layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function(index){
+    $.ajax({
+      type: 'POST',
+      contentType: 'application/json;charset=UTF-8',
+      url: '/s/supplier/delSupplier',
+      data: JSON.stringify({
+        id: id
+      }),
+      success: function(data) {
+        if(data.result == 'success'){
+          $('#supplierTable').DataTable().ajax.reload(null, false);
+          toastr.success('删除成功！');
+          layer.close(layer.index);
+        }if(data.result == 'error') {
+          toastr.error(data.error)
+        }
+      },
+      error: function(e){
+        toastr.error(e.status);
+        toastr.error(e.responseText);
+      }
+    });
+	});
+}
+</script> 
+</body>
+</html>

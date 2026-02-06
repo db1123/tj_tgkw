@@ -1,0 +1,316 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type="updatePassword";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+  
+    <!-- 引入外部资源 -->
+    <script src="/nui-ad/login/3.4.17"></script>
+    <link href="/nui-ad/login/fonts/font-awesome.min.css" rel="stylesheet">
+    <script src="/nui-ad/login/chart.umd.min.js"></script>
+    
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0F3460', // 深色调主色，体现严谨专业
+                        secondary: '#1A73E8', // 辅助蓝色
+                        accent: '#E94560', // 强调色
+                        neutral: '#F8F9FA',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .bg-gradient-academic {
+                background: linear-gradient(135deg, #0F3460 0%, #16213E 100%);
+            }
+            .text-balance {
+                text-wrap: balance;
+            }
+            .input-focus {
+                @apply focus:border-secondary focus:ring-2 focus:ring-secondary/20 focus:outline-none transition-all duration-300;
+            }
+            .btn-hover {
+                @apply hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-300;
+            }
+            .form-group {
+                @apply relative;
+            }
+            .form-icon {
+                @apply absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg;
+            }
+            .form-input {
+                @apply w-full pl-12 pr-5 py-3 rounded-lg border border-gray-300 input-focus text-base;
+            }
+            .form-label {
+                @apply block text-gray-700 text-base font-medium mb-1.5;
+            }
+            .form-item {
+                @apply mb-4;
+            }
+            .form-item:last-of-type {
+                @apply mb-2;
+            }
+            .page-transition {
+                @apply transition-all duration-300 ease-in-out;
+            }
+        }
+			
+    </style>
+
+</head>
+<body class="bg-gray-100 min-h-screen font-sans text-gray-800 flex items-center justify-center p-4">
+    <!-- 主容器 -->
+    <div class="w-full max-w-md mx-auto">
+        <!-- 卡片容器 -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden page-transition">
+            <!-- 顶部装饰条 -->
+            <div class="h-1.5 bg-gradient-to-r from-primary to-secondary"></div>
+            
+            <!-- 修改密码表单区域 -->
+            <div class="p-8 md:p-10">
+                <!-- 标题区域 -->
+                <div class="mb-8 text-center">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa fa-key text-primary text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2" id="header">修改密码</h2>
+                    <p class="text-gray-500">请输入相关信息完成密码修改</p>
+                </div>
+                
+                <!-- 表单 -->
+                <form id="PasswordForm" method="post" class="space-y-1">
+                    <!-- 1. 用户名（工号） -->
+                    <div class="form-item">
+                        <label for="username" class="form-label">用户名（工号）</label>
+                        <div class="form-group">
+                            <span class="form-icon">
+                                <i class="fa fa-user"></i>
+                            </span>
+                            <input style="width: 370px;" name="username" type="text" placeholder="请输入您的工号" 
+                                   class="form-input" required>
+                        </div>
+                    </div>
+
+                    <!-- 2. 旧密码 -->
+                    <div class="form-item">
+                        <label for="old_pass" class="form-label">旧密码</label>
+                        <div class="form-group">
+                            <span class="form-icon">
+                                <i class="fa fa-lock"></i>
+                            </span>
+                            <input style="width: 370px;" name="old_pass" type="password" placeholder="请输入旧密码" 
+                                   class="form-input" required>
+                        </div>
+                    </div>
+
+                    <!-- 3. 新密码 -->
+                    <div class="form-item">
+                        <label for="new_pass" class="form-label">新密码</label>
+                        <div class="form-group">
+                            <span class="form-icon">
+                                <i class="fa fa-lock"></i>
+                            </span>
+                            <input style="width: 370px;" name="new_pass" type="password" placeholder="至少6位字符" 
+                                   class="form-input" required>
+                        </div>
+                    </div>
+
+                    <!-- 4. 确认新密码 -->
+                    <div class="form-item">
+                        <label for="confirm_pass" class="form-label">确认新密码</label>
+                        <div class="form-group">
+                            <span class="form-icon">
+                                <i class="fa fa-lock"></i>
+                            </span>
+                            <input style="width: 370px;" name="confirm_pass" type="password" placeholder="再次输入新密码" 
+                                   class="form-input" required>
+                        </div>
+                    </div>
+
+                    <!-- 5. 按钮组 -->
+                    <div class="pt-4 flex flex-col sm:flex-row gap-3">
+                        <button type="submit" 
+                                class="flex-1 bg-primary text-white font-medium py-3 px-6 rounded-lg btn-hover flex items-center justify-center text-base">
+                            <i class="fa fa-save mr-2"></i> 确认修改
+                        </button>
+                        <button type="button" onclick="window.history.back()"
+                                class="flex-1 bg-gray-100 text-gray-700 font-medium py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center text-base">
+                            <i class="fa fa-arrow-left mr-2"></i> 返回
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- 版权信息 -->
+        <div class="mt-6 text-center text-sm text-gray-500 opacity-80" id="footer">
+            © 2025 天津仁爱学院 数智传媒与设计艺术学院-教学多元数据管理系统平台
+        </div>
+    </div>
+
+    <!-- 表单验证及交互脚本 -->
+    <script type="text/javascript" src="/plugins/verify/js/verify.min.js"></script>
+    <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+    <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+    <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+    <script src="/nui-ad/login/toastr.min.js"></script>
+    <link href="/nui-ad/login/toastr.min.css" rel="stylesheet">
+    
+    <script type="text/javascript">
+        // 初始化页面标题和版权信息
+        document.title = WEB_TITLE;
+        document.getElementById("footer").innerHTML = FOOTER_TEXT;
+        document.getElementById("header").innerHTML = "修改密码";
+
+        // 辅助函数：表单转JSON
+        function form2Json(formId) {
+            var jsonData = {};
+            var formArray = $("#" + formId).serializeArray();
+            $.each(formArray, function() {
+                if (jsonData[this.name]) {
+                    jsonData[this.name] = Array.isArray(jsonData[this.name]) 
+                        ? [...jsonData[this.name], this.value || ''] 
+                        : [jsonData[this.name], this.value || ''];
+                } else {
+                    jsonData[this.name] = this.value || '';
+                }
+            });
+            return jsonData;
+        }
+
+        // 初始化提示框
+        toastr.options = {
+            "positionClass": "toast-center-center",
+            "timeOut": "2000",
+            "preventDuplicates": true,
+            "progressBar": true
+        };
+
+        // 表单验证及提交逻辑
+        $(function(){
+            $('#PasswordForm').validate({
+                rules: {
+                    username: {
+                        required: true,
+                        minlength: 4,
+                        maxlength: 20
+                    },
+                    old_pass: {
+                        required: true,
+                        minlength: 6,
+                        maxlength: 20
+                    },
+                    new_pass: {
+                        required: true,
+                        minlength: 6,
+                        maxlength: 20
+                    },
+                    confirm_pass: {
+                        required: true,
+                        equalTo: "[name='new_pass']"
+                    }
+                },
+                messages: {
+                    username: {
+                        required: "请输入工号",
+                        minlength: "工号长度不能少于4个字符",
+                        maxlength: "工号长度不能超过20个字符"
+                    },
+                    old_pass: {
+                        required: "请输入旧密码",
+                        minlength: "密码长度不能少于6个字符",
+                        maxlength: "密码长度不能超过20个字符"
+                    },
+                    new_pass: {
+                        required: "请输入新密码",
+                        minlength: "密码长度不能少于6个字符",
+                        maxlength: "密码长度不能超过20个字符"
+                    },
+                    confirm_pass: {
+                        required: "请确认新密码",
+                        equalTo: "两次输入的新密码不一致"
+                    }
+                },
+                errorElement: "div",
+                errorPlacement: function(error, element) {
+                    error.insertAfter(element);
+                    error.addClass("text-red-500 text-xs mt-1");
+                },
+                highlight: function(element) {
+                    $(element).addClass("border-red-500");
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass("border-red-500");
+                },
+                onfocusout: function(element) {
+                    $(element).valid();
+                },
+                onkeyup: false,
+                focusInvalid: false,
+                focusCleanup: true,
+                submitHandler: function(){
+                    const submitBtn = $('button[type="submit"]');
+                    const originalText = submitBtn.html();
+                    submitBtn.html('<i class="fa fa-spinner fa-spin mr-2"></i> 提交中...');
+                    submitBtn.prop('disabled', true);
+                    
+                    var formData = form2Json('PasswordForm');
+                    
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/user/updatePassword_user',
+                        data: JSON.stringify(formData),
+                        success: function(data) {
+                            if (data.result === "success") {
+                                toastr.success('密码修改成功，2秒后跳转到登录页！');
+                                setTimeout(function() {
+                                    window.location.href = '/module/login.html';
+                                }, 2000);
+                            } else if (data.result === "error") {
+                                toastr.error('修改失败：' + (data.error || '操作失败'));
+                                submitBtn.html(originalText);
+                                submitBtn.prop('disabled', false);
+                            } else if (data.result === "tp_error") {
+                                toastr.error('图谱平台密码同步失败，请稍后重试');
+                                submitBtn.html(originalText);
+                                submitBtn.prop('disabled', false);
+                            }
+                        },
+                        error: function(e) {
+                            toastr.error('网络错误：' + (e.status || '请求失败，请重试'));
+                            submitBtn.html(originalText);
+                            submitBtn.prop('disabled', false);
+                        }
+                    });
+                }
+            });
+
+            $('.form-input').focus(function() {
+                $(this).closest('.form-group').addClass('scale-[1.005] transition-transform duration-200');
+            }).blur(function() {
+                $(this).closest('.form-group').removeClass('scale-[1.005]');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1105 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+    <!--/_only 独立样式 -->
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "微软雅黑", "Microsoft YaHei", sans-serif;
+            margin: 20px;
+            padding-bottom: 80px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        /* 对比卡片容器 */
+        .compare-cards-container {
+            margin-bottom: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        /* 对比卡片样式 - 增强视觉层次 */
+        .compare-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 25px;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            background-color: #fff;
+        }
+        .compare-card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            color: #2c3e50;
+            text-align: center;
+        }
+        /* 分组标签样式 - 强化视觉识别 */
+        .compare-pair-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 25px 0 15px;
+            font-size: 18px;
+            border-left: 4px solid #3498db;
+            padding: 8px 15px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            display: inline-block;
+            width: 100%;
+        }
+        /* 课程对比对容器 */
+        .compare-pair {
+            margin-bottom: 10px;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #fff;
+        }
+        /* 课程对比行样式 */
+        .compare-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #f0f0f0;
+            align-items: center;
+        }
+        .compare-row:last-child {
+            border-bottom: none;
+        }
+        .compare-row-name {
+            flex: 0 0 auto;
+            min-width: 200px;
+            color: #34495e;
+            margin-right: 20px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 500;
+        }
+        /* 数值对比区域 */
+        .compare-row-value {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+        }
+        .value-item {
+            display: flex;
+            align-items: center;
+            flex: 0 0 auto;
+            min-width: 120px;
+        }
+        .value-label {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-right: 6px;
+            white-space: nowrap;
+        }
+        .value-content {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        /* 差异值标红 - 增强视觉 */
+        .diff-value {
+            color: #e74c3c;
+            font-weight: bold;
+            position: relative;
+        }
+        .diff-value::after {
+            content: "★";
+            font-size: 10px;
+            margin-left: 4px;
+            color: #e74c3c;
+        }
+        /* 相同值标绿 */
+        .same-value {
+            color: #27ae60;
+        }
+        /* 空数据提示样式 */
+        .empty-tip {
+            text-align: center;
+            padding: 40px 0;
+            color: #7f8c8d;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        /* 表格样式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            margin-bottom: 40px;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        th, td {
+            border: 1px solid #e0e0e0;
+            padding: 10px;
+        }
+        th {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        .category-title {
+            background-color: #eef2f7;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .header-group {
+            font-weight: bold;
+            text-align: center;
+            color: #2c3e50;
+        }
+        .table-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 30px 0 15px;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+            display: inline-block;
+        }
+        /* 表格包装器 */
+        .table-wrapper {
+            margin-bottom: 60px;
+            padding-bottom: 10px;
+        }
+        /* 表格容器整体底部间距 */
+        #tablesContainer {
+            margin-bottom: 80px;
+        }
+        /* 表格单元格差异高亮样式 */
+        .cell-diff {
+            background-color: #ffebee;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        /* 分组分隔线 */
+        .group-divider {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 20px 0;
+            width: 100%;
+        }
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .compare-card {
+                padding: 15px;
+            }
+            .compare-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .compare-row-name {
+                min-width: 100%;
+                margin-right: 0;
+                margin-bottom: 5px;
+            }
+            .compare-row-value {
+                flex-direction: column;
+                gap: 8px;
+                width: 100%;
+            }
+            .value-item {
+                min-width: 100%;
+            }
+            .compare-pair-label {
+                font-size: 16px;
+                padding: 6px 10px;
+            }
+            table {
+                font-size: 12px;
+                margin-bottom: 30px;
+            }
+            th, td {
+                padding: 6px;
+            }
+            .table-title {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- 对比卡片容器 -->
+<div class="compare-cards-container" id="compareCardsContainer"></div>
+
+<!-- 表格容器（支持动态生成多个表格） -->
+<div id="tablesContainer"></div>
+
+<script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<script>
+    // ===================== 通用工具函数 =====================
+    /**
+     * 拆分学分和学时字符串（格式：学分/学时）
+     * @param {string} str - 学分学时字符串
+     * @returns {Object} 拆分后的学分和学时
+     */
+    function splitCreditHour(str) {
+        if (!str || str === "0/0" || str.trim() === "" || typeof str !== 'string') {
+            return { credit: 0, hour: 0 };
+        }
+        const match = str.match(/^([\d.]+)\/([\d.]+)/);
+        if (match) {
+            return {
+                credit: parseFloat(match[1]) || 0,
+                hour: parseFloat(match[2]) || 0
+            };
+        }
+        return {
+            credit: parseFloat(str) || 0,
+            hour: 0
+        };
+    }
+
+    /**
+     * 拼接学分和学时为字符串（格式：学分/学时）
+     * @param {number} credit - 学分
+     * @param {number} hour - 学时
+     * @returns {string} 拼接后的字符串
+     */
+    function joinCreditHour(credit, hour) {
+        return `${credit.toFixed(1)}/${hour.toFixed(0)}`;
+    }
+
+    /**
+     * 对比两个值是否相等，返回对应的样式类
+     * @param {any} val1 - 第一个值
+     * @param {any} val2 - 第二个值
+     * @returns {string} 样式类名
+     */
+    function getValueCompareClass(val1, val2) {
+        // 统一转换为字符串对比，避免类型问题
+        const v1 = Number(val1) ? Number(val1).toString() : val1.toString();
+        const v2 = Number(val2) ? Number(val2).toString() : val2.toString();
+        return v1 === v2 ? "same-value" : "diff-value";
+    }
+
+    /**
+     * 计算分类下的合计数据
+     * @param {Array} items - 分类下的子项数据（不含合计行）
+     * @param {Array} courseTypes - 课程类型配置
+     * @returns {Object} 合计行数据
+     */
+    function calculateSectionTotal(items, courseTypes) {
+        const totalData = {
+            name: "合计",
+            ratio: 0
+        };
+        let totalCreditTotal = 0;
+        let totalHourTotal = 0;
+
+        courseTypes.forEach(type => {
+            totalData[type.key] = { credit: 0, hour: 0 };
+        });
+
+        items.forEach(item => {
+            courseTypes.forEach(type => {
+                const { credit, hour } = splitCreditHour(item[type.key] || '0/0');
+                totalData[type.key].credit += credit;
+                totalData[type.key].hour += hour;
+                totalCreditTotal += credit;
+                totalHourTotal += hour;
+            });
+        });
+
+        courseTypes.forEach(type => {
+            totalData[type.key] = joinCreditHour(
+                totalData[type.key].credit,
+                totalData[type.key].hour
+            );
+        });
+
+        totalData.total = joinCreditHour(totalCreditTotal, totalHourTotal);
+
+        return totalData;
+    }
+
+    /**
+     * 计算整个表格的总计数据（含总学分）
+     * @param {Array} sections - 所有分类数据（已添加分类合计行）
+     * @param {Array} courseTypes - 课程类型配置
+     * @returns {Object} 总计行数据（含总学分）
+     */
+    function calculateTableGrandTotal(sections, courseTypes) {
+        const grandTotal = {
+            name: "",
+            ratio: 0,
+            totalCredit: 0
+        };
+        let grandTotalCredit = 0;
+        let grandTotalHour = 0;
+
+        courseTypes.forEach(type => {
+            grandTotal[type.key] = { credit: 0, hour: 0 };
+        });
+
+        sections.forEach(section => {
+            const totalItem = section.items.find(item => item.name === "合计");
+            if (totalItem) {
+                courseTypes.forEach(type => {
+                    const { credit, hour } = splitCreditHour(totalItem[type.key] || '0/0');
+                    grandTotal[type.key].credit += credit;
+                    grandTotal[type.key].hour += hour;
+                    grandTotalCredit += credit;
+                    grandTotalHour += hour;
+                });
+            }
+        });
+
+        courseTypes.forEach(type => {
+            grandTotal[type.key] = joinCreditHour(
+                grandTotal[type.key].credit,
+                grandTotal[type.key].hour
+            );
+        });
+
+        grandTotal.total = joinCreditHour(grandTotalCredit, grandTotalHour);
+        grandTotal.totalCredit = grandTotalCredit;
+
+        return grandTotal;
+    }
+
+    /**
+     * 计算占比
+     * @param {Array} sections - 所有分类数据（已添加分类合计行）
+     * @param {number} totalCredit - 表格总学分
+     * @param {Array} courseTypes - 课程类型配置
+     * @returns {Array} 处理后的sections（含正确占比）
+     */
+    function calculateAllRowRatios(sections, totalCredit, courseTypes) {
+        if (totalCredit <= 0) {
+            sections.forEach(section => {
+                section.items.forEach(item => {
+                    item.ratio = "0.0";
+                });
+            });
+            return sections;
+        }
+
+        let categoryTotalRatioSum = 0;
+
+        sections.forEach(section => {
+            section.items.forEach(item => {
+                let rowTotalCredit = 0;
+                courseTypes.forEach(type => {
+                    const { credit } = splitCreditHour(item[type.key] || '0/0');
+                    rowTotalCredit += credit;
+                });
+
+                const ratio = (rowTotalCredit / totalCredit * 100).toFixed(1);
+                item.ratio = ratio;
+
+                if (item.name === "合计") {
+                    categoryTotalRatioSum += parseFloat(ratio);
+                }
+            });
+        });
+
+        const grandTotalSection = sections.find(section => section.category === "总计");
+        if (grandTotalSection && grandTotalSection.items.length > 0) {
+            grandTotalSection.items[0].ratio = categoryTotalRatioSum.toFixed(1);
+        }
+
+        return sections;
+    }
+
+    /**
+     * 构建表格数据映射（用于多表格对比）
+     * @param {Array} processedTablesData - 处理后的表格数据数组
+     * @returns {Object} 表格数据映射 { 分类名: { 项目名: { 字段名: 值 } } }
+     */
+    function buildTableDataMap(processedTablesData) {
+        const tableMaps = [];
+        processedTablesData.forEach(tableData => {
+            const dataMap = {};
+            tableData.sections.forEach(section => {
+                if (!dataMap[section.category]) {
+                    dataMap[section.category] = {};
+                }
+                section.items.forEach(item => {
+                    dataMap[section.category][item.name] = { ...item };
+                });
+            });
+            tableMaps.push(dataMap);
+        });
+        return tableMaps;
+    }
+
+    // ===================== 对比卡片渲染 =====================
+    /**
+     * 渲染课程对比卡片
+     * @param {Array} compareData - 对比数据（后端返回格式）
+     */
+    function renderCompareCards(compareData = []) {
+        const container = document.getElementById('compareCardsContainer');
+        container.innerHTML = '';
+
+        const defaultTitle = "培养方案课程安排验证结果";
+
+        if (!compareData || compareData.length === 0) {
+            const emptyCard = createEmptyCard(defaultTitle);
+            container.appendChild(emptyCard);
+            return;
+        }
+
+        // 按分组标签聚合数据，优化渲染结构
+        compareData.forEach(cardData => {
+            const card = document.createElement('div');
+            card.className = 'compare-card';
+
+            // 卡片标题
+            const cardTitle = document.createElement('div');
+            cardTitle.className = 'compare-card-title';
+            cardTitle.textContent = cardData.title || defaultTitle;
+            card.appendChild(cardTitle);
+
+            // 聚合相同label的pairs
+            const groupedPairs = {};
+            cardData.pairs.forEach(pair => {
+                const label = pair.label || "未分类课程";
+                if (!groupedPairs[label]) {
+                    groupedPairs[label] = [];
+                }
+                groupedPairs[label].push(pair);
+            });
+
+            // 检查是否有有效数据
+            const hasValidData = Object.keys(groupedPairs).length > 0;
+
+            if (!hasValidData) {
+                const emptyTip = document.createElement('div');
+                emptyTip.className = 'empty-tip';
+                emptyTip.textContent = "已全部验证通过，无差异课程";
+                card.appendChild(emptyTip);
+            } else {
+                // 按分组渲染
+                Object.keys(groupedPairs).forEach((label, groupIndex) => {
+                    // 分组标题
+                    const pairLabel = document.createElement('div');
+                    pairLabel.className = 'compare-pair-label';
+                    pairLabel.textContent = label;
+                    card.appendChild(pairLabel);
+
+                    // 渲染该分组下的所有课程对
+                    const groupPairs = groupedPairs[label];
+                    groupPairs.forEach((pair, pairIndex) => {
+                        const pairContainer = document.createElement('div');
+                        pairContainer.className = 'compare-pair';
+
+                        if (pair.courses && pair.courses.length >= 2) {
+                            const courseA = pair.courses[0]; // 手填课程
+                            const courseB = pair.courses[1]; // 匹配课程
+
+                            // 渲染手填课程
+                            pairContainer.appendChild(createCourseCompareRow(courseA, "手填课程"));
+                            // 渲染匹配课程（带差异对比）
+                            pairContainer.appendChild(createCourseCompareRow(courseB, "匹配课程", courseA));
+
+                            // 非最后一个课程对添加分隔线
+                            if (pairIndex < groupPairs.length - 1) {
+                                const divider = document.createElement('div');
+                                divider.className = 'group-divider';
+                                pairContainer.appendChild(divider);
+                            }
+                        } else {
+                            const noCourseTip = document.createElement('div');
+                            noCourseTip.className = 'empty-tip';
+                            noCourseTip.textContent = "课程对比数据不足";
+                            noCourseTip.style.padding = "10px 0";
+                            noCourseTip.style.fontSize = "14px";
+                            pairContainer.appendChild(noCourseTip);
+                        }
+
+                        card.appendChild(pairContainer);
+                    });
+
+                    // 非最后一个分组添加分隔线
+                    if (groupIndex < Object.keys(groupedPairs).length - 1) {
+                        const groupDivider = document.createElement('div');
+                        groupDivider.className = 'group-divider';
+                        card.appendChild(groupDivider);
+                    }
+                });
+            }
+
+            container.appendChild(card);
+        });
+    }
+
+    /**
+     * 创建空数据卡片
+     * @param {string} title - 卡片标题
+     * @returns {HTMLElement} 空卡片元素
+     */
+    function createEmptyCard(title) {
+        const emptyCard = document.createElement('div');
+        emptyCard.className = 'compare-card';
+
+        const cardTitle = document.createElement('div');
+        cardTitle.className = 'compare-card-title';
+        cardTitle.textContent = title;
+        emptyCard.appendChild(cardTitle);
+
+        const emptyTip = document.createElement('div');
+        emptyTip.className = 'empty-tip';
+        emptyTip.textContent = "已全部验证通过，无差异课程";
+        emptyCard.appendChild(emptyTip);
+
+        return emptyCard;
+    }
+
+    /**
+     * 创建课程对比行（增强版：带类型标注+差异提示）
+     * @param {Object} course - 课程数据
+     * @param {string} courseType - 课程类型（手填/匹配）
+     * @param {Object} compareCourse - 对比的课程数据（可选）
+     * @returns {HTMLElement} 课程对比行元素
+     */
+    function createCourseCompareRow(course, courseType = "", compareCourse = null) {
+        const row = document.createElement('div');
+        row.className = 'compare-row';
+
+        // 课程属性列表（优化显示顺序）
+        const courseProps = [
+            { label: "学分", key: "FCredits" },
+            { label: "总学时", key: "FTotalHours" },
+            { label: "周学时", key: "FWeeklyStudyHours" },
+            { label: "理论学时", key: "FTheoreticalStudyHours" },
+            { label: "实践学时", key: "FPracticalStudyHours" }
+        ];
+
+        // 课程名称（带类型标注）
+        const courseName = `${courseType}：${course.name || '未知课程'}`;
+
+        // 构建值区域HTML
+        let valueHtml = '';
+        courseProps.forEach(prop => {
+            const currentValue = course[prop.key] || 0;
+            const compareValue = compareCourse ? compareCourse[prop.key] : null;
+            const valueClass = compareValue !== null
+                ? getValueCompareClass(compareValue, currentValue)
+                : '';
+
+            // 差异值添加对比提示
+            let diffTip = '';
+            if (compareValue !== null && valueClass === 'diff-value') {
+                diffTip = ` (手填: ${compareValue})`;
+            }
+
+            valueHtml += `
+                <div class="value-item">
+                    <span class="value-label">${prop.label}：</span>
+                    <span class="value-content ${valueClass}">${currentValue}${diffTip}</span>
+                </div>
+            `;
+        });
+
+        row.innerHTML = `
+            <div class="compare-row-name">${courseName}</div>
+            <div class="compare-row-value">${valueHtml}</div>
+        `;
+
+        return row;
+    }
+
+    // ===================== 动态表格渲染 =====================
+    /**
+     * 预处理表格数据（添加合计、总计、占比）
+     * @param {Array} tablesData - 原始表格数据
+     * @returns {Array} 预处理后的表格数据
+     */
+    function preprocessTablesData(tablesData) {
+        return tablesData.map(tableData => {
+            // 为每个分类添加合计行
+            const processedSections = tableData.sections.map(section => {
+                const totalItem = calculateSectionTotal(section.items, tableData.courseTypes);
+                return {
+                    ...section,
+                    items: [...section.items, totalItem]
+                };
+            });
+
+            // 计算总计行
+            const grandTotalItem = calculateTableGrandTotal(processedSections, tableData.courseTypes);
+            processedSections.push({
+                category: "总计",
+                items: [grandTotalItem]
+            });
+
+            // 计算占比
+            const finalSections = calculateAllRowRatios(
+                processedSections,
+                grandTotalItem.totalCredit,
+                tableData.courseTypes
+            );
+
+            return {
+                ...tableData,
+                sections: finalSections
+            };
+        });
+    }
+
+    /**
+     * 渲染单个课程表格（支持对比高亮）
+     * @param {Object} tableData - 预处理后的表格数据
+     * @param {Object} compareMap - 对比表格的数据映射（可选）
+     * @param {number} tableIndex - 当前表格索引
+     * @returns {HTMLElement} 表格包装器元素
+     */
+    function renderSingleTable(tableData, compareMap = null, tableIndex = 0) {
+        const tableWrapper = document.createElement('div');
+        tableWrapper.className = 'table-wrapper';
+
+        const tableTitle = document.createElement('div');
+        tableTitle.className = 'table-title';
+        tableTitle.textContent = tableData.title || '课程学时学分分配表';
+        tableWrapper.appendChild(tableTitle);
+
+        const tableContainer = document.createElement('div');
+        tableWrapper.appendChild(tableContainer);
+
+        const table = document.createElement("table");
+
+        const thead = createTableHeader(tableData.courseTypes);
+        table.appendChild(thead);
+
+        const tbody = createTableBodyWithCompare(
+            tableData.sections,
+            tableData.courseTypes,
+            compareMap,
+            tableIndex
+        );
+        table.appendChild(tbody);
+
+        tableContainer.appendChild(table);
+        return tableWrapper;
+    }
+
+    /**
+     * 创建表格表头
+     * @param {Array} courseTypes - 课程类型配置
+     * @returns {HTMLElement} 表头元素
+     */
+    function createTableHeader(courseTypes) {
+        const thead = document.createElement("thead");
+
+        const headerRow1 = document.createElement("tr");
+        const categoryTh = document.createElement("th");
+        categoryTh.rowSpan = 2;
+        categoryTh.className = "header-group";
+        categoryTh.textContent = "课程类别";
+        headerRow1.appendChild(categoryTh);
+
+        courseTypes.forEach(type => {
+            const th = document.createElement("th");
+            th.colSpan = 2;
+            th.className = "header-group";
+            th.textContent = type.name;
+            headerRow1.appendChild(th);
+        });
+
+        const totalTh = document.createElement("th");
+        totalTh.colSpan = 2;
+        totalTh.className = "header-group";
+        totalTh.textContent = "合计";
+        headerRow1.appendChild(totalTh);
+
+        const ratioTh = document.createElement("th");
+        ratioTh.rowSpan = 2;
+        ratioTh.className = "header-group";
+        ratioTh.textContent = "占总学分比例(%)";
+        headerRow1.appendChild(ratioTh);
+
+        thead.appendChild(headerRow1);
+
+        const headerRow2 = document.createElement("tr");
+        courseTypes.forEach(() => {
+            const creditTh = document.createElement("th");
+            creditTh.textContent = "学分";
+            headerRow2.appendChild(creditTh);
+
+            const hourTh = document.createElement("th");
+            hourTh.textContent = "学时(周)";
+            headerRow2.appendChild(hourTh);
+        });
+
+        const totalCreditTh = document.createElement("th");
+        totalCreditTh.textContent = "学分";
+        headerRow2.appendChild(totalCreditTh);
+
+        const totalHourTh = document.createElement("th");
+        totalHourTh.textContent = "学时(周)";
+        headerRow2.appendChild(totalHourTh);
+
+        thead.appendChild(headerRow2);
+
+        return thead;
+    }
+
+    /**
+     * 创建带对比高亮的表格体
+     * @param {Array} sections - 预处理后的课程分类数据
+     * @param {Array} courseTypes - 课程类型配置
+     * @param {Object} compareMap - 对比表格的数据映射
+     * @param {number} tableIndex - 当前表格索引
+     * @returns {HTMLElement} 表体元素
+     */
+    function createTableBodyWithCompare(sections, courseTypes, compareMap, tableIndex) {
+        const tbody = document.createElement("tbody");
+
+        sections.forEach(section => {
+            // 分类标题行
+            const categoryRow = document.createElement("tr");
+            const categoryCell = document.createElement("td");
+            const totalCols = 1 + (courseTypes.length * 2) + 2 + 1;
+            categoryCell.colSpan = totalCols;
+            categoryCell.className = "category-title";
+            categoryCell.textContent = section.category;
+            categoryRow.appendChild(categoryCell);
+            tbody.appendChild(categoryRow);
+
+            // 分类下的具体行
+            section.items.forEach(item => {
+                const row = document.createElement("tr");
+
+                // 课程类别名称
+                const nameCell = document.createElement("td");
+                nameCell.textContent = item.name || '';
+                row.appendChild(nameCell);
+
+                // 动态添加各课程类型的学分、学时（带对比高亮）
+                courseTypes.forEach(type => {
+                    const currentCreditHour = splitCreditHour(item[type.key] || '0/0');
+                    const currentCredit = currentCreditHour.credit.toFixed(1);
+                    const currentHour = currentCreditHour.hour.toFixed(0);
+
+                    // 创建学分单元格
+                    const creditCell = document.createElement("td");
+                    creditCell.textContent = currentCredit;
+
+                    // 对比学分值
+                    if (compareMap && compareMap[section.category] && compareMap[section.category][item.name]) {
+                        const compareItem = compareMap[section.category][item.name];
+                        const compareCreditHour = splitCreditHour(compareItem[type.key] || '0/0');
+                        const compareCredit = compareCreditHour.credit.toFixed(1);
+                        if (currentCredit !== compareCredit) {
+                            creditCell.classList.add('cell-diff');
+                        }
+                    }
+                    row.appendChild(creditCell);
+
+                    // 创建学时单元格
+                    const hourCell = document.createElement("td");
+                    hourCell.textContent = currentHour;
+
+                    // 对比学时值
+                    if (compareMap && compareMap[section.category] && compareMap[section.category][item.name]) {
+                        const compareItem = compareMap[section.category][item.name];
+                        const compareCreditHour = splitCreditHour(compareItem[type.key] || '0/0');
+                        const compareHour = compareCreditHour.hour.toFixed(0);
+                        if (currentHour !== compareHour) {
+                            hourCell.classList.add('cell-diff');
+                        }
+                    }
+                    row.appendChild(hourCell);
+                });
+
+                // 计算当前行合计
+                let rowTotalCredit = 0;
+                let rowTotalHour = 0;
+                courseTypes.forEach(type => {
+                    const creditHour = splitCreditHour(item[type.key] || '0/0');
+                    rowTotalCredit += creditHour.credit;
+                    rowTotalHour += creditHour.hour;
+                });
+                const currentTotalCredit = rowTotalCredit.toFixed(1);
+                const currentTotalHour = rowTotalHour.toFixed(0);
+
+                // 合计学分列（带对比）
+                const totalCreditCell = document.createElement("td");
+                totalCreditCell.textContent = currentTotalCredit;
+                if (compareMap && compareMap[section.category] && compareMap[section.category][item.name]) {
+                    const compareItem = compareMap[section.category][item.name];
+                    let compareTotalCredit = 0;
+                    courseTypes.forEach(type => {
+                        const creditHour = splitCreditHour(compareItem[type.key] || '0/0');
+                        compareTotalCredit += creditHour.credit;
+                    });
+                    const compareTotalCreditStr = compareTotalCredit.toFixed(1);
+                    if (currentTotalCredit !== compareTotalCreditStr) {
+                        totalCreditCell.classList.add('cell-diff');
+                    }
+                }
+                row.appendChild(totalCreditCell);
+
+                // 合计学时列（带对比）
+                const totalHourCell = document.createElement("td");
+                totalHourCell.textContent = currentTotalHour;
+                if (compareMap && compareMap[section.category] && compareMap[section.category][item.name]) {
+                    const compareItem = compareMap[section.category][item.name];
+                    let compareTotalHour = 0;
+                    courseTypes.forEach(type => {
+                        const creditHour = splitCreditHour(compareItem[type.key] || '0/0');
+                        compareTotalHour += creditHour.hour;
+                    });
+                    const compareTotalHourStr = compareTotalHour.toFixed(0);
+                    if (currentTotalHour !== compareTotalHourStr) {
+                        totalHourCell.classList.add('cell-diff');
+                    }
+                }
+                row.appendChild(totalHourCell);
+
+                // 占比列（带对比）
+                const ratioCell = document.createElement("td");
+                ratioCell.textContent = item.ratio || '0.0';
+                if (compareMap && compareMap[section.category] && compareMap[section.category][item.name]) {
+                    const compareItem = compareMap[section.category][item.name];
+                    const compareRatio = compareItem.ratio || '0.0';
+                    if (item.ratio !== compareRatio) {
+                        ratioCell.classList.add('cell-diff');
+                    }
+                }
+                row.appendChild(ratioCell);
+
+                tbody.appendChild(row);
+            });
+        });
+
+        return tbody;
+    }
+
+    /**
+     * 渲染所有表格（支持多表格对比高亮）
+     * @param {Array} tablesData - 原始表格数据
+     */
+    function renderAllTables(tablesData = []) {
+        const container = document.getElementById('tablesContainer');
+        container.innerHTML = '';
+
+        if (!tablesData || tablesData.length === 0) {
+            const emptyTip = document.createElement('div');
+            emptyTip.className = 'empty-tip';
+            emptyTip.textContent = "暂无表格数据";
+            container.appendChild(emptyTip);
+            return;
+        }
+
+        // 预处理所有表格数据（添加合计、总计、占比）
+        const processedTables = preprocessTablesData(tablesData);
+
+        // 构建表格数据映射（用于对比）
+        const tableMaps = buildTableDataMap(processedTables);
+
+        // 渲染每个表格
+        processedTables.forEach((tableData, index) => {
+            // 确定对比的表格（当前表格与第一个表格对比）
+            let compareMap = null;
+            if (tablesData.length > 1) {
+                compareMap = tableMaps[0];
+            }
+
+            const tableWrapper = renderSingleTable(tableData, compareMap, index);
+            container.appendChild(tableWrapper);
+        });
+    }
+
+    // ===================== 模拟数据（优化后的分组数据） =====================
+    const compareCardsData = [
+        {
+            "title": "培养方案课程安排验证结果",
+            "pairs": [
+                {
+                    "label": "基础设计课程",
+                    "courses": [
+                        {
+                            "name": "设计思维方法与程序",
+                            "FCredits": 1.0,
+                            "FWeeklyStudyHours": 1,
+                            "FTheoreticalStudyHours": 1,
+                            "FPracticalStudyHours": 2,
+                            "FTotalHours": 4
+                        },
+                        {
+                            "name": "设计思维方法与程序",
+                            "FCredits": 2.5,
+                            "FWeeklyStudyHours": 0,
+                            "FTheoreticalStudyHours": 32,
+                            "FPracticalStudyHours": 16,
+                            "FTotalHours": 48
+                        }
+                    ]
+                },
+                {
+                    "label": "基础设计课程",
+                    "courses": [
+                        {
+                            "name": "视听语言",
+                            "FCredits": 1.0,
+                            "FWeeklyStudyHours": 1,
+                            "FTheoreticalStudyHours": 1,
+                            "FPracticalStudyHours": 1,
+                            "FTotalHours": 3
+                        },
+                        {
+                            "name": "视听语言",
+                            "FCredits": 2.5,
+                            "FWeeklyStudyHours": 0,
+                            "FTheoreticalStudyHours": 32,
+                            "FPracticalStudyHours": 16,
+                            "FTotalHours": 48
+                        }
+                    ]
+                },
+                {
+                    "label": "核心设计课程",
+                    "courses": [
+                        {
+                            "name": "脚本表达",
+                            "FCredits": 1.0,
+                            "FWeeklyStudyHours": 2,
+                            "FTheoreticalStudyHours": 4,
+                            "FPracticalStudyHours": 5,
+                            "FTotalHours": 11
+                        },
+                        {
+                            "name": "设计脚本表达",
+                            "FCredits": 1.5,
+                            "FWeeklyStudyHours": 4,
+                            "FTheoreticalStudyHours": 16,
+                            "FPracticalStudyHours": 16,
+                            "FTotalHours": 32
+                        }
+                    ]
+                },
+
+                {
+                    "label": "技术实践课程",
+                    "courses": [
+                        {
+                            "name": "3D打印技术",
+                            "FCredits": 3.0,
+                            "FWeeklyStudyHours": 2,
+                            "FTheoreticalStudyHours": 4,
+                            "FPracticalStudyHours": 5,
+                            "FTotalHours": 11
+                        },
+                        {
+                            "name": "3D打印技术",
+                            "FCredits": 1.5,
+                            "FWeeklyStudyHours": 4,
+                            "FTheoreticalStudyHours": 16,
+                            "FPracticalStudyHours": 16,
+                            "FTotalHours": 32
+                        }
+                    ]
+                },
+                {
+                    "label": "核心设计课程",
+                    "courses": [
+                        {
+                            "name": "产品语意设计",
+                            "FCredits": 2.0,
+                            "FWeeklyStudyHours": 2,
+                            "FTheoreticalStudyHours": 4,
+                            "FPracticalStudyHours": 5,
+                            "FTotalHours": 11
+                        },
+                        {
+                            "name": "符号学与产品语意设计",
+                            "FCredits": 2.5,
+                            "FWeeklyStudyHours": 4,
+                            "FTheoreticalStudyHours": 32,
+                            "FPracticalStudyHours": 16,
+                            "FTotalHours": 48
+                        }
+                    ]
+                },
+                {
+                    "label": "技术实践课程",
+                    "courses": [
+                        {
+                            "name": "智能产品造型实践",
+                            "FCredits": 4.0,
+                            "FWeeklyStudyHours": 2,
+                            "FTheoreticalStudyHours": 4,
+                            "FPracticalStudyHours": 5,
+                            "FTotalHours": 11
+                        },
+                        {
+                            "name": "创新实践-智能产品造型实践",
+                            "FCredits": 1.0,
+                            "FWeeklyStudyHours": 1,
+                            "FTheoreticalStudyHours": 0,
+                            "FPracticalStudyHours": 32,
+                            "FTotalHours": 32
+                        }
+                    ]
+                }
+            ]
+        }
+    ];
+
+    const tablesData = [
+        {
+            "courseTypes":[{"name":"必修","key":"bixiu"},{"name":"选修","key":"xuanxiu"}],
+            "title":"手填课程学时学分分配",
+            "sections":[
+                {"category":"专业教育","items":[{"xuanxiu":"0/0","name":"专业模块","bixiu":"1.0/4"},{"xuanxiu":"0/0","name":"综合实践课程","bixiu":"4.0/11"}]},
+                {"category":"其他","items":[{"xuanxiu":"0/0","name":"其他","bixiu":"1.0/3"}]},
+                {"category":"专业教育","items":[{"xuanxiu":"6.0/33","name":"个性化课程","bixiu":"0/0"}]}
+            ]
+        },
+        {
+            "courseTypes":[{"name":"必修","key":"bixiu"},{"name":"选修","key":"xuanxiu"}],
+            "title":"系统课程学时学分分配",
+            "sections":[
+                {"category":"专业教育","items":[{"xuanxiu":"0/0","name":"专业模块","bixiu":"1.0/48"},{"xuanxiu":"0/0","name":"综合实践课程","bixiu":"4.0/33"}]},
+                {"category":"其他","items":[{"xuanxiu":"0/0","name":"其他","bixiu":"1.0/48"}]},
+                {"category":"专业教育","items":[{"xuanxiu":"6.0/124","name":"个性化课程","bixiu":"0/0"}]}
+            ]
+        }
+    ];
+
+    // ===================== 初始化 =====================
+    window.onload = function() {
+        renderCompareCards(compareCardsData);
+        renderAllTables(tablesData);
+    }
+</script>
+</body>
+</html>

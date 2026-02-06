@@ -1,0 +1,240 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+        <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+        <!--_only 独立样式 -->
+        <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+        <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+        <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+        <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+        <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+        <!--/_only 独立样式 -->
+    </head>
+    <body>
+        <div class="page-container" style="padding: 2px;">
+            <div class="f-l" style="width: 100%; margin-top: 3px;">
+                <article class="page-container">
+                    <form action="" method="post" class="form form-horizontal" id="myprojectForm">
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span
+                                    class="c-red">*</span>项目名称：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="xmFName" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span
+                                    class="c-red">*</span>项目编号：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="xmFNo" style="width: 100%;text-align: left;">222</label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span
+                                    class="c-red">*</span>客户：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="xmFCustomerID"
+                                       style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span
+                                    class="c-red">*</span>负责人：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="xmFLeadUserID"
+                                       style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span
+                                    class="c-red">*</span>计划开始：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="xmFSDate" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span
+                                    class="c-red">*</span>计划完成：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="xmFEDate" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span
+                                    class="c-red">*</span>项目类型：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="xmFTypeID" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span
+                                    class="c-red">*</span>项目等级：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="xmFLevelID" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div id="rwdata" style="display: none;">
+                            <div style="height: 10px;border-bottom:1px dashed  #000000"></div>
+                            <div class="row cl">
+                                <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span
+                                        class="c-red">*</span>任务名称：</label>
+                                <div class="formControls col-xs-3 col-sm-4">
+                                    <label class="form-label" id="rwFName"
+                                           style="width: 100%;text-align: left;"></label>
+                                </div>
+                                <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span
+                                        class="c-red">*</span>任务编号：</label>
+                                <div class="formControls col-xs-3 col-sm-4">
+                                    <label class="form-label" id="rwFNo" style="width: 100%;text-align: left;"></label>
+                                </div>
+                            </div>
+                            <div class="row cl">
+                                <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span
+                                        class="c-red">*</span>负责人：</label>
+                                <div class="formControls col-xs-3 col-sm-4">
+                                    <label class="form-label" id="rwFLeadUserID"
+                                           style="width: 100%;text-align: left;"></label>
+                                </div>
+                            </div>
+                            <div class="row cl">
+                                <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span
+                                        class="c-red">*</span>计划开始：</label>
+                                <div class="formControls col-xs-3 col-sm-4">
+                                    <label class="form-label" id="rwFSDate"
+                                           style="width: 100%;text-align: left;"></label>
+                                </div>
+                                <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span
+                                        class="c-red">*</span>计划完成：</label>
+                                <div class="formControls col-xs-3 col-sm-4">
+                                    <label class="form-label" id="rwFEDate"
+                                           style="width: 100%;text-align: left;"></label>
+                                </div>
+                            </div>
+                            <div class="row cl">
+                                <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span
+                                        class="c-red">*</span>任务类型：</label>
+                                <div class="formControls col-xs-3 col-sm-4">
+                                    <label class="form-label" id="rwFTypeID"
+                                           style="width: 100%;text-align: left;"></label>
+                                </div>
+                                <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span
+                                        class="c-red">*</span>任务要求：</label>
+                                <div class="formControls col-xs-3 col-sm-4">
+                                    <label class="form-label" id="rwFAsk" style="width: 100%;text-align: left;"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="height: 10px;border-bottom:1px dashed  #000000"></div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span
+                                    class="c-red">*</span>所属工作流：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="fflowid"
+                                       style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span
+                                    class="c-red">*</span>所属节点：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="ffliwjd"
+                                       style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span
+                                    class="c-red">*</span>上传文件：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FFileName"
+                                       style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span
+                                    class="c-red">*</span>提交人：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FSubUserID"
+                                       style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span
+                                    class="c-red">*</span>提交时间：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FSubDate"
+                                       style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span
+                                    class="c-red">*</span>审核状态：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FCheckState"
+                                       style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+
+                        <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+                    </form>
+                </article>
+            </div>
+        </div>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+        <script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+        <script src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+        <script type="text/javascript">
+            var id = getQueryStringByName('id');
+            // 业务代码
+            $(function () {
+                showxx();
+            });
+
+            function showxx() {
+                //显示基本信息
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    url: '/s/subdata/querymysubdataInfo', // 调用地址
+                    data: JSON.stringify({
+                        id: id
+                    }),
+                    async: false,
+                    success: function (data) {
+                        if(data.info.istaksid==1){
+                            $("#rwdata").attr("style", "display:none;"); //隐藏
+                        }else{
+                            $("#rwdata").attr("style", "display:block;"); //显示
+                        }
+                        $("#xmFName").text(data.info.xmFName);
+                        $("#xmFNo").text(data.info.xmFNo);
+                        $("#xmFCustomerID").text(data.info.xmFCustomerID);
+                        $("#xmFLeadUserID").text(data.info.xmFLeadUserID);
+                        $("#xmFSDate").text(data.info.xmFSDate);
+                        $("#xmFEDate").text(data.info.xmFEDate);
+                        $("#xmFTypeID").text(data.info.xmFTypeID);
+                        $("#xmFLevelID").text(data.info.xmFLevelID);
+                        $("#rwFName").text(data.info.rwFName);
+                        $("#rwFNo").text(data.info.rwFNo);
+                        $("#rwFLeadUserID").text(data.info.rwFLeadUserID);
+                        $("#rwFSDate").text(data.info.rwFSDate);
+                        $("#rwFEDate").text(data.info.rwFEDate);
+                        $("#rwFTypeID").text(data.info.rwFTypeID);
+                        $("#rwFAsk").text(data.info.rwFAsk);
+                        $("#fflowid").text(data.info.fflowid);
+                        $("#ffliwjd").text(data.info.ffliwjd);
+                        $("#FFileName").text(data.info.FFileName);
+                        $("#FSubUserID").text(data.info.FSubUserID);
+                        $("#FSubDate").text(data.info.FSubDate);
+                        $("#FCheckState").text(data.info.FCheckState);
+                        // $("#FCheckOpinion").text(data.info.FCheckOpinion);
+                        $('#FKeyID').val(data.info.key);
+
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+            }
+        </script>
+    </body>
+</html>

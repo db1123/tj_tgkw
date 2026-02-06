@@ -1,0 +1,170 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+    <!--/_only 独立样式 -->
+</head>
+
+<body>
+<div class="page-container" style="padding: 2px;">
+    <div class="f-r text-l" style="display:none;" id="editxxdiv">
+        <button type="button" class="btn btn-default size-S my-btn" id="editxx"><i
+                class=" fa fa-edit"></i> 编辑信息
+        </button>
+    </div>
+
+    <div class="f-l" style="width: 100%; margin-top: 3px;">
+        <article class="page-container">
+            <form action="" method="post" class="form form-horizontal" id="courseForm">
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span class="c-red">*</span>所属学院：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <label class="form-label" id="FCollegeName" style="width: 100%;text-align: left;"></label>
+                    </div>
+
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span class="c-red">*</span>所属专业：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <label class="form-label" id="FMjorName" style="width: 100%;text-align: left;"></label>
+                    </div>
+
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"><span class="c-red">*</span>方案名称：</label>
+                    <div class="formControls col-xs-9 col-sm-10">
+                        <label class="form-label" id="FName" style="width: 100%;text-align: left;"></label>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;">方案介绍：</label>
+                    <div class="formControls col-xs-9 col-sm-10">
+                        <label class="form-label" id="FJS" style="width: 100%;text-align: left;"></label>
+                    </div>
+                </div>
+
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;">专业介绍：</label>
+                    <div class="formControls col-xs-9 col-sm-10">
+                        <label class="form-label" id="FZYJS" style="width: 100%;text-align: left;"></label>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;">状态：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <label class="form-label" id="FState" style="width: 100%;text-align: left;"></label>
+                    </div>
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;">版本：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <label class="form-label" id="FEdition" style="width: 100%;text-align: left;"></label>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1" style="font-weight: bold;">是否有效：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <label class="form-label" id="FValid" style="width: 100%;text-align: left;"></label>
+                    </div>
+                </div>
+
+                <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+            </form>
+        </article>
+    </div>
+</div>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+    var id = getQueryStringByName('tpid');//方案ID
+    var fmajorid = getQueryStringByName('fmajorid');//专业ID
+    var showtype = getQueryStringByName('showtype');
+
+    // 业务代码
+    $(function () {
+
+        if (showtype == 1) {
+            $("#editxxdiv").attr("style", "display:block;"); //显示
+        } else {
+            $("#editxxdiv").attr("style", "display:none;");  //隐藏
+        }
+        showxx();
+        $("#editxx").removeClass('disabled'); //移除多个样式
+        // 编辑信息点击事件
+        $('#editxx').on('click', function () {
+            var index = parent.layer.open({
+                type: 2,
+                area: ['1000px', '600px'],
+                fix: false, //不固定
+                shade: 0.4,
+                title: '修改培养方案信息',
+                content: '/module/capability/trainingprogram/peiyang/trainingprogramedit.html?op=2&id=' + id +'&ftype=2'
+                , end: function () {
+                    showxx();
+                }
+            });
+            // parent.layer.full(index);
+        });
+
+    });
+
+    function showxx() {
+        //显示基本信息
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/trainingprogram/querytrainingprogramInfosql', // 调用地址
+            data: JSON.stringify({
+                id: id
+            }),
+            async: false,
+            success: function (data) {
+                $('#FName').text(data.info.FName);
+                $('#FJS').text(data.info.FJS);
+                $('#FZYJS').text(data.info.FZYJS);
+                $('#FMjorName').text(data.info.FMjorName);
+                $("#FEdition").text(data.info.FEdition);
+                $("#FCollegeName").text(data.info.FCollegeName);
+                switch (data.info.FValid) {
+                    case 1:
+                        $("#FValid").text("有效");
+                        break;
+                    case 0:
+                        $("#FValid").text("无效");
+                        break;
+                }
+                switch (data.info.FState) {
+                    case 1:
+                        $("#FState").text("编辑");
+                        break;
+                    case 2:
+                        $("#FState").text("发布");
+                        break;
+                }
+
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+    }
+</script>
+</body>
+</html>

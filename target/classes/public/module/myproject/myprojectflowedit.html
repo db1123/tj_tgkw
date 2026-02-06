@@ -1,0 +1,397 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <!--/_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/daterangepicker/daterangepicker.css">
+</head>
+<body>
+<article class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="flowsxzForm">
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>项目名称：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="FProjectName" id="FProjectName" disabled =disabled />
+            </div>
+        </div>
+        <div class="row cl">
+<!--            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>工作流名称：</label>-->
+<!--            <div class="formControls col-xs-2 col-sm-3">-->
+<!--                <input type="text" class="input-text" name="FName" id="FName"/>-->
+<!--            </div>-->
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>主要负责人：</label>
+            <div class="formControls col-xs-3 col-sm-4">
+                <select name="FUserID" id="FUserID" class="" style="width: 100%;"></select>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>计划开始：</label>
+            <div class="formControls col-xs-2 col-sm-4">
+                <input type="text" class="input-text" name="FPSDate" id="FPSDate" readonly="readonly"/>
+            </div>
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>计划完成：</label>
+            <div class="formControls col-xs-3 col-sm-3">
+                <input type="text" class="input-text" name="FPEDate" id="FPEDate" readonly="readonly"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">备注：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="FNote" id="FNote"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>工作流程：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <select name="FFlowID" id="FFlowID" class="" style="width: 100%;"></select>
+            </div>
+        </div>
+        <div class="row cl" style="height: 400px;">
+            <iframe width="100%;" height="100%;" frameborder="0" id="flow"></iframe>
+        </div>
+        <div class="toolbar-bottom-line"></div>
+        <div class="toolbar-bottom-btn">
+            <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+            <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                   onclick="layer_close()"/>
+        </div>
+        <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+        <input type="hidden" value="" name="FProjectID" id="FProjectID"/>
+    </form>
+</article>
+
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript" src="/plugins/moment/moment.min.js"></script>
+<script type="text/javascript" src="/plugins/daterangepicker/daterangepicker.js"></script>
+<script type="text/javascript">
+    // 编辑框状态 1新建 2修改
+    var op = getQueryStringByName('op');
+    var FProjectID = getQueryStringByName('FProjectID');
+    var xmname = parent.xmname;
+
+    var SignUserInfo;
+    // 业务代码
+    $(function () {
+        $('#FProjectID').val(FProjectID);
+        $('#FProjectName').val(xmname);
+        //获取当前登录用户信息
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/entry/showUserInfo',
+            async: false,
+            success : function(data) {
+                if(data.result == "success"){
+                    SignUserInfo = data.user;
+                }
+            },
+            error : function(e){
+                console.log(e.status);
+                console.log(e.responseText);
+            }
+        });
+
+        //  计划开始
+        $("#flowsxzForm input[name='FPSDate']").daterangepicker({
+            singleDatePicker: true, // 设置为单日历，即无区间 默认false
+            showDropdowns: true, // 当设置值为true时，允许年份和月份通过下拉框的形式选择 默认false
+            autoUpdateInput: false, // 1.当设置为false的时候,不给与默认值(当前时间) 2.选择时间时,失去鼠标焦点,不会给与默认值 默认true
+            timePicker24Hour: true, // 设置小时为24小时制 默认false
+            timePicker: false, // 可选中时分 默认false
+            locale: {
+                format: "YYYY-MM-DD",
+                separator: " - ",
+                daysOfWeek: ["日", "一", "二", "三", "四", "五", "六"],
+                monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]
+            }
+        }).on('apply.daterangepicker', function (ev, picker) {
+            $("#flowsxzForm input[name='FPSDate']").val(picker.startDate.format('YYYY-MM-DD'));
+        });
+
+
+        //  计划结束
+        $("#flowsxzForm input[name='FPEDate']").daterangepicker({
+            singleDatePicker: true, // 设置为单日历，即无区间 默认false
+            showDropdowns: true, // 当设置值为true时，允许年份和月份通过下拉框的形式选择 默认false
+            autoUpdateInput: false, // 1.当设置为false的时候,不给与默认值(当前时间) 2.选择时间时,失去鼠标焦点,不会给与默认值 默认true
+            timePicker24Hour: true, // 设置小时为24小时制 默认false
+            timePicker: false, // 可选中时分 默认false
+            autoApply: true,
+            locale: {
+                format: "YYYY-MM-DD",
+                separator: " - ",
+                daysOfWeek: ["日", "一", "二", "三", "四", "五", "六"],
+                monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]
+            }
+        }).on('apply.daterangepicker', function (ev, picker) {
+            $("#flowsxzForm input[name='FPEDate']").val(picker.startDate.format('YYYY-MM-DD'));
+        });
+
+        $("#flowsxzForm select[name='FUserID']").select2({
+            placeholder: '请选择负责人',
+            ajax: {
+                type: 'POST',
+                url: "/s/user/queryDataUserSelect",
+                dataType: 'json',
+                data: function (params) {
+                    return {
+                        search: params.term,
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.results
+                    };
+                },
+                delay: 800,
+                cache: true
+            },
+            language: "zh-CN"
+        });
+
+        // 修改操作时读取表单信息
+        if (op == 2) {
+            var id = getQueryStringByName('id');
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/myprojectflows/querymyprojectflowsidInfo', // 调用地址
+                data: JSON.stringify({
+                    id: FProjectID
+                }),
+                async: false,
+                success: function (data) {
+                    var option5 = new Option(data.info.FFlowName, data.info.FFlowID, true, true);
+                    $("#FFlowID").append(option5);
+                    $("#FFlowID").change();
+                    // $('#FName').val(data.info.FName);
+                    $('#flow').attr('src', '/floweditor/index.html?lang=zh&sidebar-entries=large&tv=outside-basic-edit-attribute&f='+data.info.FFlowID+'&tv=view');
+                    $('#FKeyID').val(data.info.key);
+                    $("#flowsxzForm input[name='FPSDate']").val(data.info.FPSDate);
+                    $("#flowsxzForm input[name='FPEDate']").val(data.info.FPEDate);
+                    option5 = new Option(data.info.FUserName, data.info.FUserID, true, true);
+                    $("#FUserID").append(option5);
+                    $("#FUserID").change();
+                    $('#FNote').val(data.info.FNote);
+
+
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        }else{
+            var option4 = new Option(SignUserInfo.f_name,SignUserInfo.key, true, true);
+            $("#flowsxzForm select[name='FUserID']").append(option4);
+            $("#flowsxzForm select[name='FUserID']").change();
+        }
+
+        $("#flowsxzForm select[name='FFlowID']").select2({
+            placeholder: '请选择工作流程',
+            ajax: {
+                type: 'POST',
+                url: "/s/subdata/queryDataflowSelect",
+                dataType: 'json',
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        FType:"2"
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.list
+                    };
+                },
+                delay: 800,
+                cache: true
+            },
+            language: "zh-CN"
+        });
+
+        // jQuery.validator.methods.compareDate = function(value, element, param) {
+        //     var startDate = jQuery(param).val();
+        //     var date1 = new Date(Date.parse(startDate.replace("-", "/")));
+        //     var date2 = new Date(Date.parse(value.replace("-", "/")));
+        //     return date1 < date2;
+        // };
+
+        jQuery.validator.addMethod("compareDate", function (value, element, param) {
+            var startDate = $("#flowsxzForm input[name='FPSDate']").val();
+
+            var date1 = new Date(Date.parse(startDate.replace("-", "/")));
+            var date2 = new Date(Date.parse(value.replace("-", "/")));
+
+            console.log('date1:'+date1+',date2'+date2);
+            if(date2>=date1){
+                return true;
+            }else{
+                return false;
+            }
+
+        }, $.validator.format("计划完成时间必须大于计划开始时间!"));
+        // 检验数据
+        var userValidate = $('#flowsxzForm').validate({
+            rules: {
+                FFlowID: {
+                    required: true,
+                    levelLimit: false
+                },
+                // FName: {
+                //     required: true,
+                //     levelLimit: false
+                // },
+                FUserID: {
+                    required: true,
+                    levelLimit: false
+                },
+                FPSDate: {
+                    required: true,
+                    levelLimit: false
+                },
+                FPEDate: {
+                    required: true,
+                    levelLimit: false,
+                    compareDate: true
+                },
+            },
+            messages: {
+                FFlowID: {
+                    required: '*请选择工作流程'
+                },
+                // FName: {
+                //     required: '*请输入工作流名称'
+                // },
+                FUserID: {
+                    required: '*请选择负责人'
+                },
+                FPSDate: {
+                    required: '*请选择计划开始时间'
+                },
+                FPEDate: {
+                    required: '*请选择计划完成时间',
+                    // compareDate: "计划完成时间必须大于计划开始时间!"
+                },
+            },
+            onfocusout: false, // 是否在获取焦点时验证
+            onkeyup: false, // 是否在敲击键盘时验证
+            focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+            focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+            success: 'valid',
+            submitHandler: function () {
+                var xml ;
+                // 获取参数
+                var data = form2Json('flowsxzForm');
+                // 逐级保存修改内容
+                $('#flow')[0].contentWindow.savaParent();
+                // 获取顶级流程图xml字符串
+                console.log("length:"+$('#flow')[0].contentWindow.saveXMLArray.length);
+                if ($('#flow')[0].contentWindow.saveXMLArray.length > 0) {
+                    data['xml'] = $('#flow')[0].contentWindow.saveXMLArray[0].xml;
+                    xml =$('#flow')[0].contentWindow.saveXMLArray[0].xml;
+                } else {
+                    data['xml'] = $('#flow')[0].contentWindow.getFlowStr().xml;
+                    xml = $('#flow')[0].contentWindow.getFlowStr().xml;
+                }
+
+                if (op == 1 ) { // 添加操作
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/myprojectflows/addmyprojectflows', // 调用地址
+                        data: JSON.stringify(data),
+                        async: false,
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                $('body').mLoading('show');
+                                setTimeout(function(){
+                                    $('.mloading-text').html('加载工作流...');
+                                    setTimeout(function(){
+                                        $('.mloading-text').html('读取数据中...');
+                                        // parent.my_frame2.contentWindow.openFlowXml(xml);
+                                        // parent.flowid = data.FFlowID;
+                                        parent.iframeloadevent_s(xml,data.FFlowID,data.projectflowid);
+                                        layer_close();
+                                        setTimeout(function(){
+                                            $('.mloading-text').html('加载完成...');
+                                            $("body").mLoading("hide");
+                                            // layer_close();
+                                        }, 1000);
+                                        $("body").mLoading("hide");
+                                    }, 1000);
+                                }, 1000);
+
+
+                            }  else if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                }else{
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/myprojectflows/updatemyprojectflows', // 调用地址
+                        data: JSON.stringify(data),
+                        async: false,
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                $('body').mLoading('show');
+                                setTimeout(function(){
+                                    $('.mloading-text').html('加载工作流...');
+                                    setTimeout(function(){
+                                        $('.mloading-text').html('读取数据中...');
+                                        // parent.my_frame2.contentWindow.openFlowXml(xml);
+                                        // parent.flowid = data.FFlowID;
+                                        parent.iframeloadevent_s(xml,data.FFlowID,data.projectflowid);
+                                        layer_close();
+                                        setTimeout(function(){
+                                            $('.mloading-text').html('加载完成...');
+                                            $("body").mLoading("hide");
+
+                                        }, 1000);
+                                        $("body").mLoading("hide");
+                                    }, 1000);
+                                }, 1000);
+                            }   else if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                }
+            }
+        });
+        $('#FFlowID').change(function(){
+            var p1=$(this).children('option:selected').val();//这就是selected的值
+            console.log(p1);
+            $('#flow').attr('src', '/floweditor/index.html?lang=zh&sidebar-entries=large&tv=outside-edit-attribute&f='+p1+'&tv=view');
+        });
+
+
+    });
+</script>
+</body>
+</html>

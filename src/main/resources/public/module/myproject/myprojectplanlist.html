@@ -1,0 +1,85 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+        <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+        <!--/_only 独立样式 -->
+    </head>
+    <body>
+        <div class="page-container" style="padding: 2px;">
+            <div class="f-l text-l">
+                <button type="button" class="btn btn-secondary-outline radius" id="jiahulist" onclick="jihua()">
+                    计划列表
+                </button>
+                <button type="button" class="btn btn-secondary-outline radius" id="gantt" onclick="gantt()">
+                    甘特图
+                </button>
+                <button type="button" class="btn btn-secondary-outline radius" id="bglog" onclick="bglog()">
+                    计划变更记录
+                </button>
+            </div>
+            <div class="f-l" style="width: 100%; margin-top: 3px;">
+                <div id="iframediv">
+                    <iframe width="100%;" height="100%;" frameborder="0" id="plan" ></iframe>
+                </div>
+            </div>
+
+        </div>
+        <script type="text/javascript">
+            var id = getQueryStringByName('id');
+            var xmname = parent.xmname;
+            var showtype = getQueryStringByName('showtype'); //显示类型 1=项目管理 2=项目执行 3=项目预警
+            // 业务代码
+            $(function () {
+                jihua();
+                if(document.body.clientHeight > 600){
+                    $('#iframediv').height(document.body.clientHeight-50);
+                }else {
+                    $('#iframediv').height(document.body.clientHeight-80);
+                }
+            });
+            function jihua() {
+                $("#jiahulist").css("background","#3BB4F2");
+                $("#jiahulist").css("color","#FFFFFF");
+                $("#gantt").css("color","#3BB4F2");
+                $("#gantt").css("background","#FFFFFF");
+
+
+                $("#bglog").css("background","#FFFFFF");
+                $("#bglog").css("color","#3BB4F2");
+
+                $('#plan').attr('src', 'myprojectplanllist.html?id=' + id+'&showtype='+showtype);
+            }
+
+            function gantt() {
+                $("#gantt").css("background","#3BB4F2");
+                $("#gantt").css("color","#FFFFFF");
+                $("#jiahulist").css("color","#3BB4F2");
+                $("#jiahulist").css("background","#FFFFFF");
+
+
+                $("#bglog").css("background","#FFFFFF");
+                $("#bglog").css("color","#3BB4F2");
+
+                $('#plan').attr('src', 'myprojectplangantt.html?id=' + id+'&showtype='+showtype);
+            }
+            function bglog() {
+                $("#gantt").css("background","#FFFFFF");
+                $("#gantt").css("color","#3BB4F2");
+                $("#jiahulist").css("color","#3BB4F2");
+                $("#jiahulist").css("background","#FFFFFF");
+
+                $("#bglog").css("background","#3BB4F2");
+                $("#bglog").css("color","#FFFFFF");
+                $('#plan').attr('src', 'myprojectplanbgloglist.html?id=' + id+'&showtype='+showtype);
+            }
+        </script>
+    </body>
+</html>

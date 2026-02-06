@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fun.server.mapper.TProjectTeamMapper">
+  <resultMap id="BaseResultMap" type="fun.server.model.TProjectTeam">
+    <!--
+    @mbg.generated
+    -->
+    <constructor>
+      <idArg column="FKeyID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FUID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCDATE" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FUDATE" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FState" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FProjectID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FUserID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FRole" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FDuty" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FNote" javaType="java.lang.String" jdbcType="VARCHAR" />
+    </constructor>
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <!--
+    @mbg.generated
+    -->
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <!--
+    @mbg.generated
+    -->
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    <!--
+    @mbg.generated
+    -->
+    FKeyID, FCID, FUID, FCDATE, FUDATE, FState, FProjectID, FUserID, FRole, FDuty, FNote
+  </sql>
+
+</mapper>

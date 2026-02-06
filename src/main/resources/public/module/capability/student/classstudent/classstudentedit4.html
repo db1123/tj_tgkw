@@ -1,0 +1,234 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <!--/_only 独立样式 -->
+</head>
+<style>
+    label.error{
+        position: absolute;
+        right: 128px;
+        top: 5px;
+        color: #ef392b;
+        font-size: 12px;
+        z-index: 1;
+        padding-right: 15px;
+    }
+
+</style>
+<body>
+<article class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="classstudentForm">
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>专业名称：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="FMajorName" id="FMajorName" disabled="disabled"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>年级：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <select name="FGradeID" id="FGradeID" style="width: 100%;" disabled="disabled"></select>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>班级名称：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="FClassName" id="FClassName" disabled="disabled"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>学生：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+<!--                <select name="FStudentName" id="FStudentName" multiple="multiple" style="width: 100%;"></select>-->
+                <input type="text" class="input-text" name="FStudentName" id="FStudentName" style="width: 87%;" readonly="readonly" />
+<!--                <input type="button" onclick="openStudent()" style="width: 15%;height: 31px;" value="学生信息"/>-->
+                <div id="addtjbtndiv" style="float: right;display: block;">
+                    <button type="button" class="btn btn-primary size-S" onclick="openStudent()">学生信息</button>
+                </div>
+            </div>
+        </div>
+        <div class="toolbar-bottom-line"></div>
+        <div class="toolbar-bottom-btn">
+            <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+            <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                   onclick="layer_close()"/>
+        </div>
+        <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+        <input type="hidden" value="" name="FMajorID" id="FMajorID"/>
+    </form>
+</article>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript">
+    // 编辑框状态 1新建 2修改
+    var op = getQueryStringByName('op');
+    var id = getQueryStringByName('id');//班级ID
+    var selectStudent;
+    var selectedIds = [];
+    var selectedNames = [];
+    top.classstudentpage = this;
+    // 业务代码
+    $(function () {
+
+        //学生
+        // // 初始用户配置化
+        // selectStudent = $("#classstudentForm select[name='FStudentName']").select2({
+        //     placeholder: '请选择学生',
+        //     ajax: {
+        //         type: 'POST',
+        //         url: "/s/major/queryDatatstudentSelect_class",
+        //         dataType: 'json',
+        //         data: function (params) {
+        //             return {
+        //                 search: params.term,
+        //             };
+        //         },
+        //         processResults: function (data) {
+        //             return {
+        //                 results: data.list
+        //             };
+        //         },
+        //         delay: 800,
+        //         cache: true
+        //     },
+        //     language: "zh-CN"
+        // });
+        var FGradeID = $("#FGradeID").select2({
+            placeholder: '请选择年级',
+            ajax: {
+                type: 'POST',
+                url: "/s/grade/queryDatagradeSelect",
+                dataType: 'json',
+                data: function (params) {
+                    return {
+                        search: params.term,
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.list
+                    };
+                },
+                delay: 800,
+                cache: true
+            },
+            language: "zh-CN"
+        });
+        // 修改操作时读取表单信息
+        if (op == 2) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/tclass/querytclassInfo', // 调用地址
+                data: JSON.stringify({
+                    id: id
+                }),
+                async: false,
+                success: function (data) {
+                    $('#FClassName').val(data.info.FClassName);
+                    var option3 = new Option(data.info.FGradeName, data.info.FGradeID, true, true);
+                    $("#classstudentForm select[name='FGradeID']").append(option3);
+                    $("#classstudentForm select[name='FGradeID']").change();
+                    $('#FKeyID').val(data.info.key);
+                    $('#FMajorID').val(data.info.FMajorID);
+                    $('#FGradeID').val(data.info.FGradeID);
+                    $('#FMajorName').val(data.info.FMajorName);
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        }
+        // 检验数据
+        var userValidate = $('#classstudentForm').validate({
+            rules: {
+                FStudentName: {
+                    required: true,
+                },
+            },
+            messages: {
+                FStudentName: {
+                    required: "*请选择学生",
+                },
+            },
+            onfocusout: false, // 是否在获取焦点时验证
+            onkeyup: false, // 是否在敲击键盘时验证
+            focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+            focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+            success: 'valid',
+            submitHandler: function () {
+                // 获取学生信息
+                // var studentname = [];
+                // selectStudent.select2('data').forEach((item) => {
+                //     studentname.push(item.id);
+                // });
+                // 获取参数
+                var data = form2Json('classstudentForm');
+                data['studentname'] = selectedIds;
+                if (op == 1) { // 添加操作
+                } else {
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/tclass/addtclassstudent', // 调用地址
+                        data: JSON.stringify(data),
+                        async: false,
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                parent.shuaxin();
+                                parent.toastr.success('添加成功！');
+                                layer_close();
+                            }else if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                }
+            }
+        });
+    });
+
+    function getStudentlistID(selectedId,selectedName){
+        selectedIds = selectedId;
+        selectedNames = selectedName;
+        $("#FStudentName").val(selectedNames);
+        console.log("edit:" + selectedIds);
+    }
+
+    function openStudent(){
+        if(selectedIds)
+            top.layer_show('学生信息查询页面', '/module/capability/student/classstudent/classstudentopen.html?classID='+id+'&selectedIds=' + selectedIds + '&selectedNames='+selectedNames, '1400', '600');
+        else{
+            top.layer_show('学生信息查询页面', '/module/capability/student/classstudent/classstudentopen.html?classID='+id, '1400', '600');
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,563 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <script type="text/javascript" src="/javascript/quanxian.js"></script>
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+    <!--/_only 独立样式 -->
+</head>
+<body>
+<div class="page-container" style="display: none;" id="permissiongrouplistdiv">
+
+    <div class="f-l" style="width: 100%; margin-top: 3px;">
+        <div class="row cl">
+            <div class="col-md-4">
+                <div class="card-body">
+                    <div class="f-l text-l">
+                        <button type="button" class="btn btn-default size-S my-btn" onclick="Values(1)"><i
+                                class=" fa fa-user-plus"></i>
+                            新增权限组
+                        </button>
+                    </div>
+                    <div class="f-r text-r">
+
+                        <input type="text" class="input-text size-S form-text-FName" style="width:200px"
+                               placeholder="权限组名称">
+
+                        <button type="button" class="btn btn-default size-S my-btn btn-search-fun"><i
+                                class="Hui-iconfont">&#xe665;</i>
+                            搜索
+                        </button>
+                    </div>
+                    <table id="mainTable" class="display compact" style="width: 99.8%;"></table>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <div class="f-r text-r">
+                        <select style="width:200px" placeholder="菜单" class="search-menid" id="search-menid"> </select>
+                        <select style="width:200px" placeholder="权限类型" class="search-ftype">
+                            <option value="-2">全部类型</option>
+                            <!--                            <option value="-1">全部功能</option>-->
+                            <option value="1">功能</option>
+                            <option value="2">数据</option>
+                        </select>
+                        <button type="button" class="btn btn-default size-S my-btn btn-search-fun2"><i
+                                class="Hui-iconfont">&#xe665;</i>
+                            搜索
+                        </button>
+                        <button type="button" class="btn btn-default size-S" id="yijianqingkong"
+                                onclick="yijianqingkong()">
+                            一键清空权限
+                        </button>
+                        <button type="button" class="btn btn-default size-S my-btn" id="caidanqingkong"
+                                onclick="caidanqingkong()">
+                            按菜单清空权限
+                        </button>
+                    </div>
+                    <div class="f-r text-r" style="margin-top: 15px;">
+
+
+                    </div>
+                    <div class="f-l text-l" style="">
+                        <button type="button" class="btn btn-default size-S my-btn" onclick="Valuesqxx(1)"><i
+                                class=" fa fa-user-plus"></i>
+                            新增权限
+                        </button>
+                        <button type="button" class="btn btn-default size-S my-btn" onclick="Valuesqxxj(1)"><i
+                                class=" fa fa-user-plus"></i>
+                            一键新增全部权限
+                        </button>
+                    </div>
+                    <div class="f-l text-l" style="margin-left: 15px;">
+                        <strong id="mxname">权限组：</strong>
+                    </div>
+                    <table id="mainTableuser" class="display compact" style="width: 99.8%;"></table>
+
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+
+<script type="text/javascript">
+
+
+    var permissiongroupid;//权限组id
+    var mainTable;
+    var FUserGroupName;
+
+
+    // 业务代码
+    $(function () {
+        $("#permissiongrouplistdiv").css("display", "block");
+        $(".search-menid").select2({
+            placeholder: '请选择菜单',
+            ajax: {
+                type: 'POST',
+                url: "/s/permissiongroupsrelationship/queryDatatmenu_optionsSelect",
+                dataType: 'json',
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        FType: -1
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.list
+                    };
+                },
+                delay: 800,
+                cache: true
+            },
+            language: "zh-CN"
+        });
+
+        $(".search-ftype").select2({
+            placeholder: '请选择权限类型',
+            language: "zh-CN"
+        });
+        // 封装表格
+        mainTable = $('#mainTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/tpermissionGroup/querytpermissionGroup', // 调用地址
+                data: function (d) {
+                    return JSON.stringify($.extend({}, d, {
+                        page: d.start / d.length + 1, // 当前页
+                        results: d.length, // 每页显示条数
+                        name: $('.form-text-FName').val(),//权限组名称
+                        dataall: accessInfo.dataall
+                    }));
+                },
+                dataSrc: function (json) {
+                    json.recordsFiltered = json.total;  // 总行数
+                    json.recordsTotal = json.page; // 当前页数
+                    return json.list;
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+            },
+            columns: [
+                {title: '权限组名称', data: 'FName', class: 'open-work-control2'},
+                {title: '权限组说明', data: 'FNote', class: 'open-work-control2'},
+                {title: '创建时间', data: 'FCDATE', class: 'open-work-control2'},
+                {
+                    title: '状态',
+                    data: 'FState',
+                    width: 35,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (data == 1) {
+                            return '<button type="button" class="btn btn-success size-MINI" onclick="onClickdataTypeBtnState(\'' + row.key + '\',' + row.FState + ',\'' + row.FName + '\')"><i class="fas fa-toggle-on"></i> 启用</button>';
+                        } else {
+                            return '<button type="button" class="btn btn-warning size-MINI" onclick="onClickdataTypeBtnState(\'' + row.key + '\',' + row.FState + ',\'' + row.FName + '\')"><i class="fas fa-toggle-off"></i> 禁用</button>';
+                        }
+                    }
+                },
+                {
+                    title: '操作',
+                    data: 'FState',
+                    width: 90,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<button type="button" class="btn btn-secondary size-MINI" onclick="Values(2,\'' + row.key + '\')"><i class="fas fa-edit"></i>编辑</button>' +
+                            '<button type="button" class="btn btn-danger size-MINI" onclick="onClickBtnDel(\'' + row.key + '\',\'' + row.FName + '\')"><i class="fas fa-trash"></i>删除</button>';
+                    }
+                }
+            ],
+            scrollY: (document.body.clientHeight - 150) + 'px',
+            scrollX: true,
+            paging: true, // 是否开启本地分页
+            pageLength: 15, // 改变初始化页长度（每页多少条数据）
+            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+            lengthChange: false, // 是否允许因子改变表格每页显示的记录数
+            searching: false, // 是否允许Datatables开启本地搜索
+            ordering: true, // 是否允许Datatables开启排序
+            info: true, // 控制是否显示表格左下角的信息
+            order: [[2, 'desc']],
+            language: DataTablesLanguage
+        });
+        // 隐藏第二列
+        mainTable.column(2).visible(false);
+        // 查询按钮点击事件
+        $('.btn-search-fun').on('click', function () {
+            $('#mainTable').DataTable().ajax.reload(null, false);
+        });
+
+
+        // 封装表格 -专家
+        var mainTableuser = $('#mainTableuser').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/permissiongroupsrelationship/querypermissiongroupsrelationship', // 调用地址
+                data: function (d) {
+                    return JSON.stringify($.extend({}, d, {
+                        page: d.start / d.length + 1, // 当前页
+                        results: d.length, // 每页显示条数
+                        id: permissiongroupid,
+                        FMenID: $('.search-menid').val(),//菜单
+                        FType: $('.search-ftype').val(),//权限类型
+                        dataall: accessInfo.dataall
+                    }));
+                },
+                dataSrc: function (json) {
+                    json.recordsFiltered = json.total;  // 总行数
+                    json.recordsTotal = json.page; // 当前页数
+                    return json.list;
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+            },
+            columns: [
+                {
+                    title: '菜单', data: 'FMenID',
+                    render: function (data, type, row) {
+                        return row.FMenName;
+                    }
+                },
+
+                {
+                    title: '权限类型', data: 'FType',
+                    render: function (data, type, row) {
+                        return row.FTypeName;
+                    }
+                },
+                {
+                    title: '权限项', data: 'FTerm',
+                    render: function (data, type, row) {
+                        return row.FTermName;
+                    }
+                },
+                {
+                    title: '备注', data: 'FNote',
+                    render: function (data, type, row) {
+                        return data;
+                    }
+                },
+                {
+                    title: '创建时间', data: 'FCDATE',
+                    render: function (data, type, row) {
+                        return row.FCDATE;
+                    }
+                }, {
+                    title: '操作',
+                    data: 'FState',
+                    width: 90,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<button type="button" class="btn btn-danger size-MINI" onclick="onClickBtnqxxDel(\'' + row.key + '\',\'' + row.FMenName + '-->' + row.FTermName + '\')"><i class="fas fa-trash"></i>移除</button>';
+                    }
+                }
+            ],
+            //scrollY: (document.body.clientHeight-50) + 'px',
+            scrollX: true,
+            paging: true, // 是否开启本地分页
+            pageLength: 20, // 改变初始化页长度（每页多少条数据）
+            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+            lengthChange: false, // 是否允许维度改变表格每页显示的记录数
+            searching: false, // 是否允许Datatables开启本地搜索
+            ordering: true, // 是否允许Datatables开启排序
+            info: true, // 控制是否显示表格左下角的信息
+            order: [[0, "asc"], [2, "asc"]],
+            language: DataTablesLanguage
+        });
+        // 查询按钮点击事件
+        $('.btn-search-fun2').on('click', function () {
+            $('#mainTableuser').DataTable().ajax.reload(null, false);
+        });
+        // 隐藏第二列
+        mainTableuser.column(4).visible(false);
+        $('#mainTable tbody').on('click', 'tr td.open-work-control2', function () {
+
+            if (!$(this).parent().hasClass('selected')) { // 处理点击行样式
+                mainTable.$('tr.selected').removeClass('selected');
+                $(this).parent().addClass('selected');
+            }
+            var data = mainTable.row(this).data(); // 获取点击行数据
+
+            permissiongroupid = data.key;
+            FUserGroupName = data.FName;
+            $('#mxname').text("权限组：" + data.FName);
+            $('#mainTableuser').DataTable().ajax.reload(null, false);
+        });
+
+    });
+
+    function reloadtable(FPGIDd, name) {
+        permissiongroupid = FPGIDd;
+        FUserGroupName = name;
+        $('#mainTableuser').DataTable().ajax.reload(null, false);
+    }
+
+    // 新增或者修改点击事件
+    function Values(op, fKey) {
+        if (op == 1) { // 新增
+            if (accessInfo.add == 1)
+                layer_show('新增权限组信息', 'permissiongroupedit.html?op=1', '600', '300');
+            else
+                toastr.error(errormsg);
+        } else { // 修改
+            if (accessInfo.edit == 1)
+                layer_show('修改权限组信息', 'permissiongroupedit.html?op=2&id=' + fKey, '600', '300');
+            else
+                toastr.error(errormsg);
+        }
+    }
+
+    // 新增或者修改点击事件
+    function Valuesqxx(op) {
+        if (permissiongroupid) {
+            if (op == 1) { // 新增
+                if (accessInfo.add == 1)
+                    layer_show('新增权限信息', 'permissiongroupshipedit.html?op=1&fpgid=' + permissiongroupid, '800', '400');
+                else
+                    toastr.error(errormsg);
+            }
+            // else { // 修改
+            //     layer_show('修改权限信息', '.html?op=2&id=' + fKey+'&fpgid=' + permissiongroupid, '600', '300');
+            // }
+        } else {
+            toastr.error('请选择权限组后再添加！');
+        }
+    }
+
+    function yijianqingkong() {
+        if (accessInfo.del == 1) {
+            if (permissiongroupid) {
+                var text = '是否清空权限组【<b>' + FUserGroupName + '</b>】所有权限?';
+                layer.confirm(text, function (index) {
+                    $('body').mLoading('show');
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json;charset=UTF-8',
+                        url: '/s/permissiongroupsrelationship/delyijiantpermissionterm',
+                        data: JSON.stringify({
+                            id: permissiongroupid
+                        }),
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                $('#mainTableuser').DataTable().ajax.reload(null, false);
+                                toastr.success('清空完成！');
+                                layer.close(layer.index);
+                            }
+                            if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                            $("body").mLoading("hide");
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                            $("body").mLoading("hide");
+                        }
+                    });
+                });
+            } else {
+                toastr.error('请选择权限组后再清空！');
+            }
+        } else {
+            toastr.error(errormsg);
+        }
+    }
+
+    function caidanqingkong() {
+        if (accessInfo.del == 1) {
+            if (permissiongroupid) {
+                layer_show('按菜单清空权限', 'permissiongroupshipmendel.html?op=1&fpgid=' + permissiongroupid, '800', '400');
+            } else {
+                toastr.error('请选择权限组后再清空！');
+            }
+        } else {
+            toastr.error(errormsg);
+        }
+    }
+
+    // 删除按钮点击事件
+    function onClickBtnDel(id, name) {
+        if (accessInfo.del == 1) {
+            layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function (index) {
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json;charset=UTF-8',
+                    url: '/s/tpermissionGroup/deltpermissionGroup',
+                    data: JSON.stringify({
+                        id: id
+                    }),
+                    success: function (data) {
+                        if (data.result == 'success') {
+                            $('#mainTable').DataTable().ajax.reload(null, false);
+                            permissiongroupid = null;
+                            FUserGroupName = "";
+                            $('#mxname').text("权限组：" + "");
+                            $('#mainTableuser').DataTable().ajax.reload(null, false);
+                            toastr.success('删除成功！');
+                            layer.close(layer.index);
+                        }
+                        if (data.result == 'error') {
+                            toastr.error(data.error);
+                        }
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+            });
+        } else {
+            toastr.error(errormsg);
+        }
+    }
+
+    // 删除按钮点击事件
+    function onClickBtnqxxDel(id, name) {
+        if (accessInfo.del == 1) {
+            layer.confirm('<b>' + name + '</b><br />确定要移除吗?', function (index) {
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json;charset=UTF-8',
+                    url: '/s/permissiongroupsrelationship/deltpermissionterm',
+                    data: JSON.stringify({
+                        id: id
+                    }),
+                    success: function (data) {
+                        if (data.result == 'success') {
+                            $('#mainTableuser').DataTable().ajax.reload(null, false);
+                            toastr.success('移除成功！');
+                            layer.close(layer.index);
+                        }
+                        if (data.result == 'error') {
+                            toastr.error(data.error);
+                        }
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+            });
+        } else {
+            toastr.error(errormsg);
+        }
+
+    }
+
+
+    function Valuesqxxj() {
+        if (permissiongroupid) {
+            if (accessInfo.add == 1) {
+                var text = '是否给权限组【<b>' + FUserGroupName + '</b>】新增所有菜单权限?';
+                layer.confirm(text, function (index) {
+                    $("body").mLoading("show");
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json;charset=UTF-8',
+                        url: '/s/permissiongroupsrelationship/addcaidanqx',
+                        data: JSON.stringify({
+                            id: permissiongroupid
+                        }),
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                $('#mainTableuser').DataTable().ajax.reload(null, false);
+                                toastr.success('新增成功！');
+                                layer.close(layer.index);
+                                $("body").mLoading("hide");
+                            }
+                            if (data.result == 'error') {
+                                toastr.error(data.error);
+                                $("body").mLoading("hide");
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                            $("body").mLoading("hide");
+                        }
+                    });
+                });
+            } else {
+                toastr.error(errormsg);
+            }
+        } else {
+            toastr.error('请选择权限组后再添加！');
+        }
+    }
+
+
+    function onClickdataTypeBtnState(id, state, name) {
+        var text = '';
+        if (state == 1) {
+            text = '<b>' + name + '</b><br />确定要&nbsp;<b>禁用</b>&nbsp;吗?';
+        } else {
+            text = '<b>' + name + '</b><br />确定要&nbsp;<b>启用</b>&nbsp;吗?';
+        }
+
+        if (state == 1 && accessInfo.disable == 0) {
+            toastr.error(errormsg);
+            return false;
+        }
+        if (state == 0 && accessInfo.enable == 0) {
+            toastr.error(errormsg);
+            return false;
+        }
+        layer.confirm(text, function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/tpermissionGroup/statetpermissionGroup',
+                data: JSON.stringify({
+                    id: id,
+                    state: state
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#mainTable').DataTable().ajax.reload(null, false);
+                        toastr.success('状态改变成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error)
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<!--_global 公共配置文件 -->
+<script language="javascript">var golbal_type="admin";</script>
+<script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+<!--_only 独立样式 -->
+<link rel="stylesheet" href="/plugins/select2/css/select2.min.css" />
+<link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css" />
+<!--/_only 独立样式 -->
+</head>
+<body>
+<div class="page-container" style="padding: 0 2px 2px 2px;">
+  <div class="f-l text-l">
+    <button type="button" class="btn btn-default size-S my-btn" onclick="SupplierCertificateValues(1)"><i class=" fa fa-user-plus"></i> 新增</button>
+  </div>
+  <div class="f-r text-r">
+    <select class="supplier-certificate-form-select-supplier-div supplier-certificate-form-select-supplier-id" style="display: none; width: 150px;"></select>
+    <input type="text" class="input-text size-S supplier-certificate-form-text-name" style="width:200px" placeholder="输入证书名称" />
+    <button type="button" class="btn btn-default size-S my-btn supplier-certificate-btn-search-fun"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+  </div>
+	<div class="f-l table-panel">
+    <table id="supplierCertificateTable" class="display compact" style="width: 99.8%;"></table>
+	</div>
+</div>
+
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+var id = getQueryStringByName('id');
+// 业务代码
+$(function(){
+  if (isNull(id)) {
+    $('.supplier-certificate-form-select-supplier-div').show();
+    // 初始公司下拉列表(查询)
+    $(".supplier-certificate-form-select-supplier-id").select2({
+      placeholder: '请选择公司',
+      ajax: {
+        type:'POST',
+        url: "/s/supplier/queryDataSupplierSelect",
+        dataType: 'json',
+        data: function (params) {
+          return {
+            search: params.term,
+            type: 'all'
+          };
+        },
+        delay: 800,
+        cache: true
+      },
+      language: "zh-CN"
+    });
+  }
+  // 证书-表格
+  var supplierCertificateTableColumns = [];
+  if (isNull(id)) {
+    supplierCertificateTableColumns.push({ title: '企业', data: 'supplier_name', orderable: false });
+  }
+  supplierCertificateTableColumns.push({ title: '证书名称', data: 'f_name' });
+  supplierCertificateTableColumns.push({ title: '认证机构名称(年)', data: 'f_certification_body' });
+  supplierCertificateTableColumns.push({ title: '证书编号', data: 'f_no' });
+  supplierCertificateTableColumns.push({ title: '认证时间', data: 'f_date', width: 60 });
+  supplierCertificateTableColumns.push({
+    title: '操作',
+    data: 'f_state',
+    width: 90,
+    orderable: false,
+    render: function (data, type, row) {
+      return '<button type="button" class="btn btn-secondary size-MINI" onclick="SupplierCertificateValues(2,\''+row.key+'\')"><i class="fas fa-edit"></i>编辑</button>' +
+             '<button type="button" class="btn btn-danger size-MINI" onclick="onClickSupplierCertificateBtnDel(\''+row.key+'\',\''+row.f_name+'\')"><i class="fas fa-trash"></i>删除</button>';
+    }
+  });
+  var supplierCertificateTableConfig = {
+    processing: true,
+    serverSide: true,
+    ajax: {
+      type: 'POST',
+      contentType: 'application/json',
+      url: '/s/supplierCertificate/querySupplierCertificate', // 调用地址
+      data: function ( d ) {
+        return JSON.stringify( $.extend( {}, d, {
+          page: d.start/d.length+1, // 当前页
+          results: d.length, // 每页显示条数
+          name: $('.supplier-certificate-form-text-name').val(),
+          f_supplier_id: isNull(id) ? $('.supplier-certificate-form-select-supplier-id').val() : id
+        } ) );
+      },
+      dataSrc: function (json) {
+        json.recordsFiltered = json.total;  // 总行数
+        json.recordsTotal = json.page; // 当前页数
+        return json.list;
+      },
+      error: function (xhr, status, error) {
+        toastr.error(xhr);
+      }
+    },
+    scrollY: (document.body.clientHeight-96) + 'px',
+    scrollX: true,
+    columns: supplierCertificateTableColumns,
+    paging: true, // 是否开启本地分页
+    pageLength: 15, // 改变初始化页长度（每页多少条数据）
+    pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+    lengthChange: false, // 是否允许流程项目改变表格每页显示的记录数
+    searching: false, // 是否允许Datatables开启本地搜索
+    ordering: true, // 是否允许Datatables开启排序
+    info: true, // 控制是否显示表格左下角的信息
+    language: DataTablesLanguage
+  };
+  $('#supplierCertificateTable').DataTable(supplierCertificateTableConfig);
+  // 查询按钮点击事件
+  $('.supplier-certificate-btn-search-fun').on('click', function(){
+    $('#supplierCertificateTable').DataTable().ajax.reload(null, false);
+  });
+});
+// 新增或者修改点击事件
+function SupplierCertificateValues(op, fKey) {
+  if (op == 1) { // 新增
+    layer_show('新增管理体系认证信息','edit.html?sid='+id+'&op=1','600','420');
+  } else { // 修改
+    layer_show('修改管理体系认证信息','edit.html?sid='+id+'&op=2&id='+fKey,'600','420');
+  }
+}
+// 删除按钮点击事件
+function onClickSupplierCertificateBtnDel(id, name) {
+  layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function(index){
+    $.ajax({
+      type: 'POST',
+      contentType: 'application/json;charset=UTF-8',
+      url: '/s/supplierCertificate/delSupplierCertificate',
+      data: JSON.stringify({
+        id: id
+      }),
+      success: function(data) {
+        if(data.result == 'success'){
+          $('#supplierCertificateTable').DataTable().ajax.reload(null, false);
+          toastr.success('删除成功！');
+          layer.close(layer.index);
+        }if(data.result == 'error') {
+          toastr.error(data.error)
+        }
+      },
+      error: function(e){
+        toastr.error(e.status);
+        toastr.error(e.responseText);
+      }
+    });
+	});
+}
+</script> 
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <!--/_only 独立样式 -->
+</head>
+
+<body>
+    <iframe id="iframe-view" scrolling="yes" frameborder="0"
+        style="position:absolute; bottom:0; height:100%; width:100%;"></iframe>
+</body>
+
+<script type="text/javascript">
+    var id = getQueryStringByName('tpid');//培养ID
+    var fmajorid = getQueryStringByName('fmajorid');//专业ID
+    var showtype = getQueryStringByName('showtype'); //显示类型
+    $("#iframe-view").attr("src", "/floweditor/index.html?lang=zh&sidebar-entries=large&tv=outside-training-gramminister-edit&tpc="+id);
+</script>
+
+</html>

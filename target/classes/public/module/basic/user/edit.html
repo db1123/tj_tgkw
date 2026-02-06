@@ -1,0 +1,384 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+        <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+        <!--_only 独立样式 -->
+        <link rel="stylesheet" href="/plugins/select2/css/select2.min.css"/>
+        <!--/_only 独立样式 -->
+    </head>
+    <body>
+        <article class="page-container">
+            <form action="" method="post" class="form form-horizontal" id="userForm">
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>登录名：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <input type="text" class="input-text" name="f_login" style="background-color: lightgray;"/>
+                    </div>
+                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>密码：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <input type="password" class="input-text" name="f_pass" style="background-color: lightgray;"/>
+                    </div>
+                </div>
+
+				<div class="row cl">
+					<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>编号：</label>
+					<div class="formControls col-xs-3 col-sm-4">
+						<input type="text" class="input-text" name="f_userno" style="background-color: lightgray;"/>
+					</div>
+                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>姓名：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <input type="text" class="input-text" name="f_name" style="background-color: lightgray;"/>
+                    </div>
+				</div>
+                <div class="row cl">
+<!--                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>供应商：</label>-->
+<!--                    <div class="formControls col-xs-3 col-sm-4 big">-->
+<!--                        <select name="f_supplier_id" style="width: 100%;"></select>-->
+<!--                    </div>-->
+                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>角色：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <select name="roles" multiple="multiple" style="width: 100%;"></select>
+                    </div>
+                </div>
+               <!--  <div class="row cl" id="bumenzhiwu">
+                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>部门：</label>
+                    <div class="formControls col-xs-3 col-sm-4 ">
+                        <select name="f_dept" style="width: 100%;"></select>
+                    </div>
+                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>职务：</label>
+                    <div class="formControls col-xs-3 col-sm-4 ">
+                        <select name="f_post" style="width: 100%;"></select>
+                    </div>
+                </div> -->
+
+                <div class="row cl" style="display: none;">
+                    <label class="form-label col-xs-3 col-sm-2">手机：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <input type="text" class="input-text" name="f_tel"/>
+                    </div>
+                    <label class="form-label col-xs-3 col-sm-2">邮箱：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <input type="text" class="input-text" placeholder="@" name="f_email"/>
+                    </div>
+                </div>
+
+                <div class="row cl" style="display: none;">
+                    <label class="form-label col-xs-3 col-sm-2">备注：</label>
+                    <div class="formControls col-xs-8 col-sm-10">
+                        <textarea name="f_note" class="textarea"></textarea>
+                    </div>
+                </div>
+                <div class="toolbar-bottom-line"></div>
+                <div class="toolbar-bottom-btn">
+                    <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+                    <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                           onclick="layer_close()"/>
+                </div>
+                <input type="hidden" value="" name="f_key_id"/>
+            </form>
+        </article>
+
+        <script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+        <script type="text/javascript">
+            // 编辑框状态 1新建 2修改
+            var op = getQueryStringByName('op');
+            // 角色下拉列表
+            var selectRole;
+            var ftyppe =1;
+            // 业务代码
+            $(function () {
+                // // 初始公司下拉列表(表单)
+                // $("#userForm select[name='f_supplier_id']").select2({
+                //     placeholder: '请选择公司',
+                //     ajax: {
+                //         type: 'POST',
+                //         url: "/s/supplier/queryDataSupplierSelect",
+                //         dataType: 'json',
+                //         data: function (params) {
+                //             return {
+                //                 search: params.term,
+                //             };
+                //         },
+                //         delay: 800,
+                //         cache: true
+                //     },
+                //     language: "zh-CN"
+                // });
+
+				$("#userForm select[name='f_dept']").select2({
+					placeholder: '请选择部门',
+					ajax: {
+						type: 'POST',
+						url: "/s/dept/queryDatadeptSelect",
+						dataType: 'json',
+						data: function (params) {
+							return {
+								search: params.term,
+							};
+						},
+                        processResults: function (data) {
+                            return {
+                                results: data.list
+                            };
+                        },
+						delay: 800,
+						cache: true
+					},
+					language: "zh-CN"
+				});
+				$("#userForm select[name='f_post']").select2({
+					placeholder: '请选择职务',
+					ajax: {
+						type: 'POST',
+						url: "/s/post/queryDatapostSelect",
+						dataType: 'json',
+						data: function (params) {
+							return {
+								search: params.term,
+							};
+						},
+                        processResults: function (data) {
+                            return {
+                                results: data.list
+                            };
+                        },
+						delay: 800,
+						cache: true
+					},
+					language: "zh-CN"
+				});
+
+                // 初始角色配置化
+                selectRole = $("#userForm select[name='roles']").select2({
+                    placeholder: '请选择角色',
+                    ajax: {
+                        type: 'POST',
+                        url: "/s/role/queryRoleSelect",
+                        dataType: 'json',
+                        data: function (params) {
+                            return {
+                                search: params.term,
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: data.list
+                            };
+                        },
+                        delay: 800,
+                        cache: true
+                    },
+                    language: "zh-CN"
+                });
+                // 修改操作时读取表单信息
+                if (op == 2) {
+                    var id = getQueryStringByName('id');
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/user/queryUserInfo', // 调用地址
+                        data: JSON.stringify({
+                            id
+                        }),
+                        async: false,
+                        success: function (data) {
+                            var option = new Option(data.info.supplier_name, data.info.f_supplier_id, true, true);
+
+                            $("#userForm input[name='f_login']").attr('readonly', 'readonly');
+                            $("#userForm input[name='f_name']").attr('readonly', 'readonly');
+                            $("#userForm input[name='f_tel']").attr('readonly', 'readonly');
+                            $("#userForm input[name='f_pass']").attr('readonly', 'readonly');
+                            $("#userForm input[name='f_email']").attr('readonly', 'readonly');
+                            $("#userForm input[name='f_userno']").attr('readonly', 'readonly');
+                            
+                            
+                            $("#userForm input[name='f_login']").val(data.info.f_login);
+                            $("#userForm input[name='f_name']").val(data.info.f_name);
+                            $("#userForm input[name='f_tel']").val(data.info.f_tel);
+                            $("#userForm input[name='f_pass']").val(data.info.f_pass);
+                            $("#userForm input[name='f_email']").val(data.info.f_email);
+                            $("#userForm input[name='f_note']").val(data.info.f_note);
+                            $("#userForm input[name='f_key_id']").val(data.info.key);
+                            $("#userForm input[name='f_userno']").val(data.info.f_userno);
+                            var option3 = new Option(data.info.dept_name, data.info.f_dept, true, true);
+                            $("#userForm select[name='f_dept']").append(option3);
+                            $("#userForm select[name='f_dept']").change();
+
+                            var option2 = new Option(data.info.post_name, data.info.f_post, true, true);
+                            $("#userForm select[name='f_post']").append(option2);
+                            $("#userForm select[name='f_post']").change();
+
+                            selectRole.empty();
+                            data.info.roles.forEach(item => {
+                                var option = new Option(item.name, item.id, true, true);
+                                selectRole.append(option);
+                            });
+                            ftyppe = data.info.f_type;
+                            if(data.info.f_type == 1){
+                                $("#bumenzhiwu").show();
+                            }else{
+                                $("#bumenzhiwu").hide();
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                }else{
+                    //bumenzhiwu
+                    $("#bumenzhiwu").show();
+                }
+
+
+                const validationRules = {
+                    f_email: {
+                        email: true,
+                    },
+                    f_pass: {
+                        required: true,
+                        minlength: 6
+                    },
+                    f_login: {
+                        required: true,
+                        levelLimit: false
+                    },
+                    f_name: {
+                        required: true
+                    },
+                    f_tel: {
+                        minlength: 11,
+                        maxlength: 11
+                    },
+                    f_userno: {
+                        required: true,
+                        levelLimit: false
+                    },
+                };
+
+                // 定义错误消息
+                const validationMessages = {
+                    f_email: {
+                        email: '*请输入有效的电子邮件地址'
+                    },
+                    f_pass: {
+                        required: '*请输入密码',
+                        minlength: '*您的密码必须至少6个字符长'
+                    },
+                    f_login: {
+                        required: '*请输入登录名称'
+                    },
+                    f_name: {
+                        required: '*请输入姓名'
+                    },
+                    f_tel: {
+                        minlength: '*您的电话必须11个字符长度',
+                        maxlength: '*您的电话必须11个字符长度'
+                    },
+                    f_userno: {
+                        required: '*请输入编号'
+                    },
+
+                };
+
+                if (ftyppe == 1) {
+                    validationRules.f_dept = {
+                        required: true,
+                        levelLimit: false
+                    };
+                    validationRules.f_post = {
+                        required: true,
+                        levelLimit: false
+                    };
+
+                    validationMessages.f_dept = {
+                        required: '*请选择部门'
+                    };
+                    validationMessages.f_post = {
+                        required: '*请选择职务'
+                    };
+                }
+                // 检验数据
+                $('#userForm').validate({
+                    rules: validationRules,
+                    messages: validationMessages,
+                    onfocusout: false, // 是否在获取焦点时验证
+                    onkeyup: false, // 是否在敲击键盘时验证
+                    focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+                    focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+                    success: 'valid',
+                    submitHandler: function () {
+                        // 获取菜单信息
+                        var roles = [];
+                        selectRole.select2('data').forEach((item) => {
+                            roles.push(item.id);
+                        });
+                        // 获取参数
+                        var data = form2Json('userForm');
+                        data['roles'] = roles;
+                        // 执行
+                        if (op == 1) { // 添加操作
+                            $.ajax({
+                                type: 'POST',
+                                contentType: 'application/json',
+                                url: '/s/user/addUser', // 调用地址
+                                data: JSON.stringify(data),
+                                async: false,
+                                success: function (data) {
+                                    if (data.result == 'success') {
+                                        parent.$('#userTable').DataTable().ajax.reload(null, false);
+                                        parent.toastr.success('添加成功！');
+                                        layer_close();
+                                    } else if (data.result == 'fail') {
+                                        toastr.warning('登录名称重复，请重新输入');
+                                    } else if (data.result == 'error') {
+                                        toastr.error(data.error);
+                                    }
+                                },
+                                error: function (e) {
+                                    toastr.error(e.status);
+                                    toastr.error(e.responseText);
+                                }
+                            });
+                        } else {
+                            $.ajax({
+                                type: 'POST',
+                                contentType: 'application/json',
+                                url: '/s/user/updateUser', // 调用地址
+                                data: JSON.stringify(data),
+                                async: false,
+                                success: function (data) {
+                                    if (data.result == 'success') {
+                                        parent.$('#userTable').DataTable().ajax.reload(null, false);
+                                        parent.toastr.success('修改成功！');
+                                        layer_close();
+                                    } else if (data.result == 'fail') {
+                                        toastr.warning('登录名称重复，请重新输入');
+                                    } else if (data.result == 'error') {
+                                        toastr.error(data.error);
+                                    }
+                                },
+                                error: function (e) {
+                                    toastr.error(e.status);
+                                    toastr.error(e.responseText);
+                                }
+                            });
+                        }
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>

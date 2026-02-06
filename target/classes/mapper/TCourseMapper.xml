@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fun.server.mapper.TCourseMapper">
+  <resultMap id="BaseResultMap" type="fun.server.model.TCourse">
+    <!--
+    @mbg.generated
+    -->
+    <constructor>
+      <idArg column="FKeyID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FUID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCDATE" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FUDATE" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FState" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FName" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FNo" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FCon" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FPassScore" javaType="java.math.BigDecimal" jdbcType="DECIMAL" />
+      <arg column="FFullScore" javaType="java.math.BigDecimal" jdbcType="DECIMAL" />
+      <arg column="FAbilityID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FAbilityLevelID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FTotalHours" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FCredits" javaType="java.lang.Float" jdbcType="REAL" />
+      <arg column="FMajor" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FPrerequisites" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FTeachingRequirements" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FType" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCNature" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FWeeklyStudyHours" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FTheoreticalStudyHours" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FPracticalStudyHours" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FKKQJ" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FKKCJ" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FDXQ" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FJYXNXQ" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FYWName" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FEditionNo" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FEdition" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FValid" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FSJZS" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FIstk" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FParentId" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FJYXQ" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FJCZYK" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FKKDW" javaType="java.lang.Long" jdbcType="BIGINT" />
+    </constructor>
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <!--
+    @mbg.generated
+    -->
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <!--
+    @mbg.generated
+    -->
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    <!--
+    @mbg.generated
+    -->
+    FKeyID, FCID, FUID, FCDATE, FUDATE, FState, FName, FNo, FCon, FPassScore, FFullScore, 
+    FAbilityID, FAbilityLevelID, FTotalHours, FCredits, FMajor, FPrerequisites, FTeachingRequirements, 
+    FType, FCNature, FWeeklyStudyHours, FTheoreticalStudyHours, FPracticalStudyHours, 
+    FKKQJ, FKKCJ, FDXQ, FJYXNXQ, FYWName, FEditionNo, FEdition, FValid, FSJZS, FIstk, 
+    FParentId, FJYXQ, FJCZYK, FKKDW
+  </sql>
+
+</mapper>

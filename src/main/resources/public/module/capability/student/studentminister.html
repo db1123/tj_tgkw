@@ -1,0 +1,98 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+        <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+        <!--_only 独立样式 -->
+        <!--/_only 独立样式 -->
+    </head>
+    <style type="text/css">
+        legend {
+            width: 5%;
+            margin-bottom: 5px;
+            font-size: 12px;
+            line-height: 40px;
+            border: 0;
+            border-bottom: 0px solid #e5e5e5
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* 防止滚动条 */
+        }
+
+        #tab_demo {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        iframe {
+            width: 100vw;
+            height: 100vh;
+            border: none; /* 去掉 iframe 的边框 */
+        }
+    </style>
+    <body>
+        <div class="page-container" style="padding: 2px;">
+<!--            <div class="f-l" style="width: 100%; margin-top: 3px;">-->
+<!--                <div class="panel panel-default">-->
+<!--                    <div class="panel-header">课程名称：<strong class="xmname"></strong></div>-->
+<!--                    <div class="panel-body">-->
+<!--                        -->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--            </div>-->
+            <div id="tab_demo" class="HuiTab">
+                <div class="tabBar clearfix">
+                    <span onclick="getValue(1);">班级管理</span>
+                    <span onclick="getValue(2);">学生管理</span>
+                </div>
+                <div class="tabCon" id="nianjidiv">
+                    <iframe width="100%;" height="100%;" frameborder="0" id="nianji"></iframe>
+                </div>
+                <div class="tabCon">
+                    <iframe width="100%;" height="100%;" frameborder="0" id="student"></iframe>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            var id = getQueryStringByName('id');
+            var xmname = parent.xmname;
+            var showtype = getQueryStringByName('showtype'); //显示类型
+            // 业务代码
+            $
+            (function () {
+                $(".xmname").text(xmname);
+                var tab = $("#tab_demo").Huitab({
+                    index: 0
+                });
+                $('#nianji').attr('src', '/module/capability/student/mgstudenttree.html?id=' + id+'&ftype=1&showtype='+showtype);
+            });
+            function getValue(obj) {
+                var value = obj;
+                if (value == 1) {
+                    $('#nianji').attr('src', '/module/capability/student/mgstudenttree.html?id=' + id+'&showtype='+showtype);
+                } else if (value == 2) {
+                    $('#student').attr('src', '/module/capability/student/studentlist.html?showtype='+showtype);
+                }
+                // if(document.body.clientHeight > 600){
+                //     $('.tabCon').height(document.body.clientHeight-50);
+                // }else {
+                //     $('.tabCon').height(document.body.clientHeight-80);
+                // }
+            }
+        </script>
+    </body>
+</html>

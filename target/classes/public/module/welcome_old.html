@@ -1,0 +1,604 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type="admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css" />
+    <style type="text/css">
+        .welcomePanel {
+            border: solid 1px #93c6eb;
+        }
+        .welcomePanelTitle {
+            background-color: #e9f0ff !important;
+            height: 15px;
+            padding: 5px 10px;
+            font-size: 14px;
+            font-weight: 600;
+            padding-left: 5px;
+        }
+        .welcomePanelTitle .leftTitle {
+            float: left;
+            line-height: 15px;
+        }
+        .welcomePanelTitle .rightTitle {
+            float: right;
+            line-height: 15px;
+            cursor: pointer;
+        }
+        .welcomePanelBody {
+            padding: 0;
+        }
+        .dataTables_wrapper.no-footer .dataTables_scrollBody {
+            border-bottom: 1px solid rgb(216, 230, 253);
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+            border: 1px solid #93c6eb;
+        }
+    </style>
+    <!--/_only 独立样式 -->
+</head>
+<body>
+<div class="page-container">
+    <div class="row cl" style="margin-right: -6px;">
+        <div class="col-xs-12 col-sm-5" style="padding-right: 0;">
+            <div class="panel panel-default welcomePanel">
+                <div class="panel-header welcomePanelTitle">
+                    <div class="leftTitle"><i class="fa fa-th-large" aria-hidden="true" style="padding-right: 3px;"></i>待办项目</div>
+                    <div class="rightTitle" onclick="top.creatIframe('/module/myproject/myprojectlist.html?lang=zh&sidebar-entries=large&showtype=2','我负责的项目执行')">更多&gt;&gt;&gt;</div>
+                </div>
+                <div class="panel-body welcomePanelBody">
+                    <table id="projectTable" class="display compact" style="width: 99.8%;"></table>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-xs-12 col-sm-5" style="padding-right: 0;">
+
+        </div>
+        <div class="col-xs-12 col-sm-2" style="padding-right: 0;">
+            <div class="panel panel-default welcomePanel">
+                <div class="panel-header welcomePanelTitle">
+                    <div class="leftTitle">用户信息</div>
+                </div>
+                <div class="panel-body welcomePanelBody">
+                    <div id="userInfoPanel" class="row" style="padding-bottom: 20px;"></div>
+                </div>
+            </div>
+            <div class="panel panel-default welcomePanel" style="margin-top: -1px;">
+                <div class="panel-header welcomePanelTitle">
+                    <div class="leftTitle">用户负责</div>
+                </div>
+                <div class="panel-body welcomePanelBody">
+                    <div style="margin: 10px; height: 35px; border: solid 1px #ccc; background-color: #f7f7f7; cursor: pointer;"
+                         onclick="top.creatIframe('/module/myproject/myprojectlist.html?lang=zh&sidebar-entries=large&showtype=1','我的项目管理')">
+                        <div style="background-color: #fdbf61; width: 35px; height: 35px; float: left;">
+                            <i class="fas fa-book" style="font-size: 21px; color: white; padding: 8px;"></i>
+                        </div>
+                        <div style="float: left; width: 70%;">
+                            <span style="line-height: 18px; width: 100%; float: left; text-align: center;" id="wfzdxm">0</span>
+                            <span style="line-height: 15px; width: 100%; float: left; font-size: 12px; text-align: center;">我负责的项目</span>
+                        </div>
+                    </div>
+                    <div style="margin: 10px; height: 35px; border: solid 1px #ccc; background-color: #f7f7f7; cursor: pointer;"
+                         onclick="top.creatIframe('/module/myproject/myprojectfiletree2.html?lang=zh&sidebar-entries=large&showtype=2','我的项目文件查询')">
+                        <div style="background-color: #d83643; width: 35px; height: 35px; float: left;">
+                            <i class="fas fa-file" style="font-size: 21px; color: white; padding: 8px 10px;"></i>
+                        </div>
+                        <div style="float: left; width: 70%;">
+                            <span style="line-height: 18px; width: 100%; float: left; text-align: center;" id="wdjfw">0</span>
+                            <span style="line-height: 15px; width: 100%; float: left; font-size: 12px; text-align: center;">我的项目文件</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default welcomePanel" style="margin-top: -1px;">
+                <div class="panel-header welcomePanelTitle">
+                    <div class="leftTitle">用户待办预警</div>
+                </div>
+                <div class="panel-body welcomePanelBody">
+                    <ul style="list-style-type: disclosure-closed; font-size: 12px; padding: 10px 5px 10px 25px;cursor: pointer;">
+                        <li  onclick="top.creatIframe('/module/myproject/myprojectlist.html?lang=zh&sidebar-entries=large&showtype=3','我的逾期项目')">
+                        逾期项目：<span id="yqxm">0</span>  查看</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+    // 业务代码
+    $(function(){
+        // 显示用户信息
+        updateUserInfo();
+
+
+
+        // 获取当前用户负责项目总数
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/myproject/queryMyProjectCount',
+            success : function(data) {
+                if(data.result == "success"){
+                    $('#wfzdxm').html(data.total);
+                }
+            },
+            error : function(e){
+                console.log(e.status);
+                console.log(e.responseText);
+            }
+        });
+
+        // 获取当前用户我的项目文件总数
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/projectFiles/queryMyProjectFileCount',
+            success : function(data) {
+                if(data.result == "success"){
+                    $('#wdjfw').html(data.total);
+                }
+            },
+            error : function(e){
+                console.log(e.status);
+                console.log(e.responseText);
+            }
+        });
+
+        // 获取当前用户逾期项目总数
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/myproject/queryyuqiyProjectCount',
+            success : function(data) {
+                if(data.result == "success"){
+                    $('#yqxm').html(data.total);
+                }
+            },
+            error : function(e){
+                console.log(e.status);
+                console.log(e.responseText);
+            }
+        });
+        // 获取当前用户逾期项目计划总数
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/projectPlan/queryyuqiyProjectPlanCount',
+            success : function(data) {
+                if(data.result == "success"){
+                    $('#yqxmjh').html(data.total);
+                }
+            },
+            error : function(e){
+                console.log(e.status);
+                console.log(e.responseText);
+            }
+        });
+
+        // 获取当前用户逾期任务总数
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/ttask/queryyuqiyttaskCount',
+            success : function(data) {
+                if(data.result == "success"){
+                    $('#yqrw').html(data.total);
+                }
+            },
+            error : function(e){
+                console.log(e.status);
+                console.log(e.responseText);
+            }
+        });
+
+        // 待办项目-表格
+        $('#projectTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/myproject/querymyprojectdaiban', // 调用地址
+                data: function ( d ) {
+                    return JSON.stringify( $.extend( {}, d, {
+                        page: d.start/d.length+1, // 当前页
+                        results: d.length, // 每页显示条数
+
+                    } ) );
+                },
+                dataSrc: function (json) {
+                    json.recordsFiltered = json.total;  // 总行数
+                    json.recordsTotal = json.page; // 当前页数
+                    return json.list;
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+            },
+            columns: [
+                {
+                    title: '项目名称',
+                    data: 'FName',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        var title =row.FName;
+                        var titleMaxLen = 30;
+                        if (title != '') {
+
+                            if (title.length > titleMaxLen) {
+                                title = '<span data-toggle="tooltip" data-placement="bottom" title="'+title+'">'+title.substring(0, titleMaxLen)+'...</span>';
+                            }
+                        }
+                        return title;
+                    }
+                },
+                { title: '项目编号', data: 'FNo', width: 90},
+                { title: '负责人', data: 'FLeadUserID', width: 50,
+                    render: function (data, type, row) {
+                        return row.FLeadName;
+                    }},
+                { title: '计划时间', data: 'FDate', width: 150}
+            ],
+            scrollY: '190px',
+            scrollX: true,
+            paging: true, // 是否开启本地分页
+            pageLength: 8, // 改变初始化页长度（每页多少条数据）
+            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+            lengthChange: false, // 是否允许用户改变表格每页显示的记录数
+            searching: false, // 是否允许Datatables开启本地搜索
+            ordering: true, // 是否允许Datatables开启排序
+            order: [[ 2, "desc" ]],
+            info: false, // 控制是否显示表格左下角的信息
+            language: DataTablesLanguage
+        });
+        // 待办任务-表格
+        $('#taskTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/ttask/queryttaskdaiban', // 调用地址
+                data: function ( d ) {
+                    return JSON.stringify( $.extend( {}, d, {
+                        page: d.start/d.length+1, // 当前页
+                        results: d.length, // 每页显示条数
+
+                    } ) );
+                },
+                dataSrc: function (json) {
+                    json.recordsFiltered = json.total;  // 总行数
+                    json.recordsTotal = json.page; // 当前页数
+                    return json.list;
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+            },
+            columns: [
+                {
+                    title: '任务名称',
+                    data: 'FName',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        var title =row.FName;
+                        var titleMaxLen = 30;
+                        if (title != '') {
+
+                            if (title.length > titleMaxLen) {
+                                title = '<span data-toggle="tooltip" data-placement="bottom" title="'+title+'">'+title.substring(0, titleMaxLen)+'...</span>';
+                            }
+                        }
+                        return title;
+                    }
+                },
+                { title: '任务编号', data: 'FNo', width: 90},
+                { title: '计划时间', data: 'FDate', width: 150}
+            ],
+            scrollY: '190px',
+            scrollX: true,
+            paging: true, // 是否开启本地分页
+            pageLength: 8, // 改变初始化页长度（每页多少条数据）
+            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+            lengthChange: false, // 是否允许用户改变表格每页显示的记录数
+            searching: false, // 是否允许Datatables开启本地搜索
+            ordering: true, // 是否允许Datatables开启排序
+            order: [[ 2, "desc" ]],
+            info: false, // 控制是否显示表格左下角的信息
+            language: DataTablesLanguage
+        });
+        // 待办设计执行节点-表格
+        $('#cellTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/projectFlowCell/queryProjectFlowCell', // 调用地址
+                data: function ( d ) {
+                    return JSON.stringify( $.extend( {}, d, {
+                        page: d.start/d.length+1, // 当前页
+                        results: d.length, // 每页显示条数
+                        state: 1,
+                        flowType: 2
+                    } ) );
+                },
+                dataSrc: function (json) {
+                    json.recordsFiltered = json.total;  // 总行数
+                    json.recordsTotal = json.page; // 当前页数
+                    return json.list;
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+            },
+            columns: [
+                {
+                    title: '标题',
+                    data: 'f_id',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        var title = '';
+                        var titleMaxLen = 30;
+                        if (row.projectName && row.projectName != '') {
+                            title += '/{' + row.projectName + '}';
+                        }
+                        if (row.taskName && row.taskName != '') {
+                            title += '/{' + row.taskName + '}';
+                        }
+                        if (row.subdataName && row.subdataName != '') {
+                            title += '/{' + row.subdataName + '}';
+                        }
+                        if (title != '') {
+                            title = title.substring(1);
+                            if (title.length > titleMaxLen) {
+                                title = '<span data-toggle="tooltip" data-placement="bottom" title="'+title+'">'+title.substring(0, titleMaxLen)+'...</span>';
+                            }
+                        }
+                        return title;
+                    }
+                },
+                { title: '节点名称', data: 'f_value', width: 110 },
+                { title: '创建日期', data: 'f_c_date', width: 110, visible:false }
+            ],
+            scrollY: '190px',
+            scrollX: true,
+            paging: true, // 是否开启本地分页
+            pageLength: 8, // 改变初始化页长度（每页多少条数据）
+            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+            lengthChange: false, // 是否允许用户改变表格每页显示的记录数
+            searching: false, // 是否允许Datatables开启本地搜索
+            ordering: true, // 是否允许Datatables开启排序
+            order: [[ 2, "desc" ]],
+            info: false, // 控制是否显示表格左下角的信息
+            language: DataTablesLanguage
+        });
+        // 待办异常审核节点-表格
+        $('#abnormalTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/projectFlowCell/queryProjectFlowCell', // 调用地址
+                data: function ( d ) {
+                    return JSON.stringify( $.extend( {}, d, {
+                        page: d.start/d.length+1, // 当前页
+                        results: d.length, // 每页显示条数
+                        state: 1,
+                        flowType: 4
+                    } ) );
+                },
+                dataSrc: function (json) {
+                    json.recordsFiltered = json.total;  // 总行数
+                    json.recordsTotal = json.page; // 当前页数
+                    return json.list;
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+            },
+            columns: [
+                {
+                    title: '标题',
+                    data: 'f_id',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        var title = '';
+                        var titleMaxLen = 30;
+                        if (row.projectName && row.projectName != '') {
+                            title += '/{' + row.projectName + '}';
+                        }
+                        if (row.taskName && row.taskName != '') {
+                            title += '/{' + row.taskName + '}';
+                        }
+                        if (row.subdataName && row.subdataName != '') {
+                            title += '/{' + row.subdataName + '}';
+                        }
+                        if (title != '') {
+                            title = title.substring(1);
+                            if (title.length > titleMaxLen) {
+                                title = '<span data-toggle="tooltip" data-placement="bottom" title="'+title+'">'+title.substring(0, titleMaxLen)+'...</span>';
+                            }
+                        }
+                        return title;
+                    }
+                },
+                { title: '节点名称', data: 'f_value', width: 110 },
+                { title: '创建日期', data: 'f_c_date', width: 110, visible:false }
+            ],
+            scrollY: '190px',
+            scrollX: true,
+            paging: true, // 是否开启本地分页
+            pageLength: 8, // 改变初始化页长度（每页多少条数据）
+            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+            lengthChange: false, // 是否允许用户改变表格每页显示的记录数
+            searching: false, // 是否允许Datatables开启本地搜索
+            ordering: true, // 是否允许Datatables开启排序
+            order: [[ 2, "desc" ]],
+            info: false, // 控制是否显示表格左下角的信息
+            language: DataTablesLanguage
+        });
+        // 待办文件审核节点-表格
+        $('#subDataTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/projectFlowCell/queryProjectFlowCell', // 调用地址
+                data: function ( d ) {
+                    return JSON.stringify( $.extend( {}, d, {
+                        page: d.start/d.length+1, // 当前页
+                        results: d.length, // 每页显示条数
+                        state: 1,
+                        flowType: 3
+                    } ) );
+                },
+                dataSrc: function (json) {
+                    json.recordsFiltered = json.total;  // 总行数
+                    json.recordsTotal = json.page; // 当前页数
+                    return json.list;
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+            },
+            columns: [
+                {
+                    title: '标题',
+                    data: 'f_id',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        var title = '';
+                        var titleMaxLen = 30;
+                        if (row.projectName && row.projectName != '') {
+                            title += '/{' + row.projectName + '}';
+                        }
+                        if (row.taskName && row.taskName != '') {
+                            title += '/{' + row.taskName + '}';
+                        }
+                        if (row.subdataName && row.subdataName != '') {
+                            title += '/{' + row.subdataName + '}';
+                        }
+                        if (title != '') {
+                            title = title.substring(1);
+                            if (title.length > titleMaxLen) {
+                                title = '<span data-toggle="tooltip" data-placement="bottom" title="'+title+'">'+title.substring(0, titleMaxLen)+'...</span>';
+                            }
+                        }
+                        return title;
+                    }
+                },
+                { title: '节点名称', data: 'f_value', width: 110 },
+                { title: '创建日期', data: 'f_c_date', width: 110, visible:false }
+            ],
+            scrollY: '190px',
+            scrollX: true,
+            paging: true, // 是否开启本地分页
+            pageLength: 8, // 改变初始化页长度（每页多少条数据）
+            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+            lengthChange: false, // 是否允许用户改变表格每页显示的记录数
+            searching: false, // 是否允许Datatables开启本地搜索
+            ordering: true, // 是否允许Datatables开启排序
+            order: [[ 2, "desc" ]],
+            info: false, // 控制是否显示表格左下角的信息
+            language: DataTablesLanguage
+        });
+        // 待办采购执行节点-表格
+        $('#procurementTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/projectFlowCell/queryProjectFlowCell', // 调用地址
+                data: function ( d ) {
+                    return JSON.stringify( $.extend( {}, d, {
+                        page: d.start/d.length+1, // 当前页
+                        results: d.length, // 每页显示条数
+                        state: 1,
+                        flowType: 5
+                    } ) );
+                },
+                dataSrc: function (json) {
+                    json.recordsFiltered = json.total;  // 总行数
+                    json.recordsTotal = json.page; // 当前页数
+                    return json.list;
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+            },
+            columns: [
+                {
+                    title: '标题',
+                    data: 'f_id',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        var title = '';
+                        var titleMaxLen = 30;
+                        if (row.projectName && row.projectName != '') {
+                            title += '/{' + row.projectName + '}';
+                        }
+                        if (row.taskName && row.taskName != '') {
+                            title += '/{' + row.taskName + '}';
+                        }
+                        if (row.subdataName && row.subdataName != '') {
+                            title += '/{' + row.subdataName + '}';
+                        }
+                        if (title != '') {
+                            title = title.substring(1);
+                            if (title.length > titleMaxLen) {
+                                title = '<span data-toggle="tooltip" data-placement="bottom" title="'+title+'">'+title.substring(0, titleMaxLen)+'...</span>';
+                            }
+                        }
+                        return title;
+                    }
+                },
+                { title: '节点名称', data: 'f_value', width: 110 },
+                { title: '创建日期', data: 'f_c_date', width: 110, visible:false }
+            ],
+            scrollY: '190px',
+            scrollX: true,
+            paging: true, // 是否开启本地分页
+            pageLength: 8, // 改变初始化页长度（每页多少条数据）
+            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+            lengthChange: false, // 是否允许用户改变表格每页显示的记录数
+            searching: false, // 是否允许Datatables开启本地搜索
+            ordering: true, // 是否允许Datatables开启排序
+            order: [[ 2, "desc" ]],
+            info: false, // 控制是否显示表格左下角的信息
+            language: DataTablesLanguage
+        });
+    });
+    // 更新用户基本信息
+    function updateUserInfo() {
+        // 用户基本信息
+        $('#userInfoPanel').html('');
+        $('#userInfoPanel').append(
+            '<div class="col-xs-5 col-sm-5"><i class="fa fa-user-circle-o" aria-hidden="true" style="padding: 20px 8px 5px 18px; font-size: 46px;"></i></div>' +
+            '<div class="col-xs-7 col-sm-7" style="padding-top: 20px">' +
+            '<span style="font-weight: 600; line-height: 30px;">' + parent.SignUserInfo.f_name + '</span><br/>' +
+            parent.SignUserInfo.post_name +
+            '</div>' +
+            '<div class="col-xs-12 col-sm-12" style="padding-top: 10px"><i class="fa fa-building" aria-hidden="true" style="padding-left: 21px; padding-right: 4px;"></i><span style="font-size: 13px;">' + parent.SignUserInfo.dept_name + '</span></div>' +
+            '<div class="col-xs-12 col-sm-12"><i class="fa fa-phone-square" aria-hidden="true" style="padding-left: 20px; padding-right: 5px;"></i><span style="font-size: 12px;">' + parent.SignUserInfo.f_tel + '</span></div>' +
+            '<div class="col-xs-12 col-sm-12"><i class="fa fa-etsy" aria-hidden="true" style="padding-left: 20px; padding-right: 5px;"></i><span style="font-size: 12px;">' + parent.SignUserInfo.f_email + '</span></div>'
+        );
+    }
+
+</script>
+</body>
+</html>

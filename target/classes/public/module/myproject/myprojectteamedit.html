@@ -1,0 +1,288 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+        <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+        <!--_only 独立样式 -->
+        <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+        <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+        <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+        <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+        <!--/_only 独立样式 -->
+    </head>
+    <body>
+        <article class="page-container">
+            <form action="" method="post" class="form form-horizontal" id="myprojectteamForm">
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>项目名称：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" name="FProjectName" id="FProjectName" disabled="disabled" />
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>团队成员：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <div id="FUserIDDIV">
+                            <select name="FUserID" id="FUserID"  class="" style="width: 100%;display: none;"></select>
+                        </div>
+                        <div id="FUserID2DIV">
+                            <select name="FUserID2" id="FUserID2" multiple="multiple"  class="" style="width: 100%;display: none;"></select>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>项目角色：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <select name="FRole" disabled="disabled" id="FRole" style="width: 100%;">
+                        </select>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2">团队职责：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" name="FDuty" id="FDuty"/>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2">备注：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" name="FNote" id="FNote"/>
+                    </div>
+                </div>
+
+                <div class="toolbar-bottom-line"></div>
+                <div class="toolbar-bottom-btn">
+                    <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+                    <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                           onclick="layer_close()"/>
+                </div>
+                <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+                <input type="hidden" value="" name="FProjectID" id="FProjectID"/>
+            </form>
+        </article>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+        <script src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+        <script type="text/javascript">
+            // 编辑框状态 1新建 2修改
+            var op = getQueryStringByName('op');
+            var FProjectID = getQueryStringByName('FProjectID');//项目ID
+            var xmname = parent.xmname;//项目名称
+            var isrole=3;
+            var fuserid;
+            var userrole;
+
+
+            var teamuser;
+            // 业务代码
+            $(function () {
+                $("#FProjectName").val(xmname);
+                $("#FProjectID").val(FProjectID);
+                if(op==1){
+                    $("#FUserID2DIV").show(); //显示
+                    $("#FUserIDDIV").hide(); //隐藏
+                }else{
+                    $("#FUserIDDIV").show(); //显示
+                    $("#FUserID2DIV").hide(); //隐藏
+                }
+                teamuser = $("#myprojectteamForm select[name='FUserID2']").select2({
+                    placeholder: '请选择团队成员',
+                    ajax: {
+                        type:'POST',
+                        url: "/s/user/queryDataUserSelect",
+                        dataType: 'json',
+                        data: function (params) {
+                            return {
+                                search: params.term,
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: data.results
+                            };
+                        },
+                        delay: 800,
+                        cache: true
+                    },
+                    language: "zh-CN"
+                });
+
+                $("#myprojectteamForm select[name='FUserID']").select2({
+                    placeholder: '请选择团队成员',
+                    ajax: {
+                        type:'POST',
+                        url: "/s/user/queryDataUserSelect",
+                        dataType: 'json',
+                        data: function (params) {
+                            return {
+                                search: params.term,
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: data.results
+                            };
+                        },
+                        delay: 800,
+                        cache: true
+                    },
+                    language: "zh-CN"
+                });
+                
+                
+                // 修改操作时读取表单信息
+                if (op == 2) {
+                    var id = getQueryStringByName('id');//成员表ID
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/myprojectteam/querymyprojectteamInfo', // 调用地址
+                        data: JSON.stringify({
+                            id: id
+                        }),
+                        async: false,
+                        success: function (data) {
+                            var role =  data.info.FRole;
+                            $('#FDuty').val(data.info.FDuty);
+                            $('#FNote').val(data.info.FNote);
+                            var option3 = new Option(data.info.FUserName, data.info.FUserID, true, true);
+                            $("#FUserID").append(option3);
+                            $("#FUserID").change();
+
+                            var option4 = new Option(data.info.FRoleName,role, true, true);
+                            $("#FRole").append(option4);
+                            $("#FRole").change();
+                            $("#FRole").prop("disabled",true);
+                            fuserid = data.info.FUserID;
+                             if(role ==1){
+                                 isrole =2;
+                                 userrole = 1;
+                                 $("#FUserID").prop("disabled",true);
+                             }else{
+                                 isrole =3;
+                                 userrole = 0;
+                                 $("#FUserID").prop("disabled",false);
+                             }
+
+                            $('#FKeyID').val(data.info.key);
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                }else{
+                    var option4 = new Option("参与人", 0, true, true);
+                    $("#FRole").append(option4);
+                    $("#FRole").change();
+                    $("#FRole").prop("disabled",true);
+                }
+
+
+
+                // 检验数据
+                var userValidate = $('#myprojectteamForm').validate({
+                    rules: {
+                        FUserID: {
+                            required: true,
+                            levelLimit: false
+                        },
+                    },
+                    messages: {
+                        FUserID: {
+                            required: '*请选择团队成员'
+                        },
+                    },
+                    onfocusout: false, // 是否在获取焦点时验证
+                    onkeyup: false, // 是否在敲击键盘时验证
+                    focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+                    focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+                    success: 'valid',
+                    submitHandler: function () {
+
+
+                        // 获取团队成员信息
+                        var userlist = [];
+                        teamuser.select2('data').forEach((item) => {
+                            userlist.push(item.id);
+                        });
+
+
+
+                        // 获取参数
+                        var data = form2Json('myprojectteamForm');
+                        data['userlist'] = userlist;
+                        if (op == 1) { // 添加操作
+                            $.ajax({
+                                type: 'POST',
+                                contentType: 'application/json',
+                                url: '/s/myprojectteam/addmyprojectteam', // 调用地址
+                                data: JSON.stringify(data),
+                                async: false,
+                                success: function (data) {
+                                    if (data.result == 'success') {
+                                        parent.$('#mainTable').DataTable().ajax.reload(null, false);
+                                        parent.toastr.success('添加成功！');
+                                        layer_close();
+                                    } else if (data.result == 'fail') {
+                                        toastr.warning('团队成员重复，请重新输入');
+                                    } else if (data.result == 'error') {
+                                        toastr.error(data.error);
+                                    }
+                                },
+                                error: function (e) {
+                                    toastr.error(e.status);
+                                    toastr.error(e.responseText);
+                                }
+                            });
+                        } else {
+                            if(isrole==2){
+                                data['FUserID'] = fuserid;
+                                data['FRole'] =1;
+                            }else{
+                                data['FRole'] =0;
+                            }
+                            $.ajax({
+                                type: 'POST',
+                                contentType: 'application/json',
+                                url: '/s/myprojectteam/updatemyprojectteam', // 调用地址
+                                data: JSON.stringify(data),
+                                async: false,
+                                success: function (data) {
+                                    if (data.result == 'success') {
+                                        parent.$('#mainTable').DataTable().ajax.reload(null, false);
+                                        parent.toastr.success('修改成功！');
+                                        layer_close();
+                                    } else if (data.result == 'fail') {
+                                        toastr.warning('团队成员重复，请重新输入');
+                                    } else if (data.result == 'error') {
+                                        toastr.error(data.error);
+                                    }
+                                },
+                                error: function (e) {
+                                    toastr.error(e.status);
+                                    toastr.error(e.responseText);
+                                }
+                            });
+                        }
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>

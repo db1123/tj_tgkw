@@ -1,0 +1,685 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+        <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+        <!--_only 独立样式 -->
+        <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+        <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+        <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+        <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+        <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+        <!--/_only 独立样式 -->
+    </head>
+    <body>
+        <div class="page-container" style="padding: 2px;">
+            <div class="f-l text-l" id="newadd">
+                <button type="button" class="btn btn-default size-S my-btn" id="newbtn" onclick="Values(1)"><i
+                        class=" fa fa-user-plus"></i> 新增
+                </button>
+            </div>
+            <div class="f-r text-r">
+                <input type="text" class="input-text size-S form-text-FName" style="width:200px" placeholder="项目名称">
+                <button type="button" class="btn btn-default size-S my-btn btn-search-fun"><i class="Hui-iconfont">&#xe665;</i>
+                    搜索
+                </button>
+            </div>
+            <div class="f-l" style="width: 100%; margin-top: 3px;">
+                <div id="zt1" style="display: none;">
+                    [编辑<i class="fa fa-circle" aria-hidden="true" style="color:#98D0DE "></i>]
+                    [正常<i class="fa fa-circle" aria-hidden="true" style="color:#00B050 "></i>]
+                    [逾期<i class="fa fa-circle" aria-hidden="true" style="color:#FF0000 "></i>]
+                    [预警<i class="fa fa-circle" aria-hidden="true" style="color:#FFC000 "></i>]
+                    [完成<i class="fa fa-circle" aria-hidden="true" style="color:#0070C0 "></i>]
+                    [关闭<i class="fa fa-circle" aria-hidden="true" style="color:#595959 "></i>]
+                </div>
+                <div id="zt2" style="display: none;">
+                    [逾期<i class="fa fa-circle" aria-hidden="true" style="color:#FF0000 "></i>]
+                    [预警<i class="fa fa-circle" aria-hidden="true" style="color:#FFC000 "></i>]
+
+                </div>
+
+            </div>
+
+            <div class="f-l" style="width: 100%; margin-top: 3px;">
+                <table id="mainTable" class="display compact" style="width: 99.8%;"></table>
+            </div>
+        </div>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+        <script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+        <script src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+        <script type="text/javascript">
+            var xmname;
+            var jmxmname;
+            var showtype = getQueryStringByName('showtype'); //显示类型 1=项目管理 2=项目执行 3=项目预警
+            var columns_s;
+
+
+            // 业务代码
+            $(function () {
+                if(showtype<3){
+                    $("#zt1").attr("style", "display:block;"); //显示
+                    $("#zt2").attr("style", "display:none;"); //隐藏
+                    columns_s=[
+                        {
+                            title: '状态', data: 'FState',
+                            render: function (data, type, row) {
+                                // console.log(row.FStates + ',' + row.FNo + ',' + data);
+                                if (data == 0) {//编辑
+                                    return '<i class="fa fa-circle" aria-hidden="true" style="color:#98D0DE "></i>';
+                                } else if (data == 1) {//在研
+                                    if (row.FStates == 1) {
+                                        return '<i class="fa fa-circle" aria-hidden="true" style="color:#FFC000 "></i>';
+                                    } else if (row.FStates == 2) {
+                                        return '<i class="fa fa-circle" aria-hidden="true" style="color:#FF0000 "></i>';
+                                    } else if (row.FStates == 3) {
+                                        return '<i class="fa fa-circle" aria-hidden="true" style="color:#00B050 "></i>';
+                                    }
+                                } else if (data == 2) {//完成
+                                    return '<i class="fa fa-circle" aria-hidden="true" style="color:#0070C0 "></i>';
+                                } else if (data == 3) {//关闭
+                                    return '<i class="fa fa-circle" aria-hidden="true" style="color:#595959 "></i>';
+                                }
+                            }
+                        },
+                        {title: '项目名称', data: 'FName'},
+                        {title: '项目编码', data: 'FNo'},
+                        {title: '内部编码', data: 'FInsideNo'},
+                        {title: '系统编码', data: 'FSysNo'},
+                        {title: '学科', data: 'FDeptName'},
+                        {title: '类型', data: 'FTypeName'},
+                        {title: '负责人', data: 'FLeadUserName'},
+                        {title: '发布时间', data: 'FDate'},
+                        {
+                            title: '管理项目',
+                            data: 'FState',
+                            width: 90,
+                            orderable: false,
+                            render: function (data, type, row) {
+                                return '<button type="button" class="btn btn-default size-MINI" onclick="oppenadminister(\'' + row.key + '\',\'' + row.FName + '\',\'' + row.isFMatertial + '\',\'' + row.jmFName + '\')" style="background-color:#D9D9D9; color: #0a001f" >管理项目</button>';
+                            }
+                        },
+                        {
+                            title: '操作',
+                            data: 'FState',
+                            width: 160,
+                            orderable: false,
+                            render: function (data, type, row) {
+
+                                if (showtype == 1) {
+                                    if (row.FState == 0) {
+                                        return '<button type="button" class="btn btn-warning size-MINI" onclick="fabu(\'' + row.key + '\',\'' + row.FName + '\')">发布</button>' +
+                                            '<button type="button" class="btn btn-secondary size-MINI" onclick="Values(2,\'' + row.key + '\',\'' + row.FState + '\')"><i class="fas fa-edit"></i>编辑</button>' +
+                                            '<button type="button" class="btn btn-danger size-MINI" onclick="onClickBtnDel(\'' + row.key + '\',\'' + row.FName + '\')"><i class="fas fa-trash"></i>删除</button>'+
+                                            '<button type="button" style="background-color: #595959;color: #F8F8F0" class="btn btn-default size-MINI" onclick="guanbi(\'' + row.key + '\',\'' + row.FName + '\')"><i class="fa fa-window-close" aria-hidden="true"></i>关闭</button>';
+                                    } else {
+                                        return '<button type="button" class="btn btn-warning size-MINI disabled ">发布</button>' +
+                                            '<button type="button" class="btn btn-secondary size-MINI disabled" ><i class="fas fa-edit"></i>编辑</button>' +
+                                            '<button type="button" class="btn btn-danger size-MINI disabled" ><i class="fas fa-trash"></i>删除</button>'+
+                                            '<button type="button" style="background-color: #595959;color: #F8F8F0" class="btn btn-default size-MINI disabled" ><i class="fa fa-window-close" aria-hidden="true"></i>关闭</button>';
+                                    }
+                                } else if (showtype == 2) {
+                                    // if (row.FState == 0) {
+                                    //     return '<button type="button" class="btn btn-warning size-MINI" onclick="fabu(\'' + row.key + '\',\'' + row.FName + '\')">发布</button>';
+                                    // } else
+                                    if (row.FState == 1) {
+                                        return '<button type="button" class="btn btn-secondary size-MINI" onclick="wancheng(\'' + row.key + '\',\'' + row.FName + '\')"><i class="fa fa-check" aria-hidden="true"></i>完成</button>' +
+                                            '<button type="button" style="background-color: #595959;color: #F8F8F0" class="btn btn-default size-MINI" onclick="guanbi(\'' + row.key + '\',\'' + row.FName + '\')"><i class="fa fa-window-close" aria-hidden="true"></i>关闭</button>';
+                                    } else if (row.FState == 2) {
+                                        return '<button type="button" class="btn btn-success size-MINI disabled" ><i class="fa fa-check" aria-hidden="true"></i>已完成</button>'
+                                    } else if (row.FState == 3) {
+                                        return '<button type="button" style="background-color: #595959;color: #F8F8F0" class="btn btn-default size-MINI disabled" ><i class="fa fa-window-close" aria-hidden="true"></i>已关闭</button>'
+                                    }
+                                } else {
+                                    if (row.FState == 1) {
+                                        return '<button type="button" class="btn btn-success size-MINI disabled" ><i class="fa fa-check" aria-hidden="true"></i>已发布</button>'
+                                    } else if (row.FState == 2) {
+                                        return '<button type="button" class="btn btn-success size-MINI disabled" ><i class="fa fa-check" aria-hidden="true"></i>已完成</button>'
+                                    } else if (row.FState == 3) {
+                                        return '<button type="button" style="background-color: #595959;color: #F8F8F0" class="btn btn-default size-MINI disabled" ><i class="fa fa-window-close" aria-hidden="true"></i>已关闭</button>'
+                                    }
+                                }
+                            }
+                        }
+                    ]
+
+                }else if(showtype==3){
+                    $("#zt2").attr("style", "display:block;"); //显示
+                    $("#zt1").attr("style", "display:none;"); //隐藏
+                    columns_s=[
+                        {
+                            title: '状态', data: 'FState',
+                            render: function (data, type, row) {
+                                //console.log(row.FStates + ',' + row.FNo + ',' + data);
+                                if (data == 0) {//编辑
+                                    return '<i class="fa fa-circle" aria-hidden="true" style="color:#98D0DE "></i>';
+                                } else if (data == 1) {//在研
+                                    if (row.FStates == 1) {
+                                        return '<i class="fa fa-circle" aria-hidden="true" style="color:#FFC000 "></i>';
+                                    } else if (row.FStates == 2) {
+                                        return '<i class="fa fa-circle" aria-hidden="true" style="color:#FF0000 "></i>';
+                                    } else if (row.FStates == 3) {
+                                        return '<i class="fa fa-circle" aria-hidden="true" style="color:#00B050 "></i>';
+                                    }
+                                } else if (data == 2) {//完成
+                                    return '<i class="fa fa-circle" aria-hidden="true" style="color:#0070C0 "></i>';
+                                } else if (data == 3) {//关闭
+                                    return '<i class="fa fa-circle" aria-hidden="true" style="color:#595959 "></i>';
+                                }
+                            }
+                        },
+                        {title: '项目名称', data: 'FName'},
+                        {title: '项目编码', data: 'FNo'},
+                        {title: '内部编码', data: 'FInsideNo'},
+                        {title: '系统编码', data: 'FSysNo'},
+                        {title: '学科', data: 'FDeptName'},
+                        {title: '类型', data: 'FTypeName'},
+                        {title: '负责人', data: 'FLeadUserName'},
+                        {title: '发布时间', data: 'FDate'},
+                        {title: '计划完成', data: 'FEDate'},
+                        {
+                            title: '管理项目',
+                            data: 'FState',
+                            width: 90,
+                            orderable: false,
+                            render: function (data, type, row) {
+                                return '<button type="button" class="btn btn-default size-MINI" onclick="oppenadminister(\'' + row.key + '\',\'' + row.FName + '\',\'' + row.isFMatertial + '\',\'' + row.jmFName + '\')" style="background-color:#D9D9D9; color: #0a001f" >管理项目</button>';
+                            }
+                        },
+                        {
+                            title: '操作',
+                            data: 'FState',
+                            width: 160,
+                            orderable: false,
+                            render: function (data, type, row) {
+
+                                if (showtype == 1) {
+                                    if (row.FState == 0) {
+                                        return '<button type="button" class="btn btn-warning size-MINI" onclick="fabu(\'' + row.key + '\',\'' + row.FName + '\',\'' + row.isFMatertial + '\')">发布</button>' +
+                                            '<button type="button" class="btn btn-secondary size-MINI" onclick="Values(2,\'' + row.key + '\',\'' + row.FState + '\')"><i class="fas fa-edit"></i>编辑</button>' +
+                                            '<button type="button" class="btn btn-danger size-MINI" onclick="onClickBtnDel(\'' + row.key + '\',\'' + row.FName + '\')"><i class="fas fa-trash"></i>删除</button>'+
+                                            '<button type="button" style="background-color: #595959;color: #F8F8F0" class="btn btn-default size-MINI" onclick="guanbi(\'' + row.key + '\',\'' + row.FName + '\')"><i class="fa fa-window-close" aria-hidden="true"></i>关闭</button>';
+                                    } else {
+                                        return '<button type="button" class="btn btn-warning size-MINI disabled ">发布</button>' +
+                                            '<button type="button" class="btn btn-secondary size-MINI disabled" ><i class="fas fa-edit"></i>编辑</button>' +
+                                            '<button type="button" class="btn btn-danger size-MINI disabled" ><i class="fas fa-trash"></i>删除</button>'+
+                                            '<button type="button" style="background-color: #595959;color: #F8F8F0" class="btn btn-default size-MINI disabled" ><i class="fa fa-window-close" aria-hidden="true"></i>关闭</button>';
+                                    }
+                                } else if (showtype == 2) {
+                                    // if (row.FState == 0) {
+                                    //     return '<button type="button" class="btn btn-warning size-MINI" onclick="fabu(\'' + row.key + '\',\'' + row.FName + '\')">发布</button>';
+                                    // } else
+                                    if (row.FState == 1) {
+                                        return '<button type="button" class="btn btn-secondary size-MINI" onclick="wancheng(\'' + row.key + '\',\'' + row.FName + '\',\'' + row.isFMatertial + '\')"><i class="fa fa-check" aria-hidden="true"></i>完成</button>' +
+                                            '<button type="button" style="background-color: #595959;color: #F8F8F0" class="btn btn-default size-MINI" onclick="guanbi(\'' + row.key + '\',\'' + row.FName + '\')"><i class="fa fa-window-close" aria-hidden="true"></i>关闭</button>';
+                                    } else if (row.FState == 2) {
+                                        return '<button type="button" class="btn btn-success size-MINI disabled" ><i class="fa fa-check" aria-hidden="true"></i>已完成</button>'
+                                    } else if (row.FState == 3) {
+                                        return '<button type="button" style="background-color: #595959;color: #F8F8F0" class="btn btn-default size-MINI disabled" ><i class="fa fa-window-close" aria-hidden="true"></i>已关闭</button>'
+                                    }
+                                } else {
+                                    if (row.FState == 1) {
+                                        return '<button type="button" class="btn btn-success size-MINI disabled" ><i class="fa fa-check" aria-hidden="true"></i>已发布</button>'
+                                    } else if (row.FState == 2) {
+                                        return '<button type="button" class="btn btn-success size-MINI disabled" ><i class="fa fa-check" aria-hidden="true"></i>已完成</button>'
+                                    } else if (row.FState == 3) {
+                                        return '<button type="button" style="background-color: #595959;color: #F8F8F0" class="btn btn-default size-MINI disabled" ><i class="fa fa-window-close" aria-hidden="true"></i>已关闭</button>'
+                                    }
+                                }
+                            }
+                        }
+                    ]
+
+                }
+
+
+
+                // 封装表格
+                $('#mainTable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/myproject/querymyproject', // 调用地址
+                        data: function (d) {
+                            return JSON.stringify($.extend({}, d, {
+                                page: d.start / d.length + 1, // 当前页
+                                results: d.length, // 每页显示条数
+                                name: $('.form-text-FName').val(),//项目名称
+                                showtype:showtype
+                            }));
+                        },
+                        dataSrc: function (json) {
+                            json.recordsFiltered = json.total;  // 总行数
+                            json.recordsTotal = json.page; // 当前页数
+                            return json.list;
+                        },
+                        error: function (xhr, status, error) {
+                            toastr.error(xhr);
+                        }
+                    },
+                    columns: columns_s,
+                    // scrollY: (document.body.clientHeight - 100) + 'px',
+                    scrollY: 80 + 'vh',
+                    scrollX: true,
+                    paging: true, // 是否开启本地分页
+                    pageLength: 15, // 改变初始化页长度（每页多少条数据）
+                    pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+                    lengthChange: false, // 是否允许因子改变表格每页显示的记录数
+                    searching: false, // 是否允许Datatables开启本地搜索
+                    ordering: true, // 是否允许Datatables开启排序
+                    info: true, // 控制是否显示表格左下角的信息
+                    language: DataTablesLanguage
+                });
+
+
+                if (showtype == 1) {
+                    $("#newadd").attr("style", "display:block;"); //显示
+                } else {
+                    $("#newadd").attr("style", "display:none;"); //隐藏
+                }
+
+                // 查询按钮点击事件
+                $('.btn-search-fun').on('click', function () {
+                    $('#mainTable').DataTable().ajax.reload(null, false);
+                });
+
+            });
+
+            // 新增或者修改点击事件
+            function Values(op, fKey, FState) {
+                if (op == 1) { // 新增
+                    layer_show('新增项目信息', 'myprojectedit.html?op=1', '1200', '600');
+                } else { // 修改
+                    layer_show('修改项目信息', 'myprojectedit.html?op=2&id=' + fKey + '&fstate=' + FState + "&type=1", '1200', '600');
+                }
+            }
+
+            function oppenadminister(key, name, isFMatertial,jmname) {
+                xmname = name;
+                layer_show('项目管理编辑器', 'myprojectadminister.html?id=' + key + "&isFMatertial=" + isFMatertial + '&showtype=' + showtype+'&jmname='+jmname, '', '');
+            }
+
+            // 删除按钮点击事件
+            function onClickBtnDel(id, name) {
+                layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function (index) {
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json;charset=UTF-8',
+                        url: '/s/myproject/delmyproject',
+                        data: JSON.stringify({
+                            id: id
+                        }),
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                $('#mainTable').DataTable().ajax.reload(null, false);
+                                toastr.success('删除成功！');
+                                layer.close(layer.index);
+                            }
+                            if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                });
+            }
+
+            //发布状态
+            function fabu(id, name, isFMatertial) {
+                xmname = name;
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json;charset=UTF-8',
+                    url: '/s/myproject/fabuemyprojectyz',
+                    data: JSON.stringify({
+                        id: id
+                    }),
+                    success: function (data) {
+                        if (data.result == 'success') {
+
+                            var fnote ='';
+                            if(data.mesg == 7 || data.mesg == 8){
+                                if(data.mesg == 7)
+                                    fnote = "监测到当前项目有部分零件没创建模具，是否跳转或者直接发布？";
+                                else{
+                                    // fnote = "监测到当前项目有部分零件没创建模具，且未选择工作流，是否跳转或者直接发布？";
+                                    fnote = "监测到当前项目未选择工作流，是否跳转或者直接发布？";
+                                }
+
+                                var indexdd=layer.confirm(fnote, {
+                                    area:['450px','200px'], //弹框的大小
+                                    // btn: ['跳转模具信息', '跳转工作流信息', '发布','取消'] //可以无限个按钮
+                                    btn: [ '跳转工作流信息', '发布','取消'] //可以无限个按钮
+                                    ,btn3: function(index, layero){
+                                        //按钮【按钮三】的回调
+                                        layer.close(indexdd);
+                                    }
+                                }, function(index, layero){
+                                    //按钮【按钮一】的回调
+                                    var indexs = layer.open({
+                                        type: 2,
+                                        area: ['1000px', '400px'],
+                                        fix: false, //不固定
+                                        shade: 0.4,
+                                        title: '项目管理编辑器',
+                                        content: 'myprojectadministerfb.html?id=' + id + "&isFMatertial=" + isFMatertial + '&showtype=' + showtype+'&mesg=3'
+                                        ,end : function() {
+                                            $('#mainTable').DataTable().ajax.reload(null, false);
+                                        }
+                                    });
+                                    layer.full(indexs);
+                                    layer.close(indexdd);
+                                }, function(index){
+                                    //按钮【按钮二】的回调
+                                    $.ajax({
+                                        type: 'POST',
+                                        contentType: 'application/json;charset=UTF-8',
+                                        url: '/s/myproject/fabuemyproject',
+                                        data: JSON.stringify({
+                                            id: id,
+                                            state: 1
+                                        }),
+                                        success: function (data) {
+                                            if (data.result == 'success') {
+                                                $('#mainTable').DataTable().ajax.reload(null, false);
+                                                toastr.success('项目发布成功！');
+                                                layer.close(layer.index);
+                                            } else if (data.result == 'error') {
+                                                toastr.error(data.error)
+                                            }
+                                        },
+                                        error: function (e) {
+                                            toastr.error(e.status);
+                                            toastr.error(e.responseText);
+                                        }
+                                    });
+                                });
+                            }
+
+                            else if(data.mesg ==1){
+                                fnote  = "当前项目版本过老，零件数据缺失，是否直接发布？";
+                                layer.confirm(fnote, function (index) {
+                                    $.ajax({
+                                        type: 'POST',
+                                        contentType: 'application/json;charset=UTF-8',
+                                        url: '/s/myproject/fabuemyproject',
+                                        data: JSON.stringify({
+                                            id: id,
+                                            state: 1
+                                        }),
+                                        success: function (data) {
+                                            if (data.result == 'success') {
+                                                $('#mainTable').DataTable().ajax.reload(null, false);
+                                                toastr.success('项目发布成功！');
+                                                layer.close(layer.index);
+                                            } else if (data.result == 'error') {
+                                                toastr.error(data.error)
+                                            }
+                                        },
+                                        error: function (e) {
+                                            toastr.error(e.status);
+                                            toastr.error(e.responseText);
+                                        }
+                                    });
+                                });
+                            }
+                            // else if(data.mesg ==5 || data.mesg ==6 ){
+                            //     if(data.mesg ==6)
+                            //         fnote="监测到当前项目未创建零件信息，是否进行跳转？";
+                            //     else
+                            //         fnote="监测到当前项目未创建模具信息，是否进行跳转？";
+                            //     var indexdd= layer.confirm(fnote, function (index) {
+                            //         // layer_show('项目管理编辑器', 'myprojectadministerfb.html?id=' + id + "&isFMatertial=" + isFMatertial + '&showtype=' + showtype+'&mesg=1', '', '');
+                            //
+                            //         var index = layer.open({
+                            //             type: 2,
+                            //             area: ['1000px', '400px'],
+                            //             fix: false, //不固定
+                            //             shade: 0.4,
+                            //             title: '项目管理编辑器',
+                            //             content: 'myprojectadministerfb.html?id=' + id + "&isFMatertial=" + isFMatertial + '&showtype=' + showtype+'&mesg=1'
+                            //             ,end : function() {
+                            //                 $('#mainTable').DataTable().ajax.reload(null, false);
+                            //             }
+                            //         });
+                            //         layer.full(index);
+                            //
+                            //         layer.close(indexdd);
+                            //     });
+                            //
+                            // }
+                            else if(data.mesg ==2){
+                                fnote="监测到当前项目未选择工作流，是否直接发布？";
+                                layer.confirm(fnote, function (index) {
+                                    $.ajax({
+                                        type: 'POST',
+                                        contentType: 'application/json;charset=UTF-8',
+                                        url: '/s/myproject/fabuemyproject',
+                                        data: JSON.stringify({
+                                            id: id,
+                                            state: 1
+                                        }),
+                                        success: function (data) {
+                                            if (data.result == 'success') {
+                                                $('#mainTable').DataTable().ajax.reload(null, false);
+                                                toastr.success('项目发布成功！');
+                                                layer.close(layer.index);
+                                            } else if (data.result == 'error') {
+                                                toastr.error(data.error)
+                                            }
+                                        },
+                                        error: function (e) {
+                                            toastr.error(e.status);
+                                            toastr.error(e.responseText);
+                                        }
+                                    });
+                                });
+                            }else if(data.mesg ==3){
+                                fnote="监测到当前项目工作流未启动，是否进行跳转？";
+
+                                var indexdd = layer.confirm(fnote, function (index) {
+                                    // layer_show('项目管理编辑器', 'myprojectadministerfb.html?id=' + id + "&isFMatertial=" + isFMatertial + '&showtype=' + showtype+'&mesg=3', '', '');
+                                    var index = layer.open({
+                                        type: 2,
+                                        area: ['1000px', '400px'],
+                                        fix: false, //不固定
+                                        shade: 0.4,
+                                        title: '项目管理编辑器',
+                                        content: 'myprojectadministerfb.html?id=' + id + "&isFMatertial=" + isFMatertial + '&showtype=' + showtype+'&mesg=3'
+                                        ,end : function() {
+                                            $('#mainTable').DataTable().ajax.reload(null, false);
+                                        }
+                                    });
+                                    layer.full(index);
+                                    layer.close(indexdd);
+                                });
+
+                            }else if(data.mesg ==4){
+                                layer.confirm('确定要发布<br /><b>' + name + '</b>项目吗?', function (index) {
+                                    $.ajax({
+                                        type: 'POST',
+                                        contentType: 'application/json;charset=UTF-8',
+                                        url: '/s/myproject/fabuemyproject',
+                                        data: JSON.stringify({
+                                            id: id,
+                                            state: 1
+                                        }),
+                                        success: function (data) {
+                                            if (data.result == 'success') {
+                                                $('#mainTable').DataTable().ajax.reload(null, false);
+                                                toastr.success('项目发布成功！');
+                                                layer.close(layer.index);
+                                            } else if (data.result == 'error') {
+                                                toastr.error(data.error)
+                                            }
+                                        },
+                                        error: function (e) {
+                                            toastr.error(e.status);
+                                            toastr.error(e.responseText);
+                                        }
+                                    });
+                                });
+                            }
+                        } else if (data.result == 'error') {
+                            toastr.error(data.error)
+                        }
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+            }
+
+            //完成状态
+            function wancheng(id, name, isFMatertial) {
+                xmname = name;
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json;charset=UTF-8',
+                    url: '/s/myproject/wanchengemyprojectyz',
+                    data: JSON.stringify({
+                        id: id
+                    }),
+                    success: function (data) {
+                        if (data.result == 'success') {
+
+                            var fnote ='';
+                            if(data.mesg == 1){
+
+                                fnote = "监测到当前项目未上传项目文件，是否跳转或者直接完成项目？";
+
+
+                                var indexdd=layer.confirm(fnote, {
+                                    area:['450px','200px'], //弹框的大小
+                                    btn: [ '跳转到项目文件', '完成','取消'] //可以无限个按钮
+                                    ,btn3: function(index, layero){
+                                        //按钮【按钮三】的回调
+                                        layer.close(indexdd);
+                                    }
+                                }, function(index, layero){
+                                    //按钮【按钮一】的回调
+                                    var indexs = layer.open({
+                                        type: 2,
+                                        area: ['1000px', '400px'],
+                                        fix: false, //不固定
+                                        shade: 0.4,
+                                        title: '项目管理编辑器',
+                                        content: 'myprojectadministerfb.html?id=' + id + "&isFMatertial=" + isFMatertial + '&showtype=' + showtype+'&mesg=8'
+                                        ,end : function() {
+                                            $('#mainTable').DataTable().ajax.reload(null, false);
+                                        }
+                                    });
+                                    layer.full(indexs);
+                                    layer.close(indexdd);
+                                }, function(index){
+                                    //按钮【按钮二】的回调
+                                    $.ajax({
+                                        type: 'POST',
+                                        contentType: 'application/json;charset=UTF-8',
+                                        url: '/s/myproject/wanchengemyproject',
+                                        data: JSON.stringify({
+                                            id: id,
+                                            state: 2
+                                        }),
+                                        success: function (data) {
+                                            if (data.result == 'success') {
+                                                $('#mainTable').DataTable().ajax.reload(null, false);
+                                                toastr.success('项目完成成功！');
+                                                layer.close(layer.index);
+                                            } else if (data.result == 'error') {
+                                                toastr.error(data.error)
+                                            }
+                                        },
+                                        error: function (e) {
+                                            toastr.error(e.status);
+                                            toastr.error(e.responseText);
+                                        }
+                                    });
+                                });
+                            } else if(data.mesg ==2){
+                                layer.confirm('确定要完成<br /><b>' + name + '</b>项目吗?', function (index) {
+                                    $.ajax({
+                                        type: 'POST',
+                                        contentType: 'application/json;charset=UTF-8',
+                                        url: '/s/myproject/wanchengemyproject',
+                                        data: JSON.stringify({
+                                            id: id,
+                                            state: 2
+                                        }),
+                                        success: function (data) {
+                                            if (data.result == 'success') {
+                                                $('#mainTable').DataTable().ajax.reload(null, false);
+                                                toastr.success('项目完成成功！');
+                                                layer.close(layer.index);
+                                            } else if (data.result == 'error') {
+                                                toastr.error(data.error);
+                                                layer.close(layer.index);
+                                            }
+                                        },
+                                        error: function (e) {
+                                            toastr.error(e.status);
+                                            toastr.error(e.responseText);
+
+                                        }
+                                    });
+                                });
+                            }
+                        } else if (data.result == 'error') {
+                            toastr.error(data.error)
+                        }
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+            }
+
+            //关闭状态
+            function guanbi(id, name) {
+                layer.confirm('确定要关闭<br /><b>' + name + '</b>项目吗?', function (index) {
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json;charset=UTF-8',
+                        url: '/s/myproject/guanbiemyproject',
+                        data: JSON.stringify({
+                            id: id,
+                            state: 3
+                        }),
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                $('#mainTable').DataTable().ajax.reload(null, false);
+                                toastr.success('项目关闭成功！');
+                                layer.close(layer.index);
+                            } else if (data.result == 'error') {
+                                toastr.error(data.error)
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                });
+            }
+        </script>
+    </body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <!--    <script type="text/javascript" src="/javascript/global.js"></script>&lt;!&ndash;/_global 公共配置文件&ndash;&gt;-->
+    <link rel="stylesheet" href="/module/capability/coursestudent/score/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/plugins/toastr/toastr.min.css"/>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f9fd;
+    }
+
+    .container {
+        width: 100%;
+        max-width: none;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .group-wrapper {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    .group-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        margin-left: 20px;
+    }
+
+    .input-section {
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        min-height: 250px;
+        max-height: 400px;
+        overflow-y: auto;
+        position: relative;
+    }
+
+    .input-section h5 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .input-section .description {
+        border: 2px solid #007BFF;
+        border-radius: 8px;
+        padding: 12px;
+        color: #666;
+        font-size: 0.9em;
+        margin-bottom: 20px;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+        transition: border-color 0.3s ease;
+    }
+
+    .input-section .description:hover {
+        border-color: #0056b3;
+    }
+
+    .input-section label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    .input-section input {
+        width: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    button {
+        display: block;
+        width: 200px;
+        height: 50px;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 18px;
+        cursor: pointer;
+        margin: 30px auto;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    .input-wrapper {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        position: relative;
+    }
+
+    .clickable{
+        cursor:pointer;
+    }
+
+    .score-display {
+        background-color: #e9ecef;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.9em;
+        color: #555;
+        align-self: flex-end;
+        margin-top: auto;
+    }
+
+
+    #toast-container{
+
+    }
+</style>
+<body>
+<div class="page-container" style="padding: 2px;">
+<!--    <div id="toast-container" class="toast-top-center"></div>-->
+    <div class="f-l" style="width: 100%; margin-top: 3px;">
+        <form id="tiaojianfrom">
+            <div class="container my-5" id="content-container"></div>
+            <button type="button" id="submitBtn">提交</button>
+        </form>
+    </div>
+</div>
+<script type="text/javascript" src="/nui-ad/lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="/javascript/tools.js"></script>
+<script type="text/javascript" src="/plugins/toastr/toastr.min.js"></script>
+<script type="text/javascript">
+    var FCourseStudent = getQueryStringByName('FCourseStudent');//学生课程报名ID
+    var FCourseID = getQueryStringByName('FCourseID');//课程ID
+    var FGroupNum = getQueryStringByName('FGroupNum');//最新第几组成绩
+    var fenshuname ="分数（值*权重）";
+    // 业务代码
+    $(function () {
+
+        //进入页面再次循环插入一下填报过程的信息
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/coursestudent/addcoursestudentsoretbtree', // 调用地址
+            data: JSON.stringify({
+                FCourseStudent: FCourseStudent,
+                FCourseID:FCourseID,
+                FGroupNum:FGroupNum
+            }),
+            async: false,
+            success: function(data) {
+
+            },
+            error : function(e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+
+        // 初始化 toastr 配置
+        toastr.options = {
+            positionClass: 'toast-top-center', // 控制位置的关键参数
+            progressBar: true,
+            timeOut: 3000
+        };
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json;charset=UTF-8',
+            url: '/s/coursestudent/coursesutdenttx',
+            data: JSON.stringify({
+                id: FCourseStudent,
+            }),
+            success: function (data) {
+                if (data.result == 'success') {
+                    const jsonData = data.jsonData;
+                    const container = $('#content-container');
+                    jsonData.forEach(group => {
+                        const groupWrapper = $('<div>', {class: 'group-wrapper'});
+                        const groupTitle = $('<div>', {class: 'group-title', text: group.groupTitle});
+                        groupWrapper.append(groupTitle);
+
+                        const row = $('<div>', {class: 'row'});
+                        group.items.forEach(item => {
+                            const col = $('<div>', {class: 'col-md-4'});
+                            const inputSection = $('<div>', {class: 'input-section' ,id:item});
+                            const title = $('<h5>', {text: item.title});
+                            const description = $('<p>', {class: 'description'}).html(item.description);
+                            inputSection.append(title, description);
+
+                            const inputWrapper = $('<div>', {class: 'input-wrapper'});
+                            item.inputs.forEach(input => {
+                                const inputLabel = $('<label>', {for: input.id, text: input.title});
+                                let inputElement = null;
+                                if (input.fqztype == 0 || input.fqztype == 2) {
+                                    inputElement = $('<input>', {
+                                        type: 'text',
+                                        id: input.id,
+                                        placeholder: `点击上方填报内容或者手动输入....`,
+                                        required:true,
+                                        data_tjid: input.tjid,
+                                        data_tjtype:input.tjtype,
+                                        data_coursestandardsID:input.coursestandardsID,
+                                    });
+
+                                } else if (input.fqztype == 1 || input.fqztype == 3) {
+                                    inputElement = $('<input>', {
+                                        type: 'number',
+                                        id: input.id,
+                                        placeholder: `请输入分数`,
+                                        required:true,
+                                        data_tjid: input.tjid,
+                                        data_tjtype:input.tjtype,
+                                        data_coursestandardsID:input.coursestandardsID,
+                                    });
+                                }
+
+                                inputElement.on('blur', function () {
+                                    const value = $(this).val();
+                                    const scoreDisplay = $(this).closest('.input-wrapper').find('.score-display');
+                                    const currentScore = parseFloat(scoreDisplay.text().replace('分数：', ''));
+                                    //根据填报内容 查询标准得分
+                                    if (value == null || value == "" || value == undefined) {
+                                        toastr.error("请输入填报内容！")
+                                    } else {
+                                        $.ajax({
+                                            type: 'POST',
+                                            contentType: 'application/json;charset=UTF-8',
+                                            url: '/s/coursestudent/gettianbaofenzhi',
+                                            data: JSON.stringify({
+                                                FCourseStudent: FCourseStudent,
+                                                fcamid: this.id,
+                                                value: value
+                                            }),
+                                            success: function (data) {
+                                                if (data.result == 'success') {
+                                                    let tbz = parseFloat(data.zongfen2);
+                                                    // const newScore = currentScore + tbz;
+                                                    scoreDisplay.text(`${fenshuname}：${tbz}`);
+                                                }
+                                                if (data.result == 'error') {
+                                                    toastr.error(data.error)
+                                                }
+                                            },
+                                            error: function (e) {
+                                                toastr.error(e.status);
+                                                toastr.error(e.responseText);
+                                            }
+                                        });
+                                    }
+                                });
+
+                                inputWrapper.append(inputLabel, inputElement);
+                            });
+                            inputSection.append(inputWrapper);
+
+                            const scoreDisplay = $('<div>', {class: 'score-display', text: `${fenshuname}：0`});
+                            inputWrapper.append(scoreDisplay);
+
+                            // 绑定点击事件
+                            description.on('click', '.clickable', function () {
+                                const text = $(this).text();
+                                const input = inputSection.find('input');
+                                input.val(text);
+                                // 触发失去焦点事件
+                                input.trigger('blur');
+                            });
+                            col.append(inputSection);
+                            row.append(col);
+                        });
+                        groupWrapper.append(row);
+                        container.append(groupWrapper);
+                    });
+                    //赋值
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/coursestudent/querycoursestudenttbInfo', // 调用地址
+                        data: JSON.stringify({
+                            id: FCourseStudent
+                        }),
+                        async: false,
+                        success: function(data) {
+                            // console.log(data.list);
+                            let conditionid = 0;
+                            let zongfen=0;
+                            let i =0;
+                            data.list.forEach(listtb => {
+                                if(i == 0){
+                                    conditionid  = listtb.FConditionID;
+                                }
+                                if(conditionid !== listtb.FConditionID){
+                                    conditionid  = listtb.FConditionID;
+                                    zongfen =  parseFloat(listtb.FScore);
+                                }else{
+                                    zongfen += parseFloat(listtb.FScore);
+
+                                }
+                                const scoreDisplay = $("#scheme-design_" + listtb.FACAMID).closest('.input-wrapper').find('.score-display');
+                                $("#scheme-design_" + listtb.FACAMID).val(listtb.FContent);
+                                scoreDisplay.text(`${fenshuname}：${zongfen}`);
+                                i ++ ;
+                            });
+                        },
+                        error : function(e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+
+
+                }
+                if (data.result == 'error') {
+                    toastr.error(data.error)
+                }
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+        //提示框居中显示
+
+        $('#submitBtn').on('click', function(event) {
+            event.preventDefault();
+
+            // 只选择带有 required 属性的输入框
+            const $requiredInputs = $('input[required]');
+            let hasEmptyInput = false;
+            const payload = {
+                inputs: [],
+                FCourseStudent: null
+            };
+
+            // 验证必填项
+            $requiredInputs.each(function() {
+                const $input = $(this);
+                const value = $input.val().trim();
+
+                if (!value) {
+                    hasEmptyInput = true;
+                    $input.addClass('is-invalid');
+                } else {
+                    $input.removeClass('is-invalid');
+                }
+
+                // 收集数据（无论是否必填）
+                payload.inputs.push({
+                    id: $input.attr('id'),
+                    value: value,
+                    tjid: $input.attr('data_tjid'),
+                    tjtype:$input.attr('data_tjtype'),
+                    coursestandardsID: $input.attr('data_coursestandardsID'),
+                });
+            });
+
+            // 检查额外参数
+            if (typeof FCourseStudent === 'undefined') {
+                toastr.error('缺少必要参数: FCourseStudent');
+                return;
+            }
+            payload.FCourseStudent = FCourseStudent;
+
+            // 处理验证结果
+            if (hasEmptyInput) {
+                toastr.error('请填写所有必填项');
+                return;
+            }
+
+            // 发送请求
+            $.ajax({
+                url: '/s/coursestudent/tianbao',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function(response) {
+                    toastr.success('提交成功');
+                    // $('#tiaojianfrom')[0].reset();
+                },
+                error: function(xhr) {
+                    const errorMsg = xhr.responseJSON?.message || xhr.statusText;
+                    toastr.error('提交失败: ' + errorMsg);
+                }
+            });
+        });
+    });
+
+</script>
+</body>
+</html>

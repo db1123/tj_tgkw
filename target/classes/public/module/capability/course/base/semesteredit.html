@@ -1,0 +1,297 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <link rel="stylesheet" href="/plugins/daterangepicker/daterangepicker.css">
+    <!--/_only 独立样式 -->
+</head>
+<body>
+<article class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="semesterForm">
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>学期名称：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="FName" id="FName"/>
+            </div>
+        </div>
+
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>学期开始时间：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="FStartDate" id="FStartDate" readonly="readonly" />
+            </div>
+        </div>
+
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>学期结束时间：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="FEndDate" id="FEndDate" readonly="readonly" />
+
+            </div>
+        </div>
+
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>学期类型：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <select style="width: 100%" name="FType" id="FType"></select>
+            </div>
+        </div>
+
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">选课开始时间：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="FRegistrationStart" id="FRegistrationStart" readonly="readonly" />
+            </div>
+        </div>
+
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">选课结束时间：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="FRegistrationEnd" id="FRegistrationEnd" readonly="readonly" />
+            </div>
+        </div>
+
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">备注：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <textarea id="FNote" name="FNote" rows="4" style="width: 100%; height: 22vh;box-sizing: border-box; border: solid 1px #ddd;" placeholder="请输入备注..." maxlength="4000000"></textarea><br><br>
+            </div>
+        </div>
+
+
+
+        <div class="toolbar-bottom-line"></div>
+        <div class="toolbar-bottom-btn">
+            <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+            <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                   onclick="layer_close()"/>
+        </div>
+        <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+    </form>
+</article>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript" src="/plugins/moment/moment.min.js"></script>
+<script type="text/javascript" src="/plugins/daterangepicker/daterangepicker.js"></script>
+<script type="text/javascript">
+    // 编辑框状态 1新建 2修改
+    var op = getQueryStringByName('op');
+    // 业务代码
+    $(function () {
+        $("#semesterForm select[name='FType']").select2({
+            placeholder: '请选择学期类型',
+            data: [{id: 2, text: "春季"} ,{id: 1, text: "秋季"} ],
+            language: "zh-CN"
+        });
+        $("#semesterForm input[name='FStartDate']").daterangepicker({
+            singleDatePicker: true, // 设置为单日历，即无区间 默认false
+            showDropdowns: true, // 当设置值为true时，允许年份和月份通过下拉框的形式选择 默认false
+            autoUpdateInput: false, // 1.当设置为false的时候,不给与默认值(当前时间) 2.选择时间时,失去鼠标焦点,不会给与默认值 默认true
+            timePicker24Hour : true, // 设置小时为24小时制 默认false
+            timePicker : false, // 可选中时分 默认false
+            locale: {
+                format: "YYYY-MM-DD",
+                separator: " - ",
+                daysOfWeek: ["日","一","二","三","四","五","六"],
+                monthNames: ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"]
+            }
+        }).on('apply.daterangepicker', function(ev, picker) {
+            $("#semesterForm input[name='FStartDate']").val(picker.startDate.format('YYYY-MM-DD'));
+        });
+
+        $("#semesterForm input[name='FEndDate']").daterangepicker({
+            singleDatePicker: true, // 设置为单日历，即无区间 默认false
+            showDropdowns: true, // 当设置值为true时，允许年份和月份通过下拉框的形式选择 默认false
+            autoUpdateInput: false, // 1.当设置为false的时候,不给与默认值(当前时间) 2.选择时间时,失去鼠标焦点,不会给与默认值 默认true
+            timePicker24Hour : true, // 设置小时为24小时制 默认false
+            timePicker : false, // 可选中时分 默认false
+            locale: {
+                format: "YYYY-MM-DD",
+                separator: " - ",
+                daysOfWeek: ["日","一","二","三","四","五","六"],
+                monthNames: ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"]
+            }
+        }).on('apply.daterangepicker', function(ev, picker) {
+            $("#semesterForm input[name='FEndDate']").val(picker.startDate.format('YYYY-MM-DD'));
+        });
+
+        $("#semesterForm input[name='FRegistrationStart']").daterangepicker({
+            singleDatePicker: true, // 设置为单日历，即无区间 默认false
+            showDropdowns: true, // 当设置值为true时，允许年份和月份通过下拉框的形式选择 默认false
+            autoUpdateInput: false, // 1.当设置为false的时候,不给与默认值(当前时间) 2.选择时间时,失去鼠标焦点,不会给与默认值 默认true
+            timePicker24Hour : true, // 设置小时为24小时制 默认false
+            timePicker : false, // 可选中时分 默认false
+            locale: {
+                format: "YYYY-MM-DD",
+                separator: " - ",
+                daysOfWeek: ["日","一","二","三","四","五","六"],
+                monthNames: ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"]
+            }
+        }).on('apply.daterangepicker', function(ev, picker) {
+            $("#semesterForm input[name='FRegistrationStart']").val(picker.startDate.format('YYYY-MM-DD'));
+        });
+
+        $("#semesterForm input[name='FRegistrationEnd']").daterangepicker({
+            singleDatePicker: true, // 设置为单日历，即无区间 默认false
+            showDropdowns: true, // 当设置值为true时，允许年份和月份通过下拉框的形式选择 默认false
+            autoUpdateInput: false, // 1.当设置为false的时候,不给与默认值(当前时间) 2.选择时间时,失去鼠标焦点,不会给与默认值 默认true
+            timePicker24Hour : true, // 设置小时为24小时制 默认false
+            timePicker : false, // 可选中时分 默认false
+            locale: {
+                format: "YYYY-MM-DD",
+                separator: " - ",
+                daysOfWeek: ["日","一","二","三","四","五","六"],
+                monthNames: ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"]
+            }
+        }).on('apply.daterangepicker', function(ev, picker) {
+            $("#semesterForm input[name='FRegistrationEnd']").val(picker.startDate.format('YYYY-MM-DD'));
+        });
+
+        
+
+
+
+
+        // 修改操作时读取表单信息
+        if (op == 2) {
+            var id = getQueryStringByName('id');
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/semester/querysemesterInfo', // 调用地址
+                data: JSON.stringify({
+                    id: id
+                }),
+                async: false,
+                success: function (data) {
+                    $('#FNote').val(data.info.FNote);
+                    $('#FName').val(data.info.FName);
+                    $('#FStartDate').val(data.info.FStartDate);
+                    $('#FEndDate').val(data.info.FEndDate);
+                    $('#FRegistrationStart').val(data.info.FRegistrationStart);
+                    $('#FRegistrationEnd').val(data.info.FRegistrationEnd);
+                    $('#FType').val(data.info.FType).change();
+                    $('#FKeyID').val(data.info.key);
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        }
+        // 检验数据
+        var userValidate = $('#semesterForm').validate({
+            rules: {
+                FName: {
+                    required: true,
+                    levelLimit: false
+                },
+
+                FStartDate: {
+                    required: true,
+                },
+                FEndDate: {
+                    required: true,
+                },
+                FType: {
+                    required: true,
+                },
+
+
+            },
+            messages: {
+                FName: {
+                    required: '*请输入学期名称'
+                },
+                FStartDate: {
+                    required: '*请选择学期开始时间',
+                },
+                FEndDate: {
+                    required: '*请选择学期结束时间',
+                },
+                FType: {
+                    required: '*请选择学期类型',
+                },
+            },
+            onfocusout: false, // 是否在获取焦点时验证
+            onkeyup: false, // 是否在敲击键盘时验证
+            focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+            focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+            success: 'valid',
+            submitHandler: function () {
+                // 获取参数
+                var data = form2Json('semesterForm');
+                if (op == 1) { // 添加操作
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/semester/addsemester', // 调用地址
+                        data: JSON.stringify(data),
+                        async: false,
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                parent.$('#mainTable').DataTable().ajax.reload(null, false);
+                                parent.toastr.success('添加成功！');
+                                layer_close();
+                            } else if (data.result == 'fail') {
+                                toastr.warning('学期名称重复，请重新输入');
+                            } else if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                } else {
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/semester/updatesemester', // 调用地址
+                        data: JSON.stringify(data),
+                        async: false,
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                parent.$('#mainTable').DataTable().ajax.reload(null, false);
+                                parent.toastr.success('修改成功！');
+                                layer_close();
+                            } else if (data.result == 'fail') {
+                                toastr.warning('学期名称重复，请重新输入');
+                            } else if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

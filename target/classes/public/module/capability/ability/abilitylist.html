@@ -1,0 +1,681 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+    <!--/_only 独立样式 -->
+</head>
+<style type="text/css">
+    .open-work-control2 {
+        cursor: pointer;
+    }
+
+    .open-work-control3 {
+        cursor: pointer;
+    }
+
+    .open-work-control4 {
+        cursor: pointer;
+    }
+</style>
+<body>
+
+<div class="page-container">
+    <div class="f-l" style="width: 99.8%; margin-top: 3px;">
+        <div class="row cl">
+            <div class="col-md-7 col-sm-7 col-xs-7">
+                <div class="panel panel-default">
+                    <div class="panel-header">能力&nbsp;
+                        <div class="f-r text-l">
+                            &nbsp;<button type="button" class="btn btn-default size-S my-btn" onclick="Values(1)"><i
+                                class=" fa fa-plus"></i>
+                            新增能力
+                        </button>
+                        </div>
+                        <div class="f-r text-r">
+                            <select style="width:200px" placeholder="能力类型" class="abilitytype"
+                                    id="abilitytype"> </select>
+
+                            <input type="text" class="input-text size-S form-text-FName" style="width:200px"
+                                   placeholder="能力名称">
+                            <button type="button" class="btn btn-default size-S my-btn btn-search-fun"><i
+                                    class="Hui-iconfont">&#xe665;</i>
+                                搜索
+                            </button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <table id="mainTable" class="display compact" style="width: 99.8%;"></table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5 col-sm-5 col-xs-5">
+                <!--                <div style="height: 20px;"></div>-->
+                <div class="panel panel-default">
+                    <div class="panel-header"> 能力等级&nbsp;
+                        <div class="f-r text-l">
+                            <button type="button" class="btn btn-default size-S my-btn" onclick="Valuesuser(1)"><i
+                                    class=" fa fa-plus"></i>
+                                新增能力等级
+                            </button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <span id="mxname" style="color: #0e90d2;font-size: 15px;"></span>
+                        <table id="mainTablelevel" class="display compact" style="width: 99.8%;"></table>
+                    </div>
+                </div>
+            </div>
+            <!--            <div class="col-md-12 col-sm-12 col-xs-12">-->
+            <!--                <div style="height: 20px;"></div>-->
+            <!--                <div class="panel panel-default">-->
+            <!--                    <div class="panel-header"> 能力等级考核条件&nbsp;-->
+            <!--                        <div class="f-r text-l">-->
+            <!--                            <button type="button" class="btn btn-default size-S my-btn" onclick="dengjitiaojian(1)"><i-->
+            <!--                                    class=" fa fa-plus"></i>-->
+            <!--                                新增能力等级考核条件-->
+            <!--                            </button>-->
+            <!--                        </div>-->
+            <!--                    </div>-->
+            <!--                    <div class="panel-body">-->
+            <!--                        <span id="mxname2" style="color: #0e90d2;font-size: 15px;"></span>-->
+            <!--&lt;!&ndash;                        <table id="mainTablelevelCondition" class="display compact" style="width: 99.8%;"></table>&ndash;&gt;-->
+            <!--                        <table class="table table-striped table-bordered table-hover" id="treetable"-->
+            <!--                               style="width: 98%"></table>-->
+            <!--                    </div>-->
+            <!--                </div>-->
+            <!--            </div>-->
+            <!--            <div class="col-md-6 col-sm-6 col-xs-6">-->
+            <!--                <div style="height: 20px;"></div>-->
+            <!--                <div class="panel panel-default">-->
+            <!--                    <div class="panel-header"> 能力等级考核方式&nbsp;-->
+            <!--                        <div class="f-r text-l">-->
+            <!--                            <button type="button" class="btn btn-default size-S my-btn" onclick="kaohefangshi(1)"><i-->
+            <!--                                    class=" fa fa-plus"></i>-->
+            <!--                                新增能力等级考核方式-->
+            <!--                            </button>-->
+            <!--                        </div>-->
+            <!--                    </div>-->
+            <!--                    <div class="panel-body">-->
+            <!--                        <span id="mxname3" style="color: #0e90d2;font-size: 15px;"></span>-->
+            <!--                        <table id="mainTablelevelConditionAssessment" class="display compact"-->
+            <!--                               style="width: 99.8%;"></table>-->
+            <!--                    </div>-->
+            <!--                </div>-->
+            <!--            </div>-->
+        </div>
+
+    </div>
+</div>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<!--<script src="/module/capability/ability/js/dataTables.treeGrid.js"></script>-->
+<script type="text/javascript">
+    var abilityid;//权限组id
+    var mainTable;
+    var mainTablelevel;
+    var mainTablelevelCondition;
+    var abilityName;
+
+    var ConditionID;
+    var ConditionName;
+
+    var LevelID;
+    var LevelName;
+    var LevelNames;
+    var tree;
+
+    let remarkShowLength = 15;
+    var dataTable = null;
+    // 业务代码
+    $(function () {
+
+        // $("#abilitytype").select2({
+        //     placeholder: '请选择能力类型',
+        //     ajax: {
+        //         type: 'POST',
+        //         url: "/s/abilitytype/queryDataabilitytypeSelectall",
+        //         dataType: 'json',
+        //         data: function (params) {
+        //             return {
+        //                 search: params.term,
+        //             };
+        //         },
+        //         processResults: function (data) {
+        //             return {
+        //                 results: data.list
+        //             };
+        //         },
+        //         delay: 800,
+        //         cache: true
+        //     },
+        //     language: "zh-CN"
+        // });
+        // 初始化类型树形下拉框
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/abilitytype/queryabilityTypeALL', // 调用地址
+            async: false,
+            success: function (data) {
+                var newObj2 = Object.assign([], data.zNodes);
+                newObj2.push({id: 1, pId: 0, name: '全部', open: true});
+                $('#abilitytype').select2ztree({
+                    textField: 'name',
+                    titleField: 'name',
+                    placeholder: '请选择能力类型',
+                    ztree: {
+                        setting: {
+                            view: {
+                                dblClickExpand: false
+                            },
+                            data: {
+                                simpleData: {
+                                    enable: true,
+                                    idKey: "id",
+                                    pIdKey: "pId",
+                                    rootPId: 0
+                                }
+                            }
+                        },
+                        zNodes: newObj2
+                    },
+                    language: "zh-CN"
+                });
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+
+        // 封装表格
+        mainTable = $('#mainTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/ability/queryability', // 调用地址
+                data: function (d) {
+                    return JSON.stringify($.extend({}, d, {
+                        page: d.start / d.length + 1, // 当前页
+                        results: d.length, // 每页显示条数
+                        name: $('.form-text-FName').val(),//能力名称
+                        abilitytype: $("#abilitytype").val(),//能力类型
+                        dataall: 1
+                    }));
+                },
+                dataSrc: function (json) {
+                    json.recordsFiltered = json.total;  // 总行数
+                    json.recordsTotal = json.page; // 当前页数
+                    return json.list;
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+            },
+            createdRow: function (row, data, dataIndex) {
+                if (data.FNote.length > remarkShowLength) {//只有超长，才有td点击事件
+                    $(row).children('td').eq(2).attr('onclick', 'javascript:changeShowRemarks(this);');
+                    $(row).children('td').eq(2).css('word-wrap', 'break-word');
+                    $(row).children('td').eq(2).css('white-space', 'normal');
+                    $(row).children('td').eq(2).css('word-break', 'break-all');
+                }
+                $(row).children('td').eq(2).attr('content', data.FNote);
+            },
+            columns: [
+
+                {
+                    title: '时间',
+                    data: 'FCDATE',
+                    class: 'open-work-control2',
+                },
+                {
+                    title: '能力类型', width: 90,
+                    data: 'FTypeID',
+                    class: 'open-work-control2',
+                    render: function (data, type, row) {
+                        return row.FTypeName;
+                    }
+                },
+                {title: '能力名称', data: 'FName', class: 'open-work-control2'},
+                {
+                    title: '描述', data: 'FNote', class: 'open-work-control2',
+                    render: function (data, type, full, row) {
+                        if (data.length > remarkShowLength) {//只有超长，才有td点击事件
+                            return getPartialRemarksHtml(data);//显示部分信息
+                        } else {
+                            return data;
+                        }
+                    }
+                },
+                {
+                    title: '状态',
+                    data: 'FState',
+                    width: 35,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (data == 1) {
+                            return '<button type="button" class="btn btn-success size-MINI" onclick="onClickabilityBtnState(\'' + row.key + '\',' + row.FState + ',\'' + row.FName + '\')"><i class="fas fa-toggle-on"></i> 启用</button>';
+                        } else {
+                            return '<button type="button" class="btn btn-warning size-MINI" onclick="onClickabilityBtnState(\'' + row.key + '\',' + row.FState + ',\'' + row.FName + '\')"><i class="fas fa-toggle-off"></i> 禁用</button>';
+                        }
+                    }
+                },
+                {
+                    title: '操作',
+                    data: 'FState',
+                    width: 160,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<button type="button" class="btn  size-MINI" onclick="abilitytree(\'' + row.key + '\')"><i class="fa fa-tree" aria-hidden="true" /></i>能力树</button> ' +
+                            '<button type="button" class="btn btn-secondary size-MINI" onclick="Values(2,\'' + row.key + '\')"><i class="fas fa-edit"></i>编辑</button> ' +
+                            '<button type="button" class="btn btn-danger size-MINI" onclick="onClickBtnDel(\'' + row.key + '\',\'' + row.FName + '\')"><i class="fas fa-trash"></i>删除</button>';
+
+                    }
+                }
+            ],
+            scrollY: (document.body.clientHeight - 100) + 'px',
+            scrollX: true,
+            paging: true, // 是否开启本地分页
+            pageLength: 15, // 改变初始化页长度（每页多少条数据）
+            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+            lengthChange: false, // 是否允许因子改变表格每页显示的记录数
+            searching: false, // 是否允许Datatables开启本地搜索
+            ordering: true, // 是否允许Datatables开启排序
+            info: true, // 控制是否显示表格左下角的信息
+            order: [[0, 'desc']],
+            language: DataTablesLanguage
+        });
+        mainTable.column(0).visible(false);
+
+        mainTablelevel = $('#mainTablelevel').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/abilitylevel/queryabilitylevel', // 调用地址
+                data: function (d) {
+                    return JSON.stringify($.extend({}, d, {
+                        page: d.start / d.length + 1, // 当前页
+                        results: d.length, // 每页显示条数
+                        id: abilityid,
+                        dataall: 1
+                    }));
+                },
+                dataSrc: function (json) {
+                    json.recordsFiltered = json.total;  // 总行数
+                    json.recordsTotal = json.page; // 当前页数
+                    return json.list;
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+            },
+            columns: [
+                {title: '等级名称', data: 'FName', orderable: false, class: 'open-work-control3'},
+                {title: '等级最低分数', data: 'FScoreMin', orderable: false, class: 'open-work-control3'},
+                {title: '等级最高分数', data: 'FScoreMax', orderable: false, class: 'open-work-control3'},
+                {title: '能力积分', data: 'FPoints', orderable: false, class: 'open-work-control3'},
+                // {
+                //     title: '条件总分数', data: 'FConditionScore', orderable: false, class: 'open-work-control3',
+                //     render: function (data, type, row) {
+                //         if (data > 100) {
+                //             return '<span style="color: red">' + data + '</span>'
+                //         } else {
+                //             return data;
+                //         }
+                //     }
+                // },
+                {
+                    title: '管理',
+                    data: 'FState',
+                    width: 60,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<button type="button" class="btn  size-MINI" onclick="abilitylevelgl(\'' + row.key + '\',\'' + row.FName + '\')">管理等级条件</button> '
+                    }
+                },
+
+                {
+                    title: '操作',
+                    data: 'FState',
+                    width: 60,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<button type="button" class="btn btn-secondary size-MINI" title="编辑" onclick="Valuesuser(2,\'' + row.key + '\')"><i class="fas fa-edit"></i></button> ' +
+                            '<button type="button" class="btn btn-danger size-MINI" title="删除" onclick="onClickBtnuserDel(\'' + row.key + '\',\'' + row.FName + '\')"><i class="fas fa-trash"></i></button>';
+                    }
+                }
+            ],
+            //scrollY: (document.body.clientHeight-50) + 'px',
+            scrollX: true,
+            paging: true, // 是否开启本地分页
+            pageLength: 5, // 改变初始化页长度（每页多少条数据）
+            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+            lengthChange: false, // 是否允许维度改变表格每页显示的记录数
+            searching: false, // 是否允许Datatables开启本地搜索
+            ordering: false, // 是否允许Datatables开启排序
+            info: true, // 控制是否显示表格左下角的信息
+            language: DataTablesLanguage
+        });
+
+        $('#mainTable tbody').on('click', 'tr td.open-work-control2', function () {
+
+            if (!$(this).parent().hasClass('selected')) { // 处理点击行样式
+                mainTable.$('tr.selected').removeClass('selected');
+                $(this).parent().addClass('selected');
+            }
+            var data = mainTable.row(this).data(); // 获取点击行数据
+
+            abilityid = data.key;
+            abilityName = data.FTypeName + "/" + data.FName;
+            $('#mxname').text("能力：" + data.FTypeName + "/" + data.FName);
+            $('#mainTablelevel').DataTable().ajax.reload(null, false);
+            LevelID = null;
+            LevelName = null;
+            ConditionID = null;
+            ConditionName = null;
+            $('#mxname2').text("");
+            // $('#mxname3').text("");
+            // $('#mainTablelevelCondition').DataTable().ajax.reload(null, false);
+            
+            // $('#mainTablelevelConditionAssessment').DataTable().ajax.reload(null, false);
+        });
+ 
+
+        // 查询按钮点击事件
+        $('.btn-search-fun').on('click', function () {
+            $('#mainTable').DataTable().ajax.reload(null, false);
+        });
+
+    });
+
+    function reloadtable(abilityID, name) {
+        abilityid = abilityID;
+        abilityName = name;
+        $('#mainTablelevel').DataTable().ajax.reload(null, false);
+    }
+
+    function reloadtiaojiantable() {
+        $('#mainTablelevel').DataTable().ajax.reload(null, false);
+        // $('#mainTablelevelCondition').DataTable().ajax.reload(null, false);
+        
+    }
+
+    function reloadkaohetable() {
+        // $('#mainTablelevelCondition').DataTable().ajax.reload(null, false);
+        
+        // $('#mainTablelevelConditionAssessment').DataTable().ajax.reload(null, false);
+    }
+
+    function Valuesuser(op, fkeyid) {
+        if (abilityid) {
+            if (op == 1) { // 新增
+                layer_show('新增能力等级信息', 'abilitylevel2edit.html?op=1&FAbilityID=' + abilityid+'&showtype=1' , '1000', '600');
+            } else {
+                layer_show('修改能力等级信息', 'abilitylevel2edit.html?op=2&FAbilityID=' + abilityid + '&id=' + fkeyid+'&showtype=1' , '1000', '600');
+            }
+        } else {
+            toastr.error('请选择能力后再添加！');
+        }
+    }
+
+    // function dengjitiaojian(op, fkeyid) {
+    //     if (LevelID) {
+    //         if (op == 1) {
+    //             layer_show('新增能力等级考核条件信息', 'tiaojianedit.html?op=1&FAbilityID=' + abilityid + '&FAbilityLevelID=' + LevelID, '800', '500');
+    //         } else {
+    //             layer_show('修改能力等级考核条件信息', 'tiaojianedit.html?op=2&FAbilityID=' + abilityid + '&FAbilityLevelID=' + LevelID + '&id=' + fkeyid, '800', '500');
+    //         }
+    //
+    //     } else {
+    //         toastr.error('请选择能力等级后再添加！');
+    //     }
+    // }
+
+    // function kaohefangshi(op, fkeyid) {
+    //     if (ConditionID) {
+    //         if (op == 1) {
+    //             layer_show('新增能力等级考核方式信息', 'kaohefangshiedit.html?op=1&FAbilityLevelID=' + LevelID + '&FAbilityConditionID=' + ConditionID, '800', '500');
+    //         } else {
+    //             layer_show('修改能力等级考核方式信息', 'kaohefangshiedit.html?op=2&FAbilityLevelID=' + LevelID + '&FAbilityConditionID=' + ConditionID + '&id=' + fkeyid, '800', '500');
+    //         }
+    //     } else {
+    //         toastr.error('请选择能力考核条件后再添加！');
+    //     }
+    // }
+
+    // 新增或者修改点击事件
+    function Values(op, fKey) {
+        if (op == 1) { // 新增
+            layer_show('新增能力信息', 'abilityedit.html?op=1'+'&showtype='+1, '800', '400');
+        } else { // 修改
+            layer_show('修改能力信息', 'abilityedit.html?op=2&id=' + fKey+'&showtype='+1, '800', '400');
+        }
+    }
+
+
+    // 删除按钮点击事件
+    function onClickBtnDel(id, name) {
+        layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/ability/delability',
+                data: JSON.stringify({
+                    id: id
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#mainTable').DataTable().ajax.reload(null, false);
+                        toastr.success('删除成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error);
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+
+    function onClickBtnuserDel(id, name) {
+
+        layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/abilitylevel/delabilitylevel',
+                data: JSON.stringify({
+                    id: id
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#mainTablelevel').DataTable().ajax.reload(null, false);
+                        $('#mainTablelevel').DataTable().ajax.reload(null, false);
+                        LevelID = null;
+                        LevelName = null;
+                        ConditionID = null;
+                        ConditionName = null;
+                        $('#mxname2').text("");
+                        $('#mxname3').text("");
+                        // $('#mainTablelevelCondition').DataTable().ajax.reload(null, false);
+                        
+                        $('#mainTablelevelConditionAssessment').DataTable().ajax.reload(null, false);
+                        toastr.success('删除成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error);
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+
+    function onClickBtnuserlcDel(id, name) {
+        //考核条件删除
+        layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/abilitycondition/delabilityCondition',
+                data: JSON.stringify({
+                    id: id
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        // $('#mainTablelevelCondition').DataTable().ajax.reload(null, false);
+                        
+                        $('#mainTablelevelConditionAssessment').DataTable().ajax.reload(null, false);
+                        ConditionID = null;
+                        ConditionName = null;
+                        $('#mxname3').text("");
+                        toastr.success('删除成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error);
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+
+    function onClickBtnuserfsDel(id, name, name2) {
+        //考核方式删除
+        layer.confirm('<b>' + name2 + '-->' + name + '</b><br />确定要删除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/abilityconditionassessmentmethod/delabilityConditionAssessmentmethod',
+                data: JSON.stringify({
+                    id: id
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#mainTablelevelConditionAssessment').DataTable().ajax.reload(null, false);
+                        toastr.success('删除成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error);
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+
+    function onClickabilityBtnState(id, state, name) {
+        var text = '';
+        if (state == 1) {
+            text = '<b>' + name + '</b><br />确定要&nbsp;<b>禁用</b>&nbsp;吗?';
+        } else {
+            text = '<b>' + name + '</b><br />确定要&nbsp;<b>启用</b>&nbsp;吗?';
+        }
+        layer.confirm(text, function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/ability/stateability',
+                data: JSON.stringify({
+                    id: id,
+                    state: state
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#mainTable').DataTable().ajax.reload(null, false);
+                        toastr.success('状态改变成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error)
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+
+    function abilitytree(fkeyid) {
+        layer_show('能力树', '/module/capability/ability/abilitytree.html?id=' + fkeyid + '&ftype=1'+'&showtype=1' , '', '');
+    }
+
+    function abilitylevelgl(fkeyid, name) {
+        LevelName = name;
+        LevelNames = abilityName + '/' + name;
+        layer_show('管理等级考核条件与方式', '/module/capability/ability/abilityCondition/abilitylevelgl.html?LevelID=' + fkeyid + '&abilityid=' + abilityid, '', '');
+    }
+
+
+    //切换显示备注信息，显示部分或者全部
+    function changeShowRemarks(obj) {//obj是td
+        var content = $(obj).attr("content");
+
+        if (content != null && content != '') {
+            if ($(obj).attr("isDetail") == 'true') {//当前显示的是详细备注，切换到显示部分
+                //$(obj).removeAttr('isDetail');//remove也可以
+                $(obj).attr('isDetail', false);
+                $(obj).html(getPartialRemarksHtml(content));
+            } else {//当前显示的是部分备注信息，切换到显示全部
+                $(obj).attr('isDetail', true);
+                $(obj).html(getTotalRemarksHtml(content));
+            }
+        }
+    }
+
+    //部分备注信息
+    function getPartialRemarksHtml(remarks) {
+        if (remarks.length > 0) {
+            return remarks.substr(0, remarkShowLength) + '&nbsp;&nbsp;<a href="javascript:void(0);" ><b>展开</b></a>';
+        }
+    }
+
+    //全部备注信息
+    function getTotalRemarksHtml(remarks) {
+        return remarks + '&nbsp;&nbsp;<a href="javascript:void(0);" ><b>收起</b></a>';
+    }
+</script>
+</body>
+</html>

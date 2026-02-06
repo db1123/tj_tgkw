@@ -1,0 +1,319 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css" type="text/css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/metroStyle/metroStyle.css" type="text/css">
+    <!--/_only 独立样式 -->
+</head>
+<style type="text/css">
+    ul.ztree {
+        margin-left: 20px;
+        border: 1px solid #617775;
+        background: #f0f6e4;
+        width: 80vw;
+        height: 69vh;
+        overflow-y: scroll;
+        overflow-x: auto;
+    }
+
+    /* 自定义图标样式 */
+    .ztree li a span[class*="_ico_open"],
+    .ztree li a span[class*="_ico_close"],
+    .ztree li a span[class*="_ico_docu"] {
+        background-size: 18px 18px; /* 背景图片的大小 */
+        width: 18px;
+        height: 18px;
+    }
+
+    .ztree li a span.school-icon_ico_open,
+    .ztree li a span.school-icon_ico_close,
+    .ztree li a span.school-icon_ico_docu {
+        background-image: url("/module/capability/ability/images/ability.png") !important;
+    }
+
+    .ztree li a span.college-icon_ico_open,
+    .ztree li a span.college-icon_ico_close,
+    .ztree li a span.college-icon_ico_docu {
+        background-image: url("/module/capability/ability/images/dengji.png") !important;
+    }
+
+    .ztree li a span.major-icon_ico_open,
+    .ztree li a span.major-icon_ico_close,
+    .ztree li a span.major-icon_ico_docu {
+        background-image: url("/module/capability/ability/images/tiaojian.png") !important;
+    }
+
+    .ztree li a span.class-icon_ico_docu {
+        background-image: url("/module/capability/ability/images/kaohe.png") !important;
+    }
+
+    .ztree li a span[class*="_bt"] {
+        background-size: 16px 16px; /* 调整图标大小 */
+        width: 16px;
+        height: 16px;
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 5px; /* 调整按钮与文本的间距 */
+        cursor: pointer; /* 设置鼠标指针为手型 */
+    }
+
+    /* 定义编辑按钮图标样式 */
+    .ztree li a span.studentadd-button_bt,
+    #addstudent {
+        background-image: url("/module/capability/ability/images/mti_add.png") !important;
+    }
+
+
+    iframe {
+        width: 60vw;
+        height: 60vh;
+        border: none; /* 去掉 iframe 的边框 */
+    }
+</style>
+<body>
+<div class="page-container" style="padding: 2px;">
+    <!--    <div class="f-l text-l">-->
+    <!--        <button type="button" class="btn btn-default size-S my-btn" onclick="abilityConditionsValues(1)"><i-->
+    <!--                class=" fa fa-plus"></i> 新增-->
+    <!--        </button>-->
+    <!--        <button type="button" class="btn btn-default size-S my-btn" onclick="abilityConditionsValues(2)"><i-->
+    <!--                class=" fa fa-edit"></i> 修改-->
+    <!--        </button>-->
+    <!--        <button type="button" class="btn btn-default size-S my-btn" onclick="onClickabilityConditionsBtnDel()"><i-->
+    <!--                class=" fa fa-trash"></i> 删除-->
+    <!--        </button>-->
+    <!--    </div>-->
+    <div class="f-l table-panel">
+        <ul id="abilityConditionsTree" class="ztree"
+            style="height:calc(100vh - 45px); overflow:auto; border: 1px solid #cccccc; background: #f7f7f7;"></ul>
+    </div>
+</div>
+
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript">
+    var abilityConditionsTree;
+    var fpname;
+    var FCID = getQueryStringByName('FCID');
+
+    var fjdname;
+
+    var treeObj;
+    // 业务代码
+    $(function () {
+        // gettreedata(1);
+        // 初始化权限树
+        var zTreeSetting = {
+            view: {
+                addHoverDom: addHoverDom,
+                removeHoverDom: removeHoverDom,
+                selectedMulti: false,
+                showIcon: true // 显示图标
+            },
+            async: {
+                enable: true,
+                type: 'post',
+                contentType: 'application/json',
+                url: '/s/abilityconditions/queryabilityConditions',
+                // autoParam: ['id', 'name=n', 'level=lv'],
+                otherParam: {
+                    FCID: FCID // 固定参数 FCID
+                }
+            },
+            data: {
+                simpleData: {
+                    enable: true,
+                    idKey: 'id',
+                    pIdKey: 'pId',
+                    rootPId: 0
+                }
+            }
+        };
+        abilityConditionsTree = $.fn.zTree.init($('#abilityConditionsTree'), zTreeSetting);
+    });
+
+
+    function addHoverDom(treeId, treeNode) {
+        var sObj = $("#" + treeNode.tId + "_span");
+
+        if (treeNode.ftype == 1) {
+            //能力等级
+            if ($("#addBtn_" + treeNode.tId).length > 0) return
+            var addStr = "<span class='button add' id='addBtn_" + treeNode.tId
+                + "' title='新增考核条件子级' onfocus='this.blur();'></span>"
+            ;
+            sObj.after(addStr);
+            var btn = $("#addBtn_" + treeNode.tId);
+            if (btn) btn.bind("click", function () {
+                xmname = rename(treeNode.name);
+                fjdname = treeNode.name;
+                //新增考核条件下子级条件
+                var index = layer.open({
+                    type: 2,
+                    area: ['800px', '500px'],
+                    fix: false, //不固定
+                    shade: 0.4,
+                    title: '新增能力等级考核条件信息',
+                    content: '/module/capability/ability/abilityCondition/tiaojianedit2.html?op=1&FAbilityLevelID=' + treeNode.id +'&FPID=' +treeNode.id+ '&op=1&tree2=1'
+                    , end: function () {
+                        // 重新加载整个树
+                        reloadtiaojian();
+                    }
+                });
+                // layer.full(index);
+                return false;
+            });
+        }
+    }
+
+    function removeHoverDom(treeId, treeNode) {
+        $("#addBtn_" + treeNode.tId).unbind().remove();
+
+    }
+
+
+    // 更新 zTree 数据
+    function updateTree(newNodes) {
+        var treeObj = $.fn.zTree.getZTreeObj("abilityConditionsTree");
+
+        // 获取当前选中的节点
+        var selectedNodes = treeObj.getSelectedNodes();
+        var selectedNodeId = selectedNodes.length > 0 ? selectedNodes[0].id : null;
+
+        // 获取当前展开的节点
+        var expandedNodes = [];
+        var allNodes = treeObj.transformToArray(treeObj.getNodes());
+        allNodes.forEach(function (node) {
+            if (node.open) {
+                expandedNodes.push(node.id);
+            }
+        });
+
+        // 清空当前树
+        treeObj.destroy();
+
+        // 重新初始化 zTree
+        treeObj = $.fn.zTree.init($("#abilityConditionsTree"), treesetting, newNodes);
+
+        // 恢复展开状态
+        expandedNodes.forEach(function (id) {
+            var node = treeObj.getNodeByParam("id", id);
+            if (node) {
+                treeObj.expandNode(node, true, false, false);
+            }
+        });
+
+        // 恢复选中状态
+        if (selectedNodeId) {
+            var selectedNode = treeObj.getNodeByParam("id", selectedNodeId);
+            if (selectedNode) {
+                treeObj.selectNode(selectedNode);
+            }
+        }
+    }
+
+    function gettreedata(type) {
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json;charset=UTF-8',
+            url: '/s/abilityconditions/queryabilityConditions',
+            data: JSON.stringify({
+                FCID: FCID
+            }),
+            success: function (data) {
+                if (data.result == 'success') {
+                    zNodes = data.zNodes;
+                    if (type == 1) {
+                        treeObj = $.fn.zTree.init($("#abilityConditionsTree"), treesetting, zNodes);
+                        fuzzySearch('abilityConditionsTree', '#key', null, true); //初始化模糊搜索方法
+                    } else if (type == 2) {
+                        updateTree(zNodes);
+                        fuzzySearch('abilityConditionsTree', '#key', null, true, 2); //初始化模糊搜索方法
+                    }
+
+
+                    // treeObj.expandAll(true);
+                    // var nodes = treeObj.getSelectedNodes();
+                    //
+                    // if (nodes.length > 0) {
+                    //     for (var i = 0; i < nodes.length; i++) {
+                    //         treeObj.expandNode(nodes[i], true, true, true);
+                    //     }
+                    // }
+                }
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+    }
+
+    // 删除按钮点击事件
+    function onClickabilityConditionsBtnDel(id, name) {
+        var nodes = abilityConditionsTree.getSelectedNodes();
+        if (nodes.length == 0) {
+            toastr.error('请选择需要删除的节点');
+        } else if (nodes[0].id == 1) {
+            toastr.error('根节点不可删除');
+        } else {
+            layer.confirm('<b>' + nodes[0].name + '</b><br />确定要删除吗?', function (index) {
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json;charset=UTF-8',
+                    url: '/s/abilityconditions/delabilityConditions',
+                    data: JSON.stringify({
+                        id: nodes[0].id
+                    }),
+                    success: function (data) {
+                        if (data.result == 'success') {
+                            // 获取选中节点
+                            var nodes = abilityConditionsTree.getSelectedNodes();
+                            // 删除选中节点
+                            abilityConditionsTree.removeNode(nodes[0]);
+                            // 获取父节点
+                            var parentNode = nodes[0].getParentNode();
+                            // 选中父节点
+                            abilityConditionsTree.selectNode(parentNode);
+                            // 判断是否需要更新父节点状态
+                            if (data.PIsLeaf == 1) {
+                                parentNode.isParent = 0;
+                                abilityConditionsTree.updateNode(parentNode);
+                            }
+                            // 弹出提示->隐藏弹出框
+                            toastr.success('删除成功！');
+                            layer.close(layer.index);
+                        }
+                        if (data.result == 'error') {
+                            toastr.error(data.error)
+                        }
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+            });
+        }
+    }
+    function reloadtiaojian(){
+        abilityConditionsTree.reAsyncChildNodes(null, "refresh", true);
+    }
+
+    function rename(name) {
+        var newname;
+        newname = name.replace(/<span[^>]*>([\s\S]*?)<\/span>/g, '$1');
+        return newname;
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+        <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+        <!--_only 独立样式 -->
+        <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+        <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+        <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+        <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+        <link rel="stylesheet" href="/plugins/daterangepicker/daterangepicker.css">
+        <!--/_only 独立样式 -->
+    </head>
+    <body>
+        <article class="page-container">
+            <form action="" method="post" class="form form-horizontal" id="materialpartForm">
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>制号：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <input type="text" class="input-text" name="FNo" id="FNo"/>
+                    </div>
+                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>模具类型：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <select name="FMMType" class="" style="width: 100%;" id="FMMType"></select>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>工序号：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <select name="FPurNo" class="" style="width: 100%;" id="FPurNo"></select>
+                    </div>
+                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>工序名称：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <select name="FPurName" class="" style="width: 100%;" id="FPurName"></select>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2">型号：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <input type="text" class="input-text" name="FModel" id="FModel"/>
+                    </div>
+                    <label class="form-label col-xs-2 col-sm-2"> 规格：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <input type="text" class="input-text" name="FSpecs" id="FSpecs"/>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2"> 材料：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <input type="text" class="input-text" name="FTexture" id="FTexture"/>
+                    </div>
+                    <label class="form-label col-xs-2 col-sm-2"> 尺寸：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <input type="text" class="input-text" name="FSize" id="FSize"/>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2">外观：</label>
+                    <div class="formControls col-xs-8 col-sm-4">
+                        <input type="text" class="input-text" name="FOutside" id="FOutside"/>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2">备注：</label>
+                    <div class="formControls col-xs-8 col-sm-10">
+                        <input type="text" class="input-text" name="FNote" id="FNote"/>
+                    </div>
+                </div>
+                <div class="toolbar-bottom-line"></div>
+                <div class="toolbar-bottom-btn">
+                    <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+                    <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                           onclick="layer_close()"/>
+                </div>
+                <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+            </form>
+        </article>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+        <script src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+        <script type="text/javascript" src="/plugins/moment/moment.min.js"></script>
+        <script type="text/javascript" src="/plugins/daterangepicker/daterangepicker.js"></script>
+        <script type="text/javascript">
+            // 编辑框状态 1新建 2修改
+            var op = 1;
+            var FProjectID = getQueryStringByName('FProjectID');
+            var FMID = getQueryStringByName('FMID');
+            var id = getQueryStringByName('id');
+            var selectunit;
+            var selectfrom;
+            // 业务代码
+            $(function () {
+                // 初始化下拉菜单---------------------------------------------------------------------------------
+                $("#materialpartForm select[name='FMMType']").select2({
+                    placeholder: '请选择模具类型',
+                    ajax: {
+                        type: 'POST',
+                        url: "/s/materialMoldType/queryDatamaterialMoldTypeSelect",
+                        dataType: 'json',
+                        data: function (params) {
+                            return {
+                                search: params.term,
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: data.list
+                            };
+                        },
+                        delay: 800,
+                        cache: true
+                    },
+                    language: "zh-CN"
+                });
+
+                $("#materialpartForm select[name='FPurNo']").select2({
+                    placeholder: '请选择工序号',
+                    ajax: {
+                        type: 'POST',
+                        url: "/s/procedureNo/queryDataprocedureNoSelect",
+                        dataType: 'json',
+                        data: function (params) {
+                            return {
+                                search: params.term,
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: data.list
+                            };
+                        },
+                        delay: 800,
+                        cache: true
+                    },
+                    language: "zh-CN"
+                });
+
+                //
+                $("#materialpartForm select[name='FPurName']").select2({
+                    placeholder: '请选择工序名称',
+
+                    ajax: {
+                        type: 'POST',
+                        url: "/s/procedureName/queryDataprocedureNameSelect",
+                        dataType: 'json',
+                        data: function (params) {
+                            return {
+                                search: params.term,
+                            };
+                        },
+                        processResults: function (data) {
+                            //console.log(data.list);
+                            return {
+                                results: data.list
+                            };
+                        },
+                        delay: 800,
+                        cache: true
+                    },
+                    language: "zh-CN"
+                });
+
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    url: '/s/material/querymaterialInfo', // 调用地址
+                    data: JSON.stringify({
+                        id: FMID
+                    }),
+                    async: false,
+                    success: function(data) {
+                        $('#FNo').val(data.info.FNo);
+                        $('#FModel').val(data.info.FModel);
+                        $('#FSpecs').val(data.info.FSpecs);
+                        $('#FTexture').val(data.info.FTexture);
+                        $('#FSize').val(data.info.FSize);
+                        $('#FOutside').val(data.info.FOutside);
+                        $('#FNote').val(data.info.FNote);
+
+                        var option = new Option(data.info.FMMTypeName, data.info.FMMType, true, true);
+                        $('#FMMType').append(option);
+                        $('#FMMType').change();
+                        option = new Option(data.info.FPurNoName, data.info.FPurNoID, true, true);
+                        $('#FPurNo').append(option);
+                        $('#FPurNo').change();
+                        option = new Option(data.info.FPurNameName, data.info.FPurNameID, true, true);
+                        $('#FPurName').append(option);
+                        $('#FPurName').change();
+                        $('#FKeyID').val(data.info.key);
+                    },
+                    error : function(e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+
+
+                // 检验数据
+                var userValidate = $('#materialpartForm').validate({
+                    rules: {
+                        FMMType: {
+                            required: true,
+                            levelLimit: false
+                        },
+                        FNo: {
+                            required: true,
+                            levelLimit: false
+                        },
+                        FPurNo: {
+                            required: true,
+                            levelLimit: false
+                        },
+                        FPurName: {
+                            required: true,
+                            levelLimit: false
+                        },
+
+                    },
+                    messages: {
+                        FMMType: {
+                            required: '*请选择模具类型'
+                        },
+                        FNo: {
+                            required: '*请输入制号'
+                        },
+                        FPurNo: {
+                            required: '*请选择工序号'
+                        },
+                        FPurName: {
+                            required: '*请选择工序名称'
+                        },
+
+                    },
+                    onfocusout: false, // 是否在获取焦点时验证
+                    onkeyup: false, // 是否在敲击键盘时验证
+                    focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+                    focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+                    success: 'valid',
+                    submitHandler: function () {
+                        // 获取参数
+                        var data = form2Json('materialpartForm');
+                        data['FProjectID'] = FProjectID;
+                        data['bomsid'] = id;
+                        var url = '';
+                        url = '/s/material/updatemyprojectmaterialmj'; // 调用地址
+                        $('body').mLoading('show');
+                        $.ajax({
+                            type: 'POST',
+                            contentType: 'application/json',
+                            url: url, // 调用地址
+                            data: JSON.stringify(data),
+                            async: false,
+                            success: function (data) {
+                                if (data.result == 'success') {
+                                    setTimeout(function () {
+                                        $('.mloading-text').html('正在执行...');
+                                        setTimeout(function () {
+                                            parent.reload();
+                                            parent.toastr.success('修改成功！');
+                                            layer_close();
+                                            $("body").mLoading("hide");
+                                        }, 1000);
+                                    }, 1000);
+                                } else if (data.result == 'fail') {
+                                    toastr.warning('零件号重复，请重新输入');
+                                } else if (data.result == 'error') {
+                                    toastr.error(data.error);
+                                }
+                                $("body").mLoading("hide");
+                            },
+                            error: function (e) {
+                                toastr.error(e.status);
+                                toastr.error(e.responseText);
+                                $("body").mLoading("hide");
+                            }
+                        });
+
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,669 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <!--/_only 独立样式 -->
+    <style>
+        /* 基础样式 */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .page-container {
+            min-height: 100%;
+            position: relative;
+            padding-bottom: 80px; /* 为固定按钮预留空间 */
+            box-sizing: border-box;
+        }
+        /* 分组容器样式 */
+        .form-group-box {
+            border: 1px solid #e6e6e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            position: relative;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        /* 序号标签样式 */
+        .group-number {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            background-color: #1E9FFF;
+            color: #fff;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        /* 操作按钮组 */
+        .group-actions {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+        /* 输入框间距优化 */
+        .formControls {
+            margin-bottom: 0 !important;
+        }
+        /* 动态添加删除按钮样式 */
+        .btn-group-sm {
+            display: flex;
+            gap: 5px;
+        }
+        /* 按钮区域基础样式 */
+        .btn-area {
+            padding: 15px 0;
+            border-top: 1px solid #e6e6e6;
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: #fff;
+            z-index: 99;
+        }
+        /* 固定按钮样式 */
+        .btn-area.fixed {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            background-color: #fff;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+        /* 跟随按钮样式 */
+        .btn-area.follow {
+            position: relative;
+            margin-top: 20px;
+        }
+        /* 验证错误提示样式 */
+        label.error-message {
+            position: absolute;
+            right: 18px;
+            top: 5px;
+            color: #ef392b;
+            font-size: 12px;
+            z-index: 1;
+            padding-right: 15px;
+        }
+
+        /* 特定字段的自定义样式 */
+        label.custom-error {
+            position: absolute;
+            right: 18px;
+            top: 3px;
+            color: #ef392b;
+            font-size: 12px;
+            z-index: 1;
+            padding-right: 15px;
+        }
+    </style>
+</head>
+<body>
+<article class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="xnxqForm">
+        <!-- 表单分组容器 -->
+        <div id="formGroupsContainer">
+            <!-- 初始分组会通过JS动态生成 -->
+        </div>
+
+        <!-- 提交/取消按钮区域 -->
+        <div class="btn-area fixed" id="btnArea">
+            <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+            <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                   onclick="layer_close()"/>
+            <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+        </div>
+    </form>
+
+    <!-- 空模板容器（仅占位，无实际作用） -->
+    <div id="formGroupTemplate" style="display: none;"></div>
+</article>
+
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+
+<script type="text/javascript">
+    // 编辑框状态 1新建 2修改
+    var op = getQueryStringByName('op');
+    var fmajorid = getQueryStringByName('fmajorid');
+    var FTPID = getQueryStringByName('FTPID');
+
+    // 存储所有学年学期下拉框实例（key: 分组唯一标识，value: select2实例）
+    var xnxqSelectInstances = {};
+    // 分组唯一标识计数器（避免删除后索引冲突）
+    var groupUniqueId = 0;
+
+    // 业务代码
+    $(function () {
+        // 初始化第一个分组（无删除按钮）
+        addNewFormGroup(true);
+
+        // 初始化按钮位置检测
+        checkBtnPosition();
+        $(window).resize(checkBtnPosition);
+        $(window).scroll(checkBtnPosition);
+
+        // 初始化表单验证
+        initFormValidation();
+
+        // 添加课程按钮事件
+        $(document).on('click', '.add-group', function () {
+            // 直接创建新分组（不影响已有内容）
+            addNewFormGroup(false);
+            // 仅为新增分组添加验证规则
+            addValidationRuleForLastGroup();
+            // 检测按钮位置
+            checkBtnPosition();
+        });
+
+        // 删除课程按钮事件
+        $(document).on('click', '.delete-group', function () {
+            var $group = $(this).closest('.form-group-box');
+            // 获取分组唯一标识（非索引，避免冲突）
+            var groupId = $group.data('group-id');
+            var groupIndex = $group.data('group-index');
+
+            // 1. 保存剩余分组的所有输入值（防止意外丢失）
+            var remainValues = saveRemainGroupValues(groupId);
+
+            // 2. 销毁对应的select2实例（仅销毁，不修改DOM）
+            if (xnxqSelectInstances[groupId]) {
+                xnxqSelectInstances[groupId].select2('destroy');
+                delete xnxqSelectInstances[groupId];
+            }
+
+            // 3. 删除课程容器（仅移除当前分组，不修改其他分组）
+            $group.fadeOut(300, function () {
+                $(this).remove();
+                // 4. 仅更新视觉序号（不修改任何分组的ID/Name/索引）
+                updateGroupVisualNumbers();
+                // 5. 仅移除删除课程的验证规则（不重建全量规则）
+                removeValidationRuleForGroup(groupIndex);
+                // 6. 恢复剩余分组的输入值（双重保险）
+                restoreRemainGroupValues(remainValues);
+                // 7. 检测按钮位置
+                checkBtnPosition();
+            });
+        });
+
+        // 学时输入框值变化事件 - 实时计算总学时
+        $(document).on('input', '.study-hours-input', function() {
+            // 防抖处理，避免频繁计算
+            clearTimeout($(this).data('calcTimer'));
+            var $this = $(this);
+            $(this).data('calcTimer', setTimeout(function() {
+                calculateTotalHours($this.closest('.form-group-box'));
+            }, 300));
+        });
+
+        // 表单提交事件
+        $('#xnxqForm').on('submit', function(e) {
+            e.preventDefault();
+            if ($(this).valid()) {
+                submitFormData();
+            }
+        });
+    });
+
+    /**
+     * 计算总学时（周学时 + 理论学时 + 实践学时）
+     * @param {jQuery} $group - 分组容器
+     */
+    function calculateTotalHours($group) {
+        try {
+            var groupId = $group.data('group-id');
+
+            // 获取各学时值，转换为数字（空值或非数字视为0）
+            // var weeklyHours = parseInt($('#FWeeklyStudyHours_' + groupId).val()) || 0;
+            var theoreticalHours = parseInt($('#FTheoreticalStudyHours_' + groupId).val()) || 0;
+            var practicalHours = parseInt($('#FPracticalStudyHours_' + groupId).val()) || 0;
+
+            // 计算总和
+            // var totalHours = weeklyHours + theoreticalHours + practicalHours;
+            var totalHours = theoreticalHours + practicalHours;
+
+            // 设置总学时输入框值
+            $('#FTotalHours_' + groupId).val(totalHours);
+
+            // 触发验证（更新验证状态）
+            $('#FTotalHours_' + groupId).valid();
+        } catch (e) {
+            console.error('计算总学时出错:', e);
+        }
+    }
+
+    /**
+     * 创建新分组（完全隔离已有分组，不修改任何已有DOM/属性）
+     * @param {boolean} isInitial - 是否是初始分组（无删除按钮）
+     */
+    function addNewFormGroup(isInitial = false) {
+        // 生成唯一标识（永久不变，避免删除后冲突）
+        var currentGroupId = groupUniqueId++;
+        // 视觉序号（仅用于显示，与实际索引无关）
+        var visualNumber = $('.form-group-box').length + 1;
+
+        // 构建删除按钮（条件判断）
+        var deleteBtnHtml = '';
+        if (!isInitial) {
+            deleteBtnHtml = '<button type="button" class="btn btn-danger btn-xs delete-group" title="删除课程">' +
+                '<i class="Hui-iconfont">&#xe6e2;</i> 删除</button>';
+        }
+
+        // 拼接分组HTML（使用唯一标识，永不修改）
+        // 为学时输入框添加统一类名study-hours-input，方便事件绑定
+        var groupHtml =
+            '<div class="form-group-box" data-group-id="' + currentGroupId + '" data-group-index="' + currentGroupId + '">' +
+            // 视觉序号标签（仅显示，无实际作用）
+            '<div class="group-number">' + visualNumber + '</div>' +
+            // 操作按钮
+            '<div class="group-actions">' +
+            '<div class="btn-group-sm">' +
+            '<button type="button" class="btn btn-primary btn-xs add-group" title="添加课程">' +
+            '<i class="Hui-iconfont">&#xe600;</i> 添加' +
+            '</button>' +
+            deleteBtnHtml +
+            '</div>' +
+            '</div>' +
+            // 第一行表单（ID/Name使用唯一标识，永久不变）
+            '<div class="row cl">' +
+            '<label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>课程名称：</label>' +
+            '<div class="formControls col-xs-2 col-sm-2">' +
+            '<input type="text" class="input-text required" name="person_' + currentGroupId + '[FName]" id="FName_' + currentGroupId + '"/>' +
+            '</div>' +
+            '<label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>学分：</label>' +
+            '<div class="formControls col-xs-2 col-sm-2">' +
+            '<input type="text" class="input-text required" name="person_' + currentGroupId + '[FXF]" id="FXF_' + currentGroupId + '"' +
+            'onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,\'\')}else{this.value=this.value.replace(/[^0-9.]/g,\'\').replace(/(\\..*)\\./g, \'$1\').replace(/^(\\d*\\.\\d{0,2}).*$/, \'$1\').replace(/^\\./, \'\')}"' +
+            'onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,\'\')}else{this.value=this.value.replace(/[^0-9.]/g,\'\').replace(/(\\..*)\\./g, \'$1\').replace(/^(\\d*\\.\\d{0,2}).*$/, \'$1\').replace(/^\\./, \'\')}"/>' +
+            '</div>' +
+            '<label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>学年学期：</label>' +
+            '<div class="formControls col-xs-2 col-sm-2">' +
+            '<select name="person_' + currentGroupId + '[FXNXQ][]" id="FXNXQ_' + currentGroupId + '" class="required" multiple="multiple" style="width: 100%"></select>' +
+            '</div>' +
+            '</div>' +
+            // 第二行表单（ID/Name使用唯一标识，永久不变）
+            '<div class="row cl mt-10">' +
+            '<label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>周学时：</label>' +
+            '<div class="formControls col-xs-2 col-sm-2">' +
+            '<input type="text" class="input-text required study-hours-input" name="person_' + currentGroupId + '[FWeeklyStudyHours]" id="FWeeklyStudyHours_' + currentGroupId + '"' +
+            'onkeyup="this.value=this.value.replace(/[^0-9]/g,\'\')" value="0" onafterpaste="this.value=this.value.replace(/[^0-9]/g,\'\')"/>' +
+            '</div>' +
+            '<label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>理论学时：</label>' +
+            '<div class="formControls col-xs-2 col-sm-2">' +
+            '<input type="text" class="input-text required study-hours-input" name="person_' + currentGroupId + '[FTheoreticalStudyHours]" id="FTheoreticalStudyHours_' + currentGroupId + '"' +
+            'onkeyup="this.value=this.value.replace(/[^0-9]/g,\'\')" value="0" onafterpaste="this.value=this.value.replace(/[^0-9]/g,\'\')"/>' +
+            '</div>' +
+            '<label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>实践学时：</label>' +
+            '<div class="formControls col-xs-2 col-sm-2">' +
+            '<input type="text" class="input-text required study-hours-input" name="person_' + currentGroupId + '[FPracticalStudyHours]" id="FPracticalStudyHours_' + currentGroupId + '"' +
+            'onkeyup="this.value=this.value.replace(/[^0-9]/g,\'\')" value="0" onafterpaste="this.value=this.value.replace(/[^0-9]/g,\'\')"/>' +
+            '</div>' +
+            '<label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>总学时：</label>' +
+            '<div class="formControls col-xs-2 col-sm-2">' +
+            '<input type="text" class="input-text required" value="0" name="person_' + currentGroupId + '[FTotalHours]" id="FTotalHours_' + currentGroupId + '" readonly style="background-color: #f8f9fa;" />' +
+            '</div>' +
+            '</div>' +
+            '</div>';
+
+        // 创建新分组DOM并添加到容器（仅追加，不修改任何已有内容）
+        var $newGroup = $(groupHtml);
+        $('#formGroupsContainer').append($newGroup);
+
+        // 初始化学年学期下拉框（绑定到唯一标识）
+        initXnxqSelect(currentGroupId);
+
+        // 非初始分组聚焦到课程名称输入框
+        if (!isInitial) {
+            $('#FName_' + currentGroupId).focus();
+        }
+    }
+
+    /**
+     * 保存剩余分组的输入值（删除课程前调用）
+     * @param {number} deleteGroupId - 要删除的分组ID
+     * @returns {object} 剩余分组的输入值（key: 控件ID，value: 控件值）
+     */
+    function saveRemainGroupValues(deleteGroupId) {
+        var values = {};
+        // 遍历所有分组（排除要删除的分组）
+        $('.form-group-box').each(function() {
+            var groupId = $(this).data('group-id');
+            if (groupId === deleteGroupId) return;
+
+            // 保存输入框值
+            $(this).find('input[type="text"]').each(function() {
+                values[$(this).attr('id')] = $(this).val();
+            });
+            // 保存select2选中值
+            var selectId = 'FXNXQ_' + groupId;
+            if (xnxqSelectInstances[groupId]) {
+                values[selectId + '_values'] = xnxqSelectInstances[groupId].select2('val');
+            }
+        });
+        return values;
+    }
+
+    /**
+     * 恢复剩余分组的输入值（删除课程后调用）
+     * @param {object} values - 保存的输入值
+     */
+    function restoreRemainGroupValues(values) {
+        // 恢复输入框值
+        for (var id in values) {
+            if (id.includes('_values')) continue;
+            if ($('#' + id).length) {
+                $('#' + id).val(values[id]);
+                // 如果是学时输入框，恢复值后重新计算总学时
+                if ($('#' + id).hasClass('study-hours-input')) {
+                    calculateTotalHours($('#' + id).closest('.form-group-box'));
+                }
+            }
+        }
+        // 恢复select2选中值
+        for (var id in values) {
+            if (id.includes('_values')) {
+                var groupId = id.replace('FXNXQ_', '').replace('_values', '');
+                var selectId = 'FXNXQ_' + groupId;
+                if (xnxqSelectInstances[groupId] && $('#' + selectId).length) {
+                    xnxqSelectInstances[groupId].val(values[id]).trigger('change');
+                }
+            }
+        }
+    }
+
+    // 初始化表单验证规则（全量，仅首次/新增时调用）
+    function initFormValidation() {
+        // 先销毁已存在的验证实例（仅首次初始化需要）
+        if ($.data($('#xnxqForm')[0], 'validator')) {
+            $('#xnxqForm').validate().destroy();
+        }
+
+        // 动态构建验证规则
+        var validationRules = {};
+        var validationMessages = {};
+
+        // 遍历所有分组，为每个必填字段添加验证规则
+        $('.form-group-box').each(function() {
+            var groupId = $(this).data('group-id');
+            buildValidationRules(groupId, validationRules, validationMessages);
+        });
+
+        // 初始化验证
+        $('#xnxqForm').validate({
+            rules: validationRules,
+            messages: validationMessages,
+            onfocusout: function(element) {
+                $(element).valid();
+            },
+            onkeyup: false,
+            focusInvalid: true,
+            focusCleanup: true,
+            errorElement: "label",
+            errorClass: "error",
+            errorPlacement: function(error, element) {
+                var isFXNXQ = element.attr('name') && element.attr('name').includes('[FXNXQ][]');
+                if (isFXNXQ) {
+                    error.addClass("custom-error");
+                } else if (element.is('select')) {
+                    error.insertAfter(element.parent());
+                }
+                error.insertAfter(element);
+            },
+            success: function(label) {
+                if (label.attr('for') && label.attr('for').includes('FXNXQ')) {
+                    $(`#${label.attr('for')}`).next('.select2-container').removeClass('custom-error');
+                }
+                label.remove();
+            }
+        });
+    }
+
+    /**
+     * 为单个分组构建验证规则
+     * @param {number} groupId - 分组唯一标识
+     * @param {object} rules - 规则对象（引用传递）
+     * @param {object} messages - 提示信息对象（引用传递）
+     */
+    function buildValidationRules(groupId, rules, messages) {
+        // 课程名称
+        rules['person_' + groupId + '[FName]'] = { required: true };
+        messages['person_' + groupId + '[FName]'] = { required: '*请输入课程名称' };
+
+        // 学分
+        rules['person_' + groupId + '[FXF]'] = { required: true, number: true, min: 0.01 };
+        messages['person_' + groupId + '[FXF]'] = {
+            required: '*请输入学分',
+            number: '*学分必须为数字',
+            min: '*学分不能小于0.01'
+        };
+
+        // 学年学期
+        rules['person_' + groupId + '[FXNXQ][]'] = { required: true };
+        messages['person_' + groupId + '[FXNXQ][]'] = { required: '*请选择学年学期' };
+
+        // 周学时
+        rules['person_' + groupId + '[FWeeklyStudyHours]'] = { required: true, digits: true, min: 0 };
+        messages['person_' + groupId + '[FWeeklyStudyHours]'] = {
+            required: '*请输入周学时',
+            digits: '*周学时必须为整数',
+            min: '*周学时不能小于0'
+        };
+
+        // 理论学时
+        rules['person_' + groupId + '[FTheoreticalStudyHours]'] = { required: true, digits: true, min: 0 };
+        messages['person_' + groupId + '[FTheoreticalStudyHours]'] = {
+            required: '*请输入理论学时',
+            digits: '*理论学时必须为整数',
+            min: '*理论学时不能小于0'
+        };
+
+        // 实践学时
+        rules['person_' + groupId + '[FPracticalStudyHours]'] = { required: true, digits: true, min: 0 };
+        messages['person_' + groupId + '[FPracticalStudyHours]'] = {
+            required: '*请输入实践学时',
+            digits: '*实践学时必须为整数',
+            min: '*实践学时不能小于0'
+        };
+
+        // 总学时 - 最小值改为0
+        rules['person_' + groupId + '[FTotalHours]'] = { required: true, digits: true, min: 0 };
+        messages['person_' + groupId + '[FTotalHours]'] = {
+            required: '*请输入总学时',
+            digits: '*总学时必须为整数',
+            min: '*总学时不能小于0'
+        };
+    }
+
+    /**
+     * 仅为最后一个新增分组添加验证规则（优化性能）
+     */
+    function addValidationRuleForLastGroup() {
+        var validator = $('#xnxqForm').validate();
+        // 获取最后一个分组的唯一标识
+        var lastGroupId = $('.form-group-box').last().data('group-id');
+
+        // 构建单个分组的验证规则
+        var rules = {};
+        var messages = {};
+        buildValidationRules(lastGroupId, rules, messages);
+
+        // 为新增字段添加规则（不修改已有规则）
+        for (var name in rules) {
+            validator.settings.rules[name] = rules[name];
+            validator.settings.messages[name] = messages[name];
+        }
+    }
+
+    /**
+     * 仅移除删除课程的验证规则（不重建全量规则）
+     * @param {number} deleteGroupId - 要删除的分组ID
+     */
+    function removeValidationRuleForGroup(deleteGroupId) {
+        var validator = $('#xnxqForm').validate();
+        // 构建要删除的规则名称列表
+        var removeRuleNames = [
+            'person_' + deleteGroupId + '[FName]',
+            'person_' + deleteGroupId + '[FXF]',
+            'person_' + deleteGroupId + '[FXNXQ][]',
+            'person_' + deleteGroupId + '[FWeeklyStudyHours]',
+            'person_' + deleteGroupId + '[FTheoreticalStudyHours]',
+            'person_' + deleteGroupId + '[FPracticalStudyHours]',
+            'person_' + deleteGroupId + '[FTotalHours]'
+        ];
+        // 移除对应规则（不影响其他分组）
+        removeRuleNames.forEach(function(name) {
+            delete validator.settings.rules[name];
+            delete validator.settings.messages[name];
+        });
+    }
+
+    // 表单提交逻辑
+    function submitFormData() {
+        // 收集所有分组数据
+        var allData = []; // 改为数组存储
+
+        $('.form-group-box').each(function() {
+            var groupId = $(this).data('group-id');
+            // 构建单条数据对象
+            var groupData = {
+                FName: $('#FName_' + groupId).val(),
+                FXF: $('#FXF_' + groupId).val(),
+                FWeeklyStudyHours: $('#FWeeklyStudyHours_' + groupId).val(),
+                FTheoreticalStudyHours: $('#FTheoreticalStudyHours_' + groupId).val(),
+                FPracticalStudyHours: $('#FPracticalStudyHours_' + groupId).val(),
+                FTotalHours: $('#FTotalHours_' + groupId).val(),
+                FXNXQ: [] // 整合学年学期数据到当前项
+            };
+
+            // 获取学年学期选中值并赋值
+            if (xnxqSelectInstances[groupId]) {
+                groupData.FXNXQ = xnxqSelectInstances[groupId].select2('val') || [];
+            }
+
+            // 将单条数据推入数组
+            allData.push(groupData);
+        });
+
+        var submitData = {
+            formData: allData, // 数组形式的表单数据
+            fmajorid: fmajorid,
+            FTPID: FTPID
+        };
+        console.log(submitData);
+        // 提交数据（根据实际业务打开）
+
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/trainingprogramcoursest/addxnxqxf',
+            data: JSON.stringify(submitData),
+            success: function (data) {
+                if (data.result == 'success') {
+                    top.coursest.$('#mainTable').DataTable().ajax.reload(null, false);
+                    top.coursest.toastr.success('操作成功！');
+                    layer_close();
+                } else if (data.result == 'error') {
+                    toastr.error(data.error);
+                }
+            },
+            error: function (e) {
+                toastr.error(e.status || '提交失败');
+            }
+        });
+
+    }
+
+    // 检测按钮位置并动态调整
+    function checkBtnPosition() {
+        var $btnArea = $('#btnArea');
+        var $formContainer = $('#formGroupsContainer');
+        var windowHeight = $(window).height();
+        var formTotalHeight = $formContainer.outerHeight() + $btnArea.outerHeight() + 20;
+
+        var formBottom = $formContainer.offset().top + $formContainer.outerHeight() + 20;
+        var windowBottom = $(window).scrollTop() + windowHeight;
+
+        if (formTotalHeight > windowHeight || formBottom > windowBottom - $btnArea.outerHeight()) {
+            $btnArea.removeClass('fixed').addClass('follow');
+            $('.page-container').css('padding-bottom', '0');
+        } else {
+            $btnArea.removeClass('follow').addClass('fixed');
+            $('.page-container').css('padding-bottom', '80px');
+        }
+    }
+
+    // 初始化学年学期下拉框（绑定到分组唯一标识）
+    function initXnxqSelect(groupId) {
+        var $select = $('#FXNXQ_' + groupId);
+        xnxqSelectInstances[groupId] = $select.select2({
+            placeholder: '请选择学年学期',
+            ajax: {
+                type: 'POST',
+                url: "/s/trainingprogramcourse/queryDataxnxqSelectsql",
+                dataType: 'json',
+                data: function (params) {
+                    return { search: params.term };
+                },
+                processResults: function (data) {
+                    return { results: data.list || [] };
+                },
+                delay: 800,
+                cache: true
+            },
+            language: "zh-CN",
+            minimumInputLength: 0,
+            allowClear: true
+        });
+    }
+
+    // 仅更新分组的视觉序号（不修改任何属性/ID/索引）
+    function updateGroupVisualNumbers() {
+        $('.form-group-box').each(function(index) {
+            // 仅修改显示的序号，不修改任何DOM属性
+            $(this).find('.group-number').text(index + 1);
+        });
+    }
+
+    // // 工具函数：获取URL参数
+    // function getQueryStringByName(name) {
+    //     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+    //     var r = window.location.search.substr(1).match(reg);
+    //     if (r != null) return unescape(r[2]);
+    //     return '';
+    // }
+
+    // 工具函数：表单转JSON
+    function form2Json(formId) {
+        var json = {};
+        $('#' + formId).serializeArray().forEach(function(item) {
+            json[item.name] = item.value;
+        });
+        return json;
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+        <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+        <!--_only 独立样式 -->
+        <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+        <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+        <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+        <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+        <!--/_only 独立样式 -->
+    </head>
+    <body>
+        <article class="page-container">
+            <form action="" method="post" class="form form-horizontal">
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >名称：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <label class="form-label" id="FName" style="width: 100%;text-align: left;"></label>
+                    </div>
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" ><span id="spanfno">编号：</span></label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <label class="form-label" id="FNo" style="width: 100%;text-align: left;"></label>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >标/非标：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <label class="form-label" id="FType" style="width: 100%;text-align: left;"></label>
+                    </div>
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >单位：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <label class="form-label" id="FUnitID" style="width: 100%;text-align: left;"></label>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >标准件类型：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <label class="form-label" id="FSPTypeID" style="width: 100%;text-align: left;"></label>
+                    </div>
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >制件类型：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <label class="form-label" id="FMType" style="width: 100%;text-align: left;"></label>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"> 工序号：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <label name="FPurNo" class=""  style="width: 100%;text-align: left;" id="FPurNo"></label>
+                    </div>
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;"> 工序名称：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <label name="FPurName" class="" style="width: 100%;text-align: left;" id="FPurName"></label>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >型号：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <label class="form-label" id="FModel" style="width: 100%;text-align: left;"></label>
+                    </div>
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >规格：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <label class="form-label" id="FSpecs" style="width: 100%;text-align: left;"></label>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >尺寸：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <label class="form-label" id="FSize" style="width: 100%;text-align: left;"></label>
+                    </div>
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >材料：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <label class="form-label" id="FTexture" style="width: 100%;text-align: left;"></label>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >外观：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <label class="form-label" id="FOutside" style="width: 100%;text-align: left;"></label>
+                    </div>
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >是否安全预警：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <label class="form-label" id="FISSafeDB" style="width: 100%;text-align: left;"></label>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >安全库存下限：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <label class="form-label" id="FSafeDB_Min" style="width: 100%;text-align: left;"></label>
+                    </div>
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >安全库存上限：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <label class="form-label" id="FSafeDB_Max" style="width: 100%;text-align: left;"></label>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >来源：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <label class="form-label" id="FFrom" style="width: 100%;text-align: left;"></label>
+                    </div>
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >模具类型：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+                        <label class="form-label" id="FMMType" style="width: 100%;text-align: left;"></label>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >备注：</label>
+                    <div class="formControls col-xs-3 col-sm-10">
+                        <label class="form-label" id="FNote" style="width: 100%;text-align: left;"></label>
+                    </div>
+                </div>
+
+            </form>
+        </article>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+        <script src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+        <script type="text/javascript">
+            var id = getQueryStringByName('id');//物料ID
+            // 业务代码
+            $(function () {
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    url: '/s/material/querymaterialInfo', // 调用地址
+                    data: JSON.stringify({
+                        id: id
+                    }),
+                    async: false,
+                    success: function (data) {
+                        if(data.info.FMType == 4){
+                            $("#spanfno").text("制号：");
+                        }else{
+                            $("#spanfno").text("编号：");
+                        }
+                        $("#FType").text(data.info.FType);
+                        $("#FName").text(data.info.FName);
+                        $("#FNo").text(data.info.FNo);
+                        $("#FUnitID").text(data.info.FUnitName);
+                        $("#FSPTypeID").text(data.info.FSPTypeName);
+                        $("#FModel").text(data.info.FModel);
+                        $("#FSpecs").text(data.info.FSpecs);
+                        $("#FSize").text(data.info.FSize);
+                        $("#FTexture").text(data.info.FTexture);
+                        $("#FOutside").text(data.info.FOutside);
+                        $("#FISSafeDB").text(data.info.FISSafeDBName);
+                        $("#FSafeDB_Min").text(data.info.FSafeDB_Min);
+                        $("#FSafeDB_Max").text(data.info.FSafeDB_Max);
+                        $("#FNote").text(data.info.FNote);
+                        $("#FMType").text(data.info.FMTypeName);
+                        $("#FFrom").text(data.info.FFromName);
+
+                        $("#FPurNo").text(data.info.FPurNoName);
+                        $("#FPurName").text(data.info.FPurNameName);
+                        $("#FMMType").text(data.info.FMMTypeName);
+
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+			});
+
+        </script>
+    </body>
+</html>

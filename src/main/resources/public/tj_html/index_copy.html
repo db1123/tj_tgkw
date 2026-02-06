@@ -1,0 +1,690 @@
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>天工开智 - 科技成果转化智能决策中枢</title>
+<!-- <script src="https://cdn.tailwindcss.com"></script> -->
+<!-- <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script> -->
+
+  <script src="js/3.4.16"></script>
+  <script src="js/iconify.min.js"></script>
+  <script src="js/echarts.min.js"></script>
+  <link href="fonts/font-awesome.min.css" rel="stylesheet">
+  <script>
+        // Tailwind 自定义配置
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // 对应5个中枢的主色调
+                        zhiheng: '#1e5799',    // 智衡-蓝
+                        ceyun: '#b71c1c',      // 策韵-红
+                        nishu: '#00695c',      // 拟术-绿
+                        shibu: '#1a237e',      // 市卜-深蓝
+                        hexu: '#e65100',       // 合序-橙
+                        dark: '#0a0e27',       // 背景深色
+                    },
+                    fontFamily: {
+                        sans: ['Microsoft YaHei', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            }
+            .card-gradient {
+                background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.8) 100%);
+            }
+            .bg-glass {
+                backdrop-filter: blur(8px);
+                background-color: rgba(10, 14, 39, 0.7);
+            }
+            .hover-scale {
+                transition: transform 0.3s ease;
+            }
+            .hover-scale:hover {
+                transform: scale(1.02);
+            }
+        }
+    </style>
+  <style>
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    @keyframes pulse-soft {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.8;
+        transform: scale(0.98);
+      }
+    }
+
+    .animate-pulse-soft {
+      animation: pulse-soft 3s infinite ease-in-out;
+    }
+
+    .carousel-container {
+      scroll-behavior: smooth;
+    }
+
+    .carousel-container::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+  <style>
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .hub-card {
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hub-card:hover {
+      flex-grow: 1.5;
+    }
+
+    @keyframes pulse-slow {
+
+      0%,
+      100% {
+        opacity: 0.6;
+      }
+
+      50% {
+        opacity: 1;
+      }
+    }
+
+    .animate-pulse-slow {
+      animation: pulse-slow 3s infinite;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-900 text-slate-100 font-sans hide-scrollbar overflow-x-hidden">
+  <!-- 顶部导航栏 -->
+  <nav class="fixed top-0 w-full z-50 bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50 px-6 py-3 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <!-- 
+      <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-emerald-400 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
+        <span class="iconify text-white text-2xl" data-icon="ri:instance-fill"></span>
+      </div> -->
+      <img  src="img/tjulogo.png" width="50px;" height="50px;">
+      
+      <div>
+        <h1 class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">天工开智</h1>
+        <p class="text-[12px] text-slate-500 uppercase tracking-widest leading-none">5大智能中枢·18类核心模型·一站式产业链科技成果转化</p>
+      </div>
+    </div>
+    <div class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-400">
+      <a class="text-blue-400 border-b-2 border-blue-400 pb-1" href="#">项目工作台</a>
+      <a class="hover:text-white transition-colors" href="#">项目检索</a>
+      <a class="hover:text-white transition-colors" href="#">产业链</a>
+      <a class="hover:text-white transition-colors" href="#">地方政策</a>
+      <a class="hover:text-white transition-colors" href="#">后台管理</a>
+    </div>
+    <div class="flex items-center space-x-4">
+      <div class="text-right hidden sm:block">
+        <p class="text-xs text-slate-400">当前日期</p>
+        <p class="text-sm font-mono text-emerald-400">2026年02月04日</p>
+      </div>
+      <button class="p-2 rounded-full bg-slate-800 border border-slate-700 hover:bg-slate-700 transition-colors relative">
+        <span class="iconify text-xl text-slate-300" data-icon="ri:notification-3-line"></span>
+        <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-slate-900"></span>
+      </button>
+      <img alt="User Avatar" class="w-9 h-9 rounded-full border border-slate-600 shadow-inner" id="img-user" src="https://modao.cc/agent-py/media/generated_images/2026-02-01/e3cce5108c444d0bba3ee657dfd2a616.jpg">
+    </div>
+  </nav>
+  <!-- 主内容区 -->
+  <main class="pt-20 px-6 pb-10 max-w-[1600px] mx-auto space-y-6">
+   
+    <!-- 成果展示滚动区 -->
+    <div class="relative group">
+      <div id="image-carousel" class="flex overflow-x-auto gap-4 snap-x snap-mandatory hide-scrollbar carousel-container">
+        <div class="flex-shrink-0 w-full md:w-1/2 lg:w-1/3 snap-center">
+          <img src="https://picsum.photos/800/400?random=1" class="w-full h-48 object-cover rounded-2xl border border-slate-700 shadow-2xl" alt="成果展示1">
+        </div>
+        <div class="flex-shrink-0 w-full md:w-1/2 lg:w-1/3 snap-center">
+          <img src="https://picsum.photos/800/400?random=2" class="w-full h-48 object-cover rounded-2xl border border-slate-700 shadow-2xl" alt="成果展示2">
+        </div>
+        <div class="flex-shrink-0 w-full md:w-1/2 lg:w-1/3 snap-center">
+          <img src="https://picsum.photos/800/400?random=3" class="w-full h-48 object-cover rounded-2xl border border-slate-700 shadow-2xl" alt="成果展示3">
+        </div>
+      </div>
+      <button onclick="document.getElementById('image-carousel').scrollBy({left: -400, behavior: 'smooth'})" class="absolute left-2 top-1/2 -translate-y-1/2 bg-slate-900/60 p-2 rounded-full border border-slate-700 text-white opacity-0 group-hover:opacity-100 transition-opacity">
+        <span class="iconify" data-icon="ri:arrow-left-s-line"></span>
+      </button>
+      <button onclick="document.getElementById('image-carousel').scrollBy({left: 400, behavior: 'smooth'})" class="absolute right-2 top-1/2 -translate-y-1/2 bg-slate-900/60 p-2 rounded-full border border-slate-700 text-white opacity-0 group-hover:opacity-100 transition-opacity">
+        <span class="iconify" data-icon="ri:arrow-right-s-line"></span>
+      </button>
+    </div>
+    
+    
+    <!-- 五大智核板块 (等宽垂直分栏) -->
+    <section class="flex flex-col lg:flex-row flex-grow w-full border-b border-white/10 lg:border-b-0">
+      <!-- 智衡 -->
+      <div class="hub-card flex-1 flex flex-col border-r border-white/10 bg-gradient-to-b from-indigo-950/40 to-black group">
+        <div class="p-6 text-center space-y-2">
+          <h2 class="text-3xl font-black group-hover:text-indigo-400 transition-colors">智衡</h2>
+          <p class="text-indigo-300 text-xs font-mono uppercase tracking-tighter">估值误差 &gt; 50%</p>
+        </div>
+        <div class="flex-grow relative flex items-center justify-center p-4">
+          <img alt="City skyline with rising financial growth charts and data visualization" class="w-full h-64 object-cover rounded-xl opacity-70 group-hover:opacity-100 transition-opacity" id="img-1" src="https://modao.cc/agent-py/media/generated_images/2026-02-02/4a4384875ffa4a8c8f71536c6b56a176.jpg">
+          <div class="absolute inset-0 bg-indigo-500/10 group-hover:bg-indigo-500/0 transition-colors"></div>
+        </div>
+        <div class="p-6 mt-auto space-y-4 bg-black/40">
+          <div class="flex items-center space-x-2 text-indigo-400">
+            <span class="iconify" data-icon="solar:chart-square-bold"></span>
+            <span class="text-sm font-bold">《 技术贴现标尺 》</span>
+          </div>
+          <button class="w-full py-3 px-4 bg-indigo-600/20 border border-indigo-500/50 rounded-lg text-sm group-hover:bg-indigo-600 transition-all">技术商业化决策力</button>
+        </div>
+      </div>
+      <!-- 策韵 -->
+      <div class="hub-card flex-1 flex flex-col border-r border-white/10 bg-gradient-to-b from-orange-950/40 to-black group">
+        <div class="p-6 text-center space-y-2">
+          <h2 class="text-3xl font-black group-hover:text-orange-400 transition-colors">策韵</h2>
+          <p class="text-orange-300 text-xs font-mono uppercase tracking-tighter">政策错配 72%</p>
+        </div>
+        <div class="flex-grow relative flex items-center justify-center p-4">
+          <img alt="Professional analyst using a high-tech magnifying glass to review legal and policy documents" class="w-full h-64 object-cover rounded-xl opacity-70 group-hover:opacity-100 transition-opacity" id="img-2" src="https://modao.cc/agent-py/media/generated_images/2026-02-02/1ef55d56a2254c1898c2e73259fd6073.jpg">
+          <div class="absolute inset-0 bg-orange-500/10 group-hover:bg-orange-500/0 transition-colors"></div>
+        </div>
+        <div class="p-6 mt-auto space-y-4 bg-black/40">
+          <div class="flex items-center space-x-2 text-orange-400">
+            <span class="iconify" data-icon="solar:document-bold"></span>
+            <span class="text-sm font-bold">《 红头解析镜 》</span>
+          </div>
+          <button class="w-full py-3 px-4 bg-orange-600/20 border border-orange-500/50 rounded-lg text-sm group-hover:bg-orange-600 transition-all">政策工具应用力</button>
+        </div>
+      </div>
+      <!-- 拟术 -->
+      <div class="hub-card flex-1 flex flex-col border-r border-white/10 bg-gradient-to-b from-emerald-950/40 to-black group">
+        <div class="p-6 text-center space-y-2">
+          <h2 class="text-3xl font-black group-hover:text-emerald-400 transition-colors">拟术</h2>
+          <p class="text-emerald-300 text-xs font-mono uppercase tracking-tighter">区域错位 60%</p>
+        </div>
+        <div class="flex-grow relative flex items-center justify-center p-4">
+          <img alt="Industrial CT scanner device revealing hidden links in an industrial supply chain" class="w-full h-64 object-cover rounded-xl opacity-70 group-hover:opacity-100 transition-opacity" id="img-3" src="https://modao.cc/agent-py/media/generated_images/2026-02-02/2bb871cb04e346bf922b497b59b7dfb5.jpg">
+          <div class="absolute inset-0 bg-emerald-500/10 group-hover:bg-emerald-500/0 transition-colors"></div>
+        </div>
+        <div class="p-6 mt-auto space-y-4 bg-black/40">
+          <div class="flex items-center space-x-2 text-emerald-400">
+            <span class="iconify" data-icon="solar:settings-bold"></span>
+            <span class="text-sm font-bold">《 产业链CT机 》</span>
+          </div>
+          <button class="w-full py-3 px-4 bg-emerald-600/20 border border-emerald-500/50 rounded-lg text-sm group-hover:bg-emerald-600 transition-all">资源协同规划力</button>
+        </div>
+      </div>
+      <!-- 市卜 -->
+      <div class="hub-card flex-1 flex flex-col border-r border-white/10 bg-gradient-to-b from-blue-950/40 to-black group">
+        <div class="p-6 text-center space-y-2">
+          <h2 class="text-3xl font-black group-hover:text-blue-400 transition-colors">市卜</h2>
+          <p class="text-blue-300 text-xs font-mono uppercase tracking-tighter">市场过时风险</p>
+        </div>
+        <div class="flex-grow relative flex items-center justify-center p-4">
+          <img alt="Glowing crystal ball displaying dynamic global market trends and demand forecasting charts" class="w-full h-64 object-cover rounded-xl opacity-70 group-hover:opacity-100 transition-opacity" id="img-4" src="https://modao.cc/agent-py/media/generated_images/2026-02-02/84defa58359d423b946f55e2aca49bc5.jpg">
+          <div class="absolute inset-0 bg-blue-500/10 group-hover:bg-blue-500/0 transition-colors"></div>
+        </div>
+        <div class="p-6 mt-auto space-y-4 bg-black/40">
+          <div class="flex items-center space-x-2 text-blue-400">
+            <span class="iconify" data-icon="solar:globus-bold"></span>
+            <span class="text-sm font-bold">《 需求预测水晶球 》</span>
+          </div>
+          <button class="w-full py-3 px-4 bg-blue-600/20 border border-blue-500/50 rounded-lg text-sm group-hover:bg-blue-600 transition-all">产业趋势分析力</button>
+        </div>
+      </div>
+      <!-- 合序 -->
+      <div class="hub-card flex-1 flex flex-col bg-gradient-to-b from-amber-950/40 to-black group">
+        <div class="p-6 text-center space-y-2">
+          <h2 class="text-3xl font-black group-hover:text-amber-400 transition-colors">合序</h2>
+          <p class="text-amber-300 text-xs font-mono uppercase tracking-tighter">利益分配僵局</p>
+        </div>
+        <div class="flex-grow relative flex items-center justify-center p-4">
+          <img alt="Golden energy threads connecting diverse stakeholders at a strategic negotiation table" class="w-full h-64 object-cover rounded-xl opacity-70 group-hover:opacity-100 transition-opacity" id="img-5" src="https://modao.cc/agent-py/media/generated_images/2026-02-02/567afc183bb444c183a7cc6655df72bd.jpg">
+          <div class="absolute inset-0 bg-amber-500/10 group-hover:bg-amber-500/0 transition-colors"></div>
+        </div>
+        <div class="p-6 mt-auto space-y-4 bg-black/40">
+          <div class="flex items-center space-x-2 text-amber-400">
+            <span class="iconify" data-icon="solar:users-group-rounded-bold"></span>
+            <span class="text-sm font-bold">《 利益动态博弈仪 》</span>
+          </div>
+          <button class="w-full py-3 px-4 bg-amber-600/20 border border-amber-500/50 rounded-lg text-sm group-hover:bg-amber-600 transition-all">多方谈判协调力</button>
+        </div>
+      </div>
+    </section>
+    
+     <!-- 核心分析模型 -->
+    <section id="models" class="py-16 px-4 bg-gradient-to-b from-dark to-blue-900/20">
+        <div class="container mx-auto">
+            <h3 class="text-2xl md:text-3xl font-bold mb-12 text-center text-shadow">核心分析模型</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- 技术价值类 -->
+                <div class="bg-glass rounded-xl p-6 border border-cyan-500/20 hover-scale">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-cyan-600/30 flex items-center justify-center mr-3">
+                            <i class="fa fa-lightbulb-o text-xl"></i>
+                        </div>
+                        <h4 class="text-xl font-bold">技术价值类</h4>
+                    </div>
+                    <ul class="space-y-2 text-gray-300">
+                        <li class="flex items-center">
+                            <i class="fa fa-check text-cyan-400 mr-2"></i>
+                            技术成熟度九宫图
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-check text-cyan-400 mr-2"></i>
+                            工程化雷达
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-check text-cyan-400 mr-2"></i>
+                            技术护城河模型
+                        </li>
+                    </ul>
+                    <button class="mt-4 w-full py-2 rounded-lg bg-cyan-600/20 hover:bg-cyan-600/40 transition-colors text-sm">
+                        查看详情 <i class="fa fa-angle-right ml-1"></i>
+                    </button>
+                </div>
+
+                <!-- 商业转化类 -->
+                <div class="bg-glass rounded-xl p-6 border border-green-500/20 hover-scale">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-green-600/30 flex items-center justify-center mr-3">
+                            <i class="fa fa-line-chart text-xl"></i>
+                        </div>
+                        <h4 class="text-xl font-bold">商业转化类</h4>
+                    </div>
+                    <ul class="space-y-2 text-gray-300">
+                        <li class="flex items-center">
+                            <i class="fa fa-check text-green-400 mr-2"></i>
+                            成果转化九宫画布
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-check text-green-400 mr-2"></i>
+                            成本-价值效益模型
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-check text-green-400 mr-2"></i>
+                            转化路径决策树
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-check text-green-400 mr-2"></i>
+                            投资潜力与退出模型
+                        </li>
+                    </ul>
+                    <button class="mt-4 w-full py-2 rounded-lg bg-green-600/20 hover:bg-green-600/40 transition-colors text-sm">
+                        查看详情 <i class="fa fa-angle-right ml-1"></i>
+                    </button>
+                </div>
+
+                <!-- 产业链位置类 -->
+                <div class="bg-glass rounded-xl p-6 border border-blue-500/20 hover-scale">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-blue-600/30 flex items-center justify-center mr-3">
+                            <i class="fa fa-sitemap text-xl"></i>
+                        </div>
+                        <h4 class="text-xl font-bold">产业链位置类</h4>
+                    </div>
+                    <ul class="space-y-2 text-gray-300">
+                        <li class="flex items-center">
+                            <i class="fa fa-check text-blue-400 mr-2"></i>
+                            产业链全景定位图
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-check text-blue-400 mr-2"></i>
+                            链上地位雷达
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-check text-blue-400 mr-2"></i>
+                            替代路径对比模型
+                        </li>
+                    </ul>
+                    <button class="mt-4 w-full py-2 rounded-lg bg-blue-600/20 hover:bg-blue-600/40 transition-colors text-sm">
+                        查看详情 <i class="fa fa-angle-right ml-1"></i>
+                    </button>
+                </div>
+
+                <!-- 战略风控类 -->
+                <div class="bg-glass rounded-xl p-6 border border-purple-500/20 hover-scale">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-purple-600/30 flex items-center justify-center mr-3">
+                            <i class="fa fa-shield text-xl"></i>
+                        </div>
+                        <h4 class="text-xl font-bold">战略风控类</h4>
+                    </div>
+                    <ul class="space-y-2 text-gray-300">
+                        <li class="flex items-center">
+                            <i class="fa fa-check text-purple-400 mr-2"></i>
+                            智能SWOT模型
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-check text-purple-400 mr-2"></i>
+                            综合风险矩阵
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-check text-purple-400 mr-2"></i>
+                            技术生命周期曲线
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-check text-purple-400 mr-2"></i>
+                            标准化与话语权模型
+                        </li>
+                    </ul>
+                    <button class="mt-4 w-full py-2 rounded-lg bg-purple-600/20 hover:bg-purple-600/40 transition-colors text-sm">
+                        查看详情 <i class="fa fa-angle-right ml-1"></i>
+                    </button>
+                </div>
+
+                <!-- 政策/环境类 -->
+                <div class="bg-glass rounded-xl p-6 border border-red-500/20 hover-scale">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-red-600/30 flex items-center justify-center mr-3">
+                            <i class="fa fa-flag text-xl"></i>
+                        </div>
+                        <h4 class="text-xl font-bold">政策/环境类</h4>
+                    </div>
+                    <ul class="space-y-2 text-gray-300">
+                        <li class="flex items-center">
+                            <i class="fa fa-check text-red-400 mr-2"></i>
+                            政策适配度矩阵
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-check text-red-400 mr-2"></i>
+                            区域产业适配模型
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-check text-red-400 mr-2"></i>
+                            示范推广价值模型
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-check text-red-400 mr-2"></i>
+                            ESG与绿色贡献模型
+                        </li>
+                    </ul>
+                    <button class="mt-4 w-full py-2 rounded-lg bg-red-600/20 hover:bg-red-600/40 transition-colors text-sm">
+                        查看详情 <i class="fa fa-angle-right ml-1"></i>
+                    </button>
+                </div>
+
+                <!-- 综合分析 -->
+                <div class="bg-glass rounded-xl p-6 border border-orange-500/20 hover-scale">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-orange-600/30 flex items-center justify-center mr-3">
+                            <i class="fa fa-cogs text-xl"></i>
+                        </div>
+                        <h4 class="text-xl font-bold">综合决策分析</h4>
+                    </div>
+                    <ul class="space-y-2 text-gray-300">
+                        <li class="flex items-center">
+                            <i class="fa fa-check text-orange-400 mr-2"></i>
+                            多维度交叉验证
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-check text-orange-400 mr-2"></i>
+                            智能决策建议生成
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-check text-orange-400 mr-2"></i>
+                            决策效果模拟推演
+                        </li>
+                    </ul>
+                    <button class="mt-4 w-full py-2 rounded-lg bg-orange-600/20 hover:bg-orange-600/40 transition-colors text-sm">
+                        开始分析 <i class="fa fa-play ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    
+    <!-- 流程展示 & 统计 -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- 转化阶段比例 (新增圆形图) -->
+      <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-6">
+        <h2 class="text-lg font-bold mb-6 flex items-center">
+          <span class="w-1.5 h-5 bg-blue-400 rounded-full mr-2"></span>
+          转化阶段比例
+        </h2>
+        <div class="h-[200px]" id="chart-stage"></div>
+      </div>
+      <!-- 成果转化流程图 -->
+      <div class="lg:col-span-1 bg-slate-800/40 border border-slate-700/50 rounded-2xl p-6">
+        <h2 class="text-lg font-bold mb-6 flex items-center">
+          <span class="w-1.5 h-5 bg-indigo-500 rounded-full mr-2"></span>
+          智能决策转化全路径
+        </h2>
+        <div class="relative py-4">
+          <!-- 流程连线 -->
+          <div class="absolute top-1/2 left-0 w-full h-0.5 bg-slate-700 -translate-y-1/2 hidden md:block"></div>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-8 relative">
+            <div class="flex flex-col items-center text-center space-y-3">
+              <div class="w-14 h-14 bg-slate-800 rounded-2xl border border-slate-600 flex items-center justify-center relative z-10 hover:border-indigo-400 transition-colors">
+                <span class="iconify text-2xl text-indigo-400" data-icon="ri:microscope-line"></span>
+              </div>
+              <div>
+                <p class="text-sm font-bold">原始浆料</p>
+                <p class="text-[10px] text-slate-500 mt-1">实验室/高校成果</p>
+              </div>
+            </div>
+            <div class="flex flex-col items-center text-center space-y-3">
+              <div class="w-14 h-14 bg-slate-800 rounded-2xl border border-slate-600 flex items-center justify-center relative z-10 hover:border-blue-400 transition-colors">
+                <span class="iconify text-2xl text-blue-400" data-icon="ri:magic-line"></span>
+              </div>
+              <div>
+                <p class="text-sm font-bold">技术评估</p>
+                <p class="text-[10px] text-slate-500 mt-1">多维度潜能挖掘</p>
+              </div>
+            </div>
+            <div class="flex flex-col items-center text-center space-y-3">
+              <div class="w-14 h-14 bg-slate-800 rounded-2xl border border-slate-600 flex items-center justify-center relative z-10 hover:border-emerald-400 transition-colors">
+                <span class="iconify text-2xl text-emerald-400" data-icon="ri:exchange-funds-line"></span>
+              </div>
+              <div>
+                <p class="text-sm font-bold">精准匹配</p>
+                <p class="text-[10px] text-slate-500 mt-1">行业龙头需求对撞</p>
+              </div>
+            </div>
+            <div class="flex flex-col items-center text-center space-y-3">
+              <div class="w-14 h-14 bg-indigo-500 rounded-2xl shadow-lg shadow-indigo-500/30 flex items-center justify-center relative z-10 animate-pulse-soft">
+                <span class="iconify text-2xl text-white" data-icon="ri:rocket-line"></span>
+              </div>
+              <div>
+                <p class="text-sm font-bold">产业落地</p>
+                <p class="text-[10px] text-slate-500 mt-1">股权/授权/作价</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 产业覆盖分布 -->
+      <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-6">
+        <h2 class="text-lg font-bold mb-6 flex items-center">
+          <span class="w-1.5 h-5 bg-amber-500 rounded-full mr-2"></span>
+          科技成果转化产业分布
+        </h2>
+        <div class="h-[200px]" id="chart-pie"></div>
+      </div>
+    </div>
+  </main>
+  <!-- 底部固定栏 -->
+  <footer class="mt-10 border-t border-slate-800 py-8 px-6 bg-slate-900/50">
+    <div class="max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+      <div class="flex items-center space-x-2 text-slate-500 text-sm">
+        <span class="iconify" data-icon="ri:shield-user-line"></span>
+        <span>© 2026 天工开智</span>
+      </div>
+      <div class="flex space-x-6 text-slate-500 text-sm">
+        <a class="hover:text-blue-400" href="#">系统帮助</a>
+        <a class="hover:text-blue-400" href="#">隐私协议</a>
+        <span class="text-slate-700">|</span>
+        <span>版本</span>
+      </div>
+    </div>
+  </footer>
+  <script>
+   
+    // 初始化饼图
+    const pieChart = echarts.init(document.getElementById('chart-pie'));
+    const pieOption = {
+      backgroundColor: 'transparent',
+      tooltip: {
+        trigger: 'item'
+      },
+      series: [{
+        name: '产业分布',
+        type: 'pie',
+        radius: ['50%', '75%'],
+        avoidLabelOverlap: false,
+        itemStyle: {
+          borderRadius: 8,
+          borderColor: '#1e293b',
+          borderWidth: 2
+        },
+        label: {
+          show: true,
+          color: '#94a3b8'
+        },
+        data: [{
+            value: 1048,
+            name: '集成电路',
+            itemStyle: {
+              color: '#3b82f6'
+            }
+          },
+          {
+            value: 735,
+            name: '航空航天',
+            itemStyle: {
+              color: '#10b981'
+            }
+          },
+          {
+            value: 580,
+            name: '生物医药',
+            itemStyle: {
+              color: '#8b5cf6'
+            }
+          },
+          {
+            value: 484,
+            name: '新材料',
+            itemStyle: {
+              color: '#f59e0b'
+            }
+          },
+          {
+            value: 300,
+            name: '量子计算',
+            itemStyle: {
+              color: '#f43f5e'
+            }
+          }
+        ]
+      }]
+    };
+    pieChart.setOption(pieOption);
+
+    // 初始化转化阶段环形图
+    const stageChart = echarts.init(document.getElementById('chart-stage'));
+    const stageOption = {
+      backgroundColor: 'transparent',
+      tooltip: {
+        trigger: 'item'
+      },
+      series: [{
+        name: '转化阶段',
+        type: 'pie',
+        radius: ['40%', '70%'],
+        avoidLabelOverlap: false,
+        itemStyle: {
+          borderRadius: 6,
+          borderColor: '#1e293b',
+          borderWidth: 2
+        },
+        label: {
+          show: false
+        },
+        data: [{
+            value: 45,
+            name: '概念验证',
+            itemStyle: {
+              color: '#3b82f6'
+            }
+          },
+          {
+            value: 25,
+            name: '中试熟化',
+            itemStyle: {
+              color: '#60a5fa'
+            }
+          },
+          {
+            value: 20,
+            name: '商业化应用',
+            itemStyle: {
+              color: '#93c5fd'
+            }
+          },
+          {
+            value: 10,
+            name: '其他',
+            itemStyle: {
+              color: '#bfdbfe'
+            }
+          }
+        ]
+      }]
+    };
+    stageChart.setOption(stageOption);
+
+    // 自动滚动逻辑
+    const carousel = document.getElementById('image-carousel');
+    let scrollDirection = 1;
+    setInterval(() => {
+      if (carousel.scrollLeft + carousel.offsetWidth >= carousel.scrollWidth) scrollDirection = -1;
+      if (carousel.scrollLeft <= 0) scrollDirection = 1;
+      carousel.scrollBy({
+        left: 300 * scrollDirection,
+        behavior: 'smooth'
+      });
+    }, 5000);
+
+    // 窗口大小适配
+    window.addEventListener('resize', () => {
+      trendChart.resize();
+      pieChart.resize();
+      stageChart.resize();
+    });
+  </script>
+
+
+</body>
+
+</html>

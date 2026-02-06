@@ -1,0 +1,705 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css"/>
+    <link rel="stylesheet" href="/plugins/daterangepicker/daterangepicker.css">
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/demo.css" type="text/css">
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/metroStyle/metroStyle.css" type="text/css">
+    <!--/_only 独立样式 -->
+</head>
+<style>
+    textarea {
+        width: 100%;
+        box-sizing: border-box;
+        resize: none; /* 禁止用户手动调整大小 */
+    }
+
+    .toolbar-bottom-line {
+        position: absolute;
+        bottom: 200px;
+        left: 50%;
+        transform: translate(-50%, 0);
+        width: 100%;
+        border-top: 1px solid #cfcfcf;
+    }
+
+    .toolbar-bottom-btn {
+        position: absolute;
+        bottom: 20%;
+        left: 50%;
+        transform: translate(-50%, 0);
+    }
+
+    /*ul.ztree {*/
+    /*    !*margin-left: 20px;*!*/
+    /*    border: 1px solid #617775;*/
+    /*    background: #f0f6e4;*/
+    /*    width: 300px;*/
+    /*    height: 130%;*/
+    /*    overflow-y: scroll;*/
+    /*    overflow-x: auto;*/
+    /*}*/
+
+    /* 自定义图标样式 */
+    .ztree li a span[class*="_ico_open"],
+    .ztree li a span[class*="_ico_close"],
+    .ztree li a span[class*="_ico_docu"] {
+        background-size: 18px 18px; /* 背景图片的大小 */
+        width: 18px;
+        height: 18px;
+    }
+
+    .ztree li a span.school-icon_ico_open,
+    .ztree li a span.school-icon_ico_close {
+        background-image: url("images/school.png") !important;
+    }
+
+    .ztree li a span.college-icon_ico_open,
+    .ztree li a span.college-icon_ico_close,
+    .ztree li a span.college-icon_ico_docu {
+        background-image: url("images/mti_hy.png") !important;
+    }
+
+    .ztree li a span.major-icon_ico_open,
+    .ztree li a span.major-icon_ico_close,
+    .ztree li a span.major-icon_ico_docu {
+        background-image: url("images/mti_qz.png") !important;
+    }
+
+    .ztree li a span.class-icon_ico_docu {
+        background-image: url("images/mti_class.png") !important;
+    }
+
+    .ztree li a span[class*="_bt"] {
+        background-size: 16px 16px; /* 调整图标大小 */
+        width: 16px;
+        height: 16px;
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 5px; /* 调整按钮与文本的间距 */
+        cursor: pointer; /* 设置鼠标指针为手型 */
+    }
+
+    /* 定义编辑按钮图标样式 */
+    .ztree li a span.studentadd-button_bt,
+    #addstudent {
+        background-image: url("images/mti_add.png") !important;
+    }
+</style>
+<body>
+<article class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="sutdentForm">
+        <div class="row cl">
+            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5"><span class="c-red">*</span>学生姓名：</label>
+            <div class="formControls col-xs-2 col-sm-2">
+                <input type="text" class="input-text" name="FName" id="FName"/>
+            </div>
+            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5"><span class="c-red">*</span>学生学号：</label>
+            <div class="formControls col-xs-2 col-sm-2">
+                <input type="text" class="input-text" name="FNo" id="FNo"/>
+            </div>
+            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5"><span class="c-red">*</span>性别：</label>
+            <div class="formControls col-xs-2 col-sm-2">
+                <select name="FSex" style="width: 100%;" id="FSex">
+                    <option value="0">男</option>
+                    <option value="1">女</option>
+                </select>
+
+            </div>
+            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5"><span class="c-red">*</span>出生日期：</label>
+            <div class="formControls col-xs-2 col-sm-2">
+                <input type="text" class="input-text" name="FBirthday" id="FBirthday" readonly="readonly"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5"><span class="c-red">*</span>身份证号：</label>
+            <div class="formControls col-xs-5 col-sm-5">
+                <input type="text" class="input-text" name="FIDNumber" id="FIDNumber"/>
+            </div>
+            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5"><span class="c-red">*</span>联系电话：</label>
+            <div class="formControls col-xs-2 col-sm-2 big">
+                <input type="text" class="input-text" name="FTel" id="FTel"/>
+            </div>
+            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5"><span class="c-red">*</span>电子邮箱：</label>
+            <div class="formControls col-xs-2 col-sm-2 big">
+                <input type="text" class="input-text" name="FEmail" id="FEmail"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5"><span class="c-red">*</span>入学时间：</label>
+            <div class="formControls col-xs-2 col-sm-2 big">
+                <input type="text" class="input-text" name="FStartSchoolDate" id="FStartSchoolDate"
+                       readonly="readonly"/>
+            </div>
+            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5"><span class="c-red">*</span>毕业时间：</label>
+            <div class="formControls col-xs-2 col-sm-2 big">
+                <input type="text" class="input-text" name="FEndSchoolDate" id="FEndSchoolDate" readonly="readonly"/>
+            </div>
+            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">专业：</label>
+            <div class="formControls col-xs-2 col-sm-2 big">
+                <input type="text" class="input-text" name="FMajor" id="FMajor"/>
+            </div>
+            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">学历：</label>
+            <div class="formControls col-xs-2 col-sm-2 big">
+                <input type="text" class="input-text" name="FEducation" id="FEducation"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">住址：</label>
+            <div class="formControls col-xs-5 col-sm-5">
+                <input type="text" class="input-text" name="FAddr" id="FAddr"/>
+            </div>
+            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">政治面目：</label>
+            <div class="formControls col-xs-2 col-sm-2 big">
+                <input type="text" class="input-text" name="FPolitical" id="FPolitical"/>
+            </div>
+            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5"><span class="c-red">*</span>工作状态：</label>
+            <div class="formControls col-xs-2 col-sm-2 big">
+                <select name="FWorkState" style="width: 100%;" id="FWorkState">
+                    <option value="0">未工作</option>
+                    <option value="1">已工作</option>
+                </select>
+            </div>
+        </div>
+        <div class="row cl">
+<!--            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">班级：</label>-->
+<!--            <div class="formControls col-xs-5 col-sm-5 big">-->
+<!--                &lt;!&ndash;                <select name="FClassID" id="FClassID" style="width: 100%;"></select>&ndash;&gt;-->
+<!--                <input id="FClassID" class="input-text" name="FClassID" type="text" readonly value=""-->
+<!--                       onclick="showMenu();"/>-->
+<!--            </div>-->
+            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">角色：</label>
+            <div class="formControls col-xs-5 col-sm-5 big">
+                <select name="roles" multiple="multiple" style="width: 100%;" id="roles"></select>
+            </div>
+        </div>
+        <!--        <div class="row cl">-->
+        <!--            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">角色：</label>-->
+        <!--            <div class="formControls col-xs-5 col-sm-5">-->
+        <!--                <select name="roles" multiple="multiple" style="width: 100%;" id="roles"></select>-->
+        <!--            </div>-->
+
+        <!--        </div>-->
+        <div class="row cl">
+            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">奖励荣誉：</label>
+            <div class="formControls col-xs-5 col-sm-5">
+                <textarea id="FHonor" name="FHonor" rows="4" placeholder="请输入奖励荣誉..." style="box-sizing: border-box; border: solid 1px #ddd;" maxlength="400000"></textarea><br><br>
+            </div>
+            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">惩罚记录：</label>
+            <div class="formControls col-xs-5 col-sm-5">
+                <textarea id="FPunish" name="FPunish" rows="4" placeholder="请输入惩罚记录..." style="box-sizing: border-box; border: solid 1px #ddd;"
+                          maxlength="40000"></textarea><br><br>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">健康记录：</label>
+            <div class="formControls col-xs-5 col-sm-5">
+                <textarea id="FHealth" name="FHealth" rows="4" placeholder="请输入健康记录..." style="box-sizing: border-box; border: solid 1px #ddd;"
+                          maxlength="40000"></textarea><br><br>
+            </div>
+            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">备注：</label>
+            <div class="formControls col-xs-5 col-sm-5">
+                <textarea id="FNote" name="FNote" rows="4" placeholder="请输入备注..." style="box-sizing: border-box; border: solid 1px #ddd;"
+                          maxlength="40000"></textarea><br><br>
+            </div>
+        </div>
+        <!--        <div class="row cl">-->
+        <!--            <label class="form-label col-xs-1 col-sm-1 pl-5 pr-5">备注：</label>-->
+        <!--            <div class="formControls col-xs-10 col-sm-10">-->
+        <!--                <input type="text" class="input-text" name="FNote" id="FNote"/>-->
+        <!--            </div>-->
+        <!--        </div>-->
+        <div class="toolbar-bottom-line"></div>
+        <div class="toolbar-bottom-btn">
+            <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+            <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                   onclick="layer_close()"/>
+        </div>
+        <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+        <div id="menuContent" class="menuContent" style="display:none; position: absolute;">
+            <ul id="treeDemo" class="ztree" style="margin-top:0; width:400px; height: 300px;"></ul>
+        </div>
+    </form>
+</article>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/moment/moment.min.js"></script>
+<script type="text/javascript" src="/plugins/daterangepicker/daterangepicker.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script>
+    function autoResizeTextarea(textarea) {
+        textarea.style.height = 'auto'; // 重置高度
+        textarea.style.height = textarea.scrollHeight + 'px'; // 设置为内容高度
+    }
+
+    document.getElementById('FHonor').addEventListener('input', function () {
+        autoResizeTextarea(this);
+    });
+    document.getElementById('FPunish').addEventListener('input', function () {
+        autoResizeTextarea(this);
+    });
+    document.getElementById('FHealth').addEventListener('input', function () {
+        autoResizeTextarea(this);
+    });
+
+    // 初始化时调整高度
+    window.addEventListener('load', function () {
+        autoResizeTextarea(document.getElementById('FHonor'));
+        autoResizeTextarea(document.getElementById('FPunish'));
+        autoResizeTextarea(document.getElementById('FHealth'));
+    });
+</script>
+<script type="text/javascript">
+    // 编辑框状态 1新建 2修改
+    var op = getQueryStringByName('op');
+    var selectRole;
+    var fkeyid;
+    var setting;
+    var classID;
+    // 业务代码
+    $(function () {
+
+        setting = {
+            check: {
+                enable: true,
+                chkStyle: "radio",
+                radioType: "all"
+            },
+            view: {
+                dblClickExpand: false
+            },
+            data: {
+                simpleData: {
+                    enable: true
+                }
+            },
+            callback: {
+                onClick: onClick,
+                onCheck: onCheck
+            }
+        };
+        // showclasstree(1, "");
+        // 初始角色配置化
+        selectRole = $("#roles").select2({
+            placeholder: '请选择角色',
+            ajax: {
+                type: 'POST',
+                url: "/s/role/queryRoleSelect",
+                dataType: 'json',
+                data: function (params) {
+                    return {
+                        search: params.term,
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.list
+                    };
+                },
+                delay: 800,
+                cache: true
+            },
+            language: "zh-CN"
+        });
+
+        // var FClassID = $("#FClassID").select2({
+        //     placeholder: '请选择班级',
+        //     ajax: {
+        //         type: 'POST',
+        //         url: "/s/tclass/queryDatatclassSelect",
+        //         dataType: 'json',
+        //         data: function (params) {
+        //             return {
+        //                 search: params.term,
+        //             };
+        //         },
+        //         processResults: function (data) {
+        //             return {
+        //                 results: data.list
+        //             };
+        //         },
+        //         delay: 800,
+        //         cache: true
+        //     },
+        //     language: "zh-CN"
+        // });
+        // 出生日期
+        $("#sutdentForm input[name='FBirthday']").daterangepicker({
+            singleDatePicker: true, // 设置为单日历，即无区间 默认false
+            showDropdowns: true, // 当设置值为true时，允许年份和月份通过下拉框的形式选择 默认false
+            autoUpdateInput: false, // 1.当设置为false的时候,不给与默认值(当前时间) 2.选择时间时,失去鼠标焦点,不会给与默认值 默认true
+            timePicker24Hour: true, // 设置小时为24小时制 默认false
+            timePicker: false, // 可选中时分 默认false
+            locale: {
+                format: "YYYY-MM-DD",
+                separator: " - ",
+                daysOfWeek: ["日", "一", "二", "三", "四", "五", "六"],
+                monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]
+            }
+        }).on('apply.daterangepicker', function (ev, picker) {
+            $("#sutdentForm input[name='FBirthday']").val(picker.startDate.format('YYYY-MM-DD'));
+        });
+
+        // 入学时间
+
+        $("#sutdentForm input[name='FStartSchoolDate']").daterangepicker({
+            singleDatePicker: true, // 设置为单日历，即无区间 默认false
+            showDropdowns: true, // 当设置值为true时，允许年份和月份通过下拉框的形式选择 默认false
+            autoUpdateInput: false, // 1.当设置为false的时候,不给与默认值(当前时间) 2.选择时间时,失去鼠标焦点,不会给与默认值 默认true
+            timePicker24Hour: true, // 设置小时为24小时制 默认false
+            timePicker: false, // 可选中时分 默认false
+            locale: {
+                format: "YYYY-MM-DD",
+                separator: " - ",
+                daysOfWeek: ["日", "一", "二", "三", "四", "五", "六"],
+                monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]
+            }
+        }).on('apply.daterangepicker', function (ev, picker) {
+            $("#sutdentForm input[name='FStartSchoolDate']").val(picker.startDate.format('YYYY-MM-DD'));
+        });
+        // 毕业时间
+        $("#sutdentForm input[name='FEndSchoolDate']").daterangepicker({
+            singleDatePicker: true, // 设置为单日历，即无区间 默认false
+            showDropdowns: true, // 当设置值为true时，允许年份和月份通过下拉框的形式选择 默认false
+            autoUpdateInput: false, // 1.当设置为false的时候,不给与默认值(当前时间) 2.选择时间时,失去鼠标焦点,不会给与默认值 默认true
+            timePicker24Hour: true, // 设置小时为24小时制 默认false
+            timePicker: false, // 可选中时分 默认false
+            locale: {
+                format: "YYYY-MM-DD",
+                separator: " - ",
+                daysOfWeek: ["日", "一", "二", "三", "四", "五", "六"],
+                monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]
+            }
+        }).on('apply.daterangepicker', function (ev, picker) {
+            $("#sutdentForm input[name='FEndSchoolDate']").val(picker.startDate.format('YYYY-MM-DD'));
+        });
+
+        $("#sutdentForm select[name='FSex']").select2({
+            placeholder: '请选择性别',
+            language: "zh-CN"
+        });
+        $("#sutdentForm select[name='FWorkState']").select2({
+            placeholder: '请选择工作状态',
+            language: "zh-CN"
+        });
+        // 修改操作时读取表单信息
+        if (op == 2) {
+            $('body').mLoading('show');
+            setTimeout(function () {
+                var id = getQueryStringByName('id');
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    url: '/s/tstudent/querytstudentInfo', // 调用地址
+                    data: JSON.stringify({
+                        id
+                    }),
+                    async: false,
+                    success: function (data) {
+                        selectRole.empty();
+                        data.info.roles.forEach(item => {
+                            var option = new Option(item.name, item.id, true, true);
+                            selectRole.append(option);
+                        });
+
+                        $("#FName").val(data.info.FName);
+                        $("#FNo").val(data.info.FNo);
+                        $("#FSex").val(data.info.FSex).trigger('change');
+                        $("#FBirthday").val(data.info.FBirthday);
+                        $("#FIDNumber").val(data.info.FIDNumber);
+                        $("#FTel").val(data.info.FTel);
+                        $("#FEmail").val(data.info.FEmail);
+                        $("#FStartSchoolDate").val(data.info.FStartSchoolDate);
+                        $("#FEndSchoolDate").val(data.info.FEndSchoolDate);
+                        $("#FMajor").val(data.info.FMajor);
+                        $("#FEducation").val(data.info.FEducation);
+                        $("#FAddr").val(data.info.FAddr);
+                        $("#FPolitical").val(data.info.FPolitical);
+                        $("#FWorkState").val(data.info.FWorkState).trigger('change');
+                        $("#FHonor").val(data.info.FHonor);
+                        $("#FPunish").val(data.info.FPunish);
+                        $("#FHealth").val(data.info.FHealth);
+                        $("#FNote").val(data.info.FNote);
+                        $("#FGradeLevel").val(data.info.FGradeLevel);
+                        // $("#FClassName").val(data.info.FClassName);
+                        $("#FKeyID").val(data.info.key);
+                        // classID = data.info.FClassID;
+                        // showclasstree(2,classID);
+                        $("#FClassID").val(data.info.FClassName);
+                        fkeyid = data.info.key;
+                        yanzhengftel($("#FTel").val(), 2, data.info.key);
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+                $('body').mLoading('hide');
+            }, 200);
+        }
+
+        const varstrrules = {
+            FName: {required: true},
+            FNo: {required: true},
+            FSex: {required: true},
+            FBirthday: {required: true},
+            FIDNumber: {required: true, isIdCardNo: true},
+            FTel: {
+                required: true,
+                minlength: 11,
+                maxlength: 11
+            },
+            FEmail: {required: true, email: true,},
+            FStartSchoolDate: {required: true},
+            FEndSchoolDate: {required: true},
+            FGradeLevel: {required: true},
+            FClassName: {required: true},
+            FWorkState: {required: true},
+        }
+
+        const varstrmessages = {
+            FName: {required: '*请输入学生姓名'},
+            FNo: {required: '*请输入学生学号'},
+            FSex: {required: '*请选择性别'},
+            FBirthday: {required: '*请填写出生日期'},
+            FIDNumber: {required: '*请输入身份证号'},
+            FTel: {
+                required: '*请输入联系电话',
+                minlength: '*您的电话必须11个字符长度',
+                maxlength: '*您的电话必须11个字符长度'
+            },
+            FEmail: {required: '*请输入电子邮箱', email: '*请输入有效的电子邮箱'},
+            FStartSchoolDate: {required: '*请输入入学时间'},
+            FEndSchoolDate: {required: '*请输入毕业时间'},
+            FGradeLevel: {required: '*请输入年级'},
+            FClassName: {required: '*请输入班级'},
+            FWorkState: {required: '*请选择工作状态'},
+        }
+        $("#FTel").on("change", function () {
+            const FTelstr = $(this).val();
+            if (op == 1)
+                yanzhengftel(FTelstr, 1, 0);
+            else
+                yanzhengftel(FTelstr, 2, fkeyid);
+        });
+
+
+        // 检验数据
+        $('#sutdentForm').validate({
+            rules: varstrrules,
+            messages: varstrmessages,
+            onfocusout: false, // 是否在获取焦点时验证
+            onkeyup: false, // 是否在敲击键盘时验证
+            focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+            focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+            success: 'valid',
+            submitHandler: function () {
+                // console.log("classID:" + classID);
+                // 获取菜单信息
+                var roles = [];
+                selectRole.select2('data').forEach((item) => {
+                    roles.push(item.id);
+                });
+
+                // 获取参数
+                var data = form2Json('sutdentForm');
+                data['roles'] = roles;
+                data['FClassID'] = classID;
+                // 执行
+                if (op == 1) { // 添加操作
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/tstudent/addtstudent', // 调用地址
+                        data: JSON.stringify(data),
+                        async: false,
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                parent.$('#mainTable').DataTable().ajax.reload(null, false);
+                                parent.toastr.success('添加成功！');
+                                layer_close();
+                            } else if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                } else {
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/tstudent/updatetstudent', // 调用地址
+                        data: JSON.stringify(data),
+                        async: false,
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                parent.$('#mainTable').DataTable().ajax.reload(null, false);
+                                parent.toastr.success('修改成功！');
+                                layer_close();
+                            } else if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                }
+            }
+        });
+    });
+
+    function isNotEmpty(value) {
+        // 检查是否为 null 或 undefined
+        if (value == null || value === undefined) {
+            return false;
+        }
+
+        // 检查是否为空字符串或仅包含空格的字符串
+        if (typeof value === 'string' && value.trim() === '') {
+            return false;
+        }
+
+        // 其他情况，认为不为空
+        return true;
+    }
+
+    function yanzhengftel(FTelstrs, ftype, fkeyid) {
+        if (isNotEmpty(FTelstrs)) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/tstudent/getlxdh', // 调用地址
+                data: JSON.stringify({
+                    FTel: FTelstrs,
+                    ftype: ftype,
+                    fkeyid: fkeyid
+                }),
+                async: false,
+                success: function (data) {
+                    // 如果用户名存在，添加自定义验证规则
+                    $.validator.addMethod("czExists", function (value, element) {
+                        return !data.iscz;
+                    }, "*联系电话已存在");
+
+                    // 动态添加规则
+                    $("#FTel").rules("add", {
+                        czExists: true
+                    });
+
+                    // 手动触发验证
+                    // $("#sutdentForm").valid();
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        }
+    }
+
+
+    function showclasstree(ftype, id) {
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/major/quermajortreeselect', // 调用地址
+            data: JSON.stringify({
+                FSchool: FSchooltree
+            }),
+            async: false,
+            success: function (data) {
+                $.fn.zTree.init($("#treeDemo"), setting, data.zNodes);
+                if (ftype == 2) {
+                    var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+                    var nodes = zTree.getNodes(); // 获取所有节点
+                    findAndCheckNode(nodes, id); // 查找并选中 id
+                }
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+    }
+
+    // 递归查找并选中指定节点
+    function findAndCheckNode(nodes, targetId) {
+        var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+        for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i].id == targetId) {
+                zTree.checkNode(nodes[i], true, true, true); // 选中节点
+
+                return;
+            }
+            if (nodes[i].children && nodes[i].children.length > 0) {
+                findAndCheckNode(nodes[i].children, targetId); // 递归查找子节点
+            }
+        }
+    }
+
+    function onClick(e, treeId, treeNode) {
+        var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+        zTree.checkNode(treeNode, !treeNode.checked, null, true);
+        return false;
+    }
+
+    function onCheck(e, treeId, treeNode) {
+
+        var zTree = $.fn.zTree.getZTreeObj("treeDemo"),
+            nodes = zTree.getCheckedNodes(true),
+            v = "";
+        for (var i = 0, l = nodes.length; i < l; i++) {
+            v += nodes[i].name + ",";
+        }
+        if (v.length > 0) v = v.substring(0, v.length - 1);
+        var cityObj = $("#FClassID");
+        cityObj.val(v);
+        if (v.length > 0)
+            classID =nodes[0].id;
+        else
+            classID =-1;
+
+    }
+
+    function showMenu() {
+        var cityObj = $("#FClassID");
+        var cityOffset = $("#FClassID").offset();
+        $("#menuContent").css({
+            left: cityOffset.left + "px",
+            top: cityOffset.top + cityObj.outerHeight() + "px"
+        }).slideDown("fast");
+        $("body").bind("mousedown", onBodyDown);
+    }
+
+    function hideMenu() {
+        $("#menuContent").fadeOut("fast");
+        $("body").unbind("mousedown", onBodyDown);
+    }
+
+    function onBodyDown(event) {
+        if (!(event.target.id == "menuBtn" || event.target.id == "FClassID" || event.target.id == "menuContent" || $(event.target).parents("#menuContent").length > 0)) {
+            hideMenu();
+        }
+    }
+</script>
+</body>
+</html>

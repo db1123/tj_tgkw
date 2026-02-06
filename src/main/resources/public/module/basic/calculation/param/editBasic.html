@@ -1,0 +1,402 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<!--_global 公共配置文件 -->
+<script language="javascript">var golbal_type="admin";</script>
+<script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+<!--_only 独立样式 -->
+<link rel="stylesheet" href="/plugins/select2/css/select2.min.css" />
+<link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css" />
+<link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css" />
+<!--/_only 独立样式 -->
+</head>
+<body>
+<form action="" method="post" class="form form-horizontal" id="basicForm">
+  <div class="my-layer-context">
+    <div class="row cl" style="padding: 10px 20px;">
+      <div class="col-xs-12 col-sm-5">
+        <div class="row cl">
+          <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>类型：</label>
+          <div class="formControls col-xs-7 col-sm-8">
+            <select name="f_type" style="width: 100%;"><option></option></select>
+          </div>
+        </div>
+        <div class="row cl">
+          <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>参数符号：</label>
+          <div class="formControls col-xs-7 col-sm-8">
+            <input type="text" class="input-text" name="f_title" />
+          </div>
+        </div>
+        <div class="row cl">
+          <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>参数名：</label>
+          <div class="formControls col-xs-7 col-sm-8">
+            <input type="text" class="input-text" name="f_subtitle" />
+          </div>
+        </div>
+        <div class="row cl">
+          <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>值类型：</label>
+          <div class="formControls col-xs-7 col-sm-8">
+            <div class="radio-box" style="padding-right: 8px;">
+              <input type="radio" id="value-type-1" name="f_value_type" value="1" checked>
+              <label for="value-type-1">关系</label>
+            </div>
+            <div class="radio-box" style="padding-right: 8px;">
+              <input type="radio" id="value-type-2" name="f_value_type" value="2">
+              <label for="value-type-2">固定值</label>
+            </div>
+            <div class="radio-box" style="padding-right: 8px;">
+              <input type="radio" id="value-type-3" name="f_value_type" value="3">
+              <label for="value-type-3">区间</label>
+            </div>
+            <div class="radio-box" style="padding-right: 8px;">
+              <input type="radio" id="value-type-4" name="f_value_type" value="4">
+              <label for="value-type-4">输入值</label>
+            </div>
+          </div>
+        </div>
+        <div class="row cl unitDiv" style="display: none;">
+          <label class="form-label col-xs-4 col-sm-3 valueDiv" style="display: none;">值：</label>
+          <label class="form-label col-xs-4 col-sm-3 sectionValueDiv" style="display: none;">区间：</label>
+          <label class="form-label col-xs-4 col-sm-3 unitViewDiv" style="display: none;">单位：</label>
+          <div class="formControls col-xs-7 col-sm-8">
+            <div class="valueDiv" style="display: none; float: left;">
+              <input type="text" class="input-text" name="f_value" placeholder="固定值" style="width: 80px; height: 27px; margin-right: 10px;" />
+            </div>
+            <div class="sectionValueDiv" style="display: none; float: left;">
+              <input type="text" class="input-text" name="f_min_value" placeholder="最小值" style="width: 80px; height: 27px;" />
+              ~
+              <input type="text" class="input-text" name="f_max_value" placeholder="最大值" style="width: 80px; height: 27px; margin-right: 10px;" />
+            </div>
+            <div class="unitDiv" style="display: none; float: left;">
+              <select name="f_value_unit" style="width: 80px;"><option></option></select>
+            </div>
+          </div>
+        </div>
+        <div class="row cl">
+          <label class="form-label col-xs-4 col-sm-3 valueDiv">成本(万元)：</label>
+          <div class="formControls col-xs-7 col-sm-8">
+            <input type="text" class="input-text" name="f_kosten" style="width: 80px; height: 27px; margin-right: 10px;" />
+          </div>
+        </div>
+        <div class="row cl">
+          <label class="form-label col-xs-4 col-sm-3 valueDiv">重要度：</label>
+          <div class="formControls col-xs-7 col-sm-8">
+            <input type="text" class="input-text" name="f_bedeutung" style="width: 80px; height: 27px; margin-right: 10px;" />
+          </div>
+        </div>
+        <div class="row cl">
+          <label class="form-label col-xs-4 col-sm-3">图：</label>
+          <div class="formControls col-xs-7 col-sm-8">
+            <div class="avatar-view">
+              <img src="/images/bg.jpeg" id="f_img" onclick="openImg()">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-7">
+        <label class="col-xs-12 col-sm-12" style="padding-left: 0;">说明：</label>
+        <div class="col-xs-12 col-sm-12" style="padding-left: 0;">
+          <script id="f_memo" type="text/plain" style="width:100%;height:300px;"></script>
+        </div>
+      </div>
+    </div>
+  </div>
+  <input type="hidden" value="" name="f_key_id" />
+  <div class="my-layer-button">
+    <div class="toolbar-bottom-line"></div>
+    <div class="toolbar-bottom-btn">
+      <input class="btn btn-primary radius radius" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;" />
+      <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;" onclick="layer_close()" />
+    </div>
+  </div>
+</form>
+
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script type="text/javascript" src="/plugins/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" src="/plugins/ueditor/ueditor.all.min.js"> </script>
+<script type="text/javascript" src="/plugins/ueditor/lang/zh-cn/zh-cn.js"></script>
+<script type="text/javascript" src="/plugins/ueditor/kityformula-plugin/addKityFormulaDialog.js"></script>
+<script type="text/javascript" src="/plugins/ueditor/kityformula-plugin/getKfContent.js"></script>
+<script type="text/javascript" src="/plugins/ueditor/kityformula-plugin/defaultFilterFix.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript" src="/javascript/ReturnData.js"></script>
+<script type="text/javascript">
+// 编辑框状态 1新建 2修改
+var op = getQueryStringByName('op');
+// 实例化所见即所得编辑器
+var ue = UE.getEditor('f_memo');
+// 业务代码
+$(function(){
+  // 初始化类型树形下拉框
+  $.ajax({
+    type: 'POST',
+    contentType: 'application/json',
+    url: '/s/paramType/queryParamTypeALL', // 调用地址
+    async: false,
+    success: function(data) {
+      $("#basicForm select[name='f_type']").select2ztree({
+        textField : 'name',
+        titleField : 'name',
+        placeholder: '请选择类型',
+        ztree: {
+          setting: {
+            view: {
+              dblClickExpand: false
+            },
+            data: {
+              simpleData: {
+                enable: true,
+                idKey: "id",
+                pIdKey: "pId",
+                rootPId: 0
+              }
+            }
+          },
+          zNodes: data.zNodes
+        },
+        language: "zh-CN"
+      });
+    },
+    error : function(e) {
+      toastr.error(e.status);
+      toastr.error(e.responseText);
+    }
+  });
+  // 值类型改变事件
+  $("#basicForm input:radio[name='f_value_type']").change(function(){
+    var value = this.value;
+    setValueControl(parseInt(value));
+  });
+  // 初始化单位下拉列表
+  $("#basicForm select[name='f_value_unit']").select2({
+    placeholder: '单位',
+    ajax: {
+      type:'POST',
+      url: "/s/unit/queryUnitSelect",
+      dataType: 'json',
+      data: function (params) {
+        return {
+          search: params.term,
+        };
+      },
+      delay: 800,
+      cache: true
+    },
+    language: "zh-CN"
+  });
+  // 修改操作时读取表单信息(调用ueditor首次赋值由于渲染问题需要将赋值放到渲染事件内)
+  ue.ready(function() {
+    if (op == 2) {
+      var id = getQueryStringByName('id');
+      $.ajax({
+        type: 'POST',
+        contentType: 'application/json',
+        url: '/s/param/queryParamInfo', // 调用地址
+        data: JSON.stringify({
+          id
+        }),
+        async: false,
+        success: function(data) {
+          setValueControl(parseInt(data.info.f_value_type));
+          $("#basicForm select[name='f_type']").select2ztree('val', [data.info.f_type]);
+          $("#basicForm input[name='f_title']").val(data.info.f_title);
+          $("#basicForm input[name='f_subtitle']").val(data.info.f_subtitle);
+          $("#value-type-" + data.info.f_value_type).prop('checked', true);
+          $("#basicForm input[name='f_value']").val(data.info.f_value);
+          $("#basicForm input[name='f_min_value']").val(data.info.f_min_value);
+          $("#basicForm input[name='f_max_value']").val(data.info.f_max_value);
+          $("#basicForm input[name='f_kosten']").val(data.info.f_kosten);
+          $("#basicForm input[name='f_bedeutung']").val(data.info.f_bedeutung);
+          var valueUnitOption = new Option(data.info.f_value_unit, data.info.f_value_unit, true, true);
+          $("#basicForm select[name='f_value_unit']").append(valueUnitOption);
+          if (data.info.f_memo) {
+            ue.setContent(data.info.f_memo);
+          }
+          if (data.info.f_img && data.info.f_img != '') {
+            $("#f_img").attr('src', data.info.f_img);
+          }
+          $("#basicForm input[name='f_key_id']").val(data.info.key);
+        },
+        error : function(e) {
+          toastr.error(e.status);
+          toastr.error(e.responseText);
+        }
+      });
+    }
+  });
+  // 检验数据
+  $('#basicForm').validate({
+    rules: {
+      f_type: {
+        required: true
+      },
+      f_title: {
+        required: true
+      }
+    },
+    messages: {
+      f_type: {
+        required: '*请选择类型'
+      },
+      f_title: {
+        required: '*请编写标题'
+      }
+    },
+    onfocusout: false, // 是否在获取焦点时验证
+    onkeyup: false, // 是否在敲击键盘时验证
+    focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+    focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+    success: 'valid',
+    submitHandler:function(){
+      // 获取参数
+      var JsonData = form2Json('basicForm');
+      JsonData['f_classify'] = 1;
+      if ($('#f_img')[0].src.indexOf('images/bg.jpeg') < 0) {
+        JsonData['f_img'] = $('#f_img')[0].src;
+      } else {
+        JsonData['f_img'] = '';
+      }
+      JsonData['f_memo'] = ue.getContent();
+      var go = true;
+      switch (parseInt(JsonData['f_value_type'])) {
+        case 2: // 固定值
+          if (!JsonData['f_value'] || JsonData['f_value'] == '') {
+            toastr.error('请填写 参数值');
+            go = false;
+          }
+          if (!JsonData['f_value_unit'] || JsonData['f_value_unit'] == '' || JsonData['f_value_unit'] == '-1') {
+            toastr.error('请选择 单位');
+            go = false;
+          }
+          break;
+      
+        case 3: // 区间
+          if (!JsonData['f_min_value'] || JsonData['f_min_value'] == ''
+              || !JsonData['f_max_value'] || JsonData['f_max_value'] == '') {
+            toastr.error('请填写 区间值');
+            go = false;
+          }
+          if (!JsonData['f_value_unit'] || JsonData['f_value_unit'] == '' || JsonData['f_value_unit'] == '-1') {
+            toastr.error('请选择 单位');
+            go = false;
+          }
+          break;
+      
+        case 4: // 输入值
+          if (!JsonData['f_value_unit'] || JsonData['f_value_unit'] == '' || JsonData['f_value_unit'] == '-1') {
+            toastr.error('请选择 单位');
+            go = false;
+          }
+          break;
+      
+        default: // 默认全部隐藏
+          break;
+      }
+      // 执行
+      if (go) {
+        if (op == 1) { // 添加操作
+          $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/param/addParam', // 调用地址
+            data: JSON.stringify(JsonData),
+            async: false,
+            success: function(data) {
+              if (data.result == 'success') {
+                parent.$('#paramTable').DataTable().ajax.reload(null, false);
+                parent.toastr.success('添加成功！');
+                layer_close();
+              } else if (data.result == 'error') {
+                toastr.error(data.error);
+              }
+            },
+            error : function(e){
+              toastr.error(e.status);
+              toastr.error(e.responseText);
+            }
+          });
+        } else {
+          $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/param/updateParam', // 调用地址
+            data: JSON.stringify(JsonData),
+            async: false,
+            success: function(data) {
+              if (data.result == 'success') {
+                parent.$('#paramTable').DataTable().ajax.reload(null, false);
+                parent.toastr.success('修改成功！');
+                layer_close();
+              } else if (data.result == 'error') {
+                toastr.error(data.error);
+              }
+            },
+            error : function(e){
+              toastr.error(e.status);
+              toastr.error(e.responseText);
+            }
+          });
+        }
+      }
+    }
+  });
+});
+// 根据值类型修改输入框状态
+function setValueControl(valueType) {
+  switch (valueType) {
+    case 2: // 固定值
+      $('.valueDiv').show();
+      $('.sectionValueDiv').hide();
+      $('.unitViewDiv').hide();
+      $('.unitDiv').show();
+      break;
+  
+    case 3: // 区间
+      $('.valueDiv').hide();
+      $('.sectionValueDiv').show();
+      $('.unitViewDiv').hide();
+      $('.unitDiv').show();
+      break;
+  
+    case 4: // 输入值
+      $('.valueDiv').hide();
+      $('.sectionValueDiv').hide();
+      $('.unitViewDiv').show();
+      $('.unitDiv').show();
+      break;
+  
+    default: // 默认全部隐藏
+      $('.valueDiv').hide();
+      $('.sectionValueDiv').hide();
+      $('.unitViewDiv').hide();
+      $('.unitDiv').hide();
+      break;
+  }
+}
+// 打开图片编辑器
+function openImg() {
+  parent.imgViewCon = $('#f_img');
+  parent.layer.open({
+		type: 2,
+		area: ['1010px', '530px'],
+		fix: true, //不固定
+		shade: 0.4,
+		title: '图片编辑器',
+		content: '/plugins/cropper/index.html'
+	});
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,623 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+    <!--/_only 独立样式 -->
+</head>
+<body>
+<div class="page-container" style="padding: 2px;">
+    <div class="f-l text-l">
+        <button type="button" class="btn btn-default size-S my-btn" onclick="Values(1)"><i class=" fa fa-plus"></i>
+            新增课程
+        </button>
+        <button type="button" class="btn btn-default size-S my-btn" onclick="mobanIn(1)"><i
+                class="fa fa-arrow-up" aria-hidden="true"></i> 模板导入
+        </button>
+        <button type="button" class="btn btn-default size-S my-btn" onclick="mobanOut(1)"><i
+                class="fa fa-arrow-down" aria-hidden="true"></i> 下载模板
+        </button>
+
+        <button type="button" class="btn btn-default size-S my-btn" onclick="yijianfabu()"><i class="fa fa-location-arrow" aria-hidden="true"></i> 一键发布
+        </button>
+    </div>
+    <div class="f-r text-r">
+        <input type="text" class="input-text size-S form-text-FNo" style="width:200px" placeholder="课程编号">
+        <input type="text" class="input-text size-S form-text-FName" style="width:200px" placeholder="课程名称">
+        <select class="course-form-select-type" id="course-form-select-type" style="width:200px"></select>
+        <select class="course-form-select-nature" id="course-form-select-nature" style="width:200px"></select>
+
+
+        <button type="button" class="btn btn-default size-S my-btn btn-search-fun"><i class="Hui-iconfont">&#xe665;</i>
+            搜索
+        </button>
+    </div>
+    <div class="f-l" style="width: 100%; margin-top: 3px;">
+        <table id="mainTable" class="display compact" style="width: 99.8%;"></table>
+    </div>
+</div>
+
+<div id="modal-demo" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content radius">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">导入错误信息</h3>
+                <a class="close" data-dismiss="modal" aria-hidden="true" href="javascript:void();">×</a>
+            </div>
+            <div class="modal-body" id="datanr">
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+    var xmname;
+    let remarkShowLength =15;
+    // 业务代码
+    $(function () {
+        //课程类别
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/coursecategory/querycourseCategoryALL', // 调用地址
+            async: false,
+            success: function(data) {
+                var newObj2 = Object.assign([], data.zNodes);
+                newObj2.push({id: 1, pId: 0, name: '全部', showname:'全部' , open: true});
+                $('.course-form-select-type').select2ztree({
+                    textField: 'showname',
+                    titleField: 'name',
+                    placeholder: '请选择课程类别',
+                    ztree: {
+                        setting: {
+                            view: {
+                                dblClickExpand: false
+                            },
+                            data: {
+                                simpleData: {
+                                    enable: true,
+                                    idKey: "id",
+                                    pIdKey: "pId",
+                                    rootPId: 0
+                                }
+                            }
+                        },
+                        zNodes: newObj2
+                    },
+                    language: "zh-CN"
+                });
+            },
+            error : function(e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+        //课程性质
+       var natrueselect = $(".course-form-select-nature").select2({
+            placeholder: '请选择课程性质',
+            ajax: {
+                type: 'POST',
+                url: "/s/coursenature/queryDatacoursenatureSelect",
+                dataType: 'json',
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        ftype:2
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.list
+                    };
+                },
+                delay: 800,
+                cache: true
+            },
+            language: "zh-CN"
+        });
+        var option = new Option("全部", "EBCA805FCF2DB7A2835690143664B03C", true, true);
+        natrueselect.append(option);
+        natrueselect.change();
+        // 封装表格
+       var maintable = $('#mainTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/course/querycourse', // 调用地址
+                data: function (d) {
+                    return JSON.stringify($.extend({}, d, {
+                        page: d.start / d.length + 1, // 当前页
+                        results: d.length, // 每页显示条数
+                        name: $('.form-text-FName').val(),//课程名称
+                        fno: $('.form-text-FNo').val(),//课程编号
+                        ftype:$(".course-form-select-type").val(),//课程类别
+                        fnature:$(".course-form-select-nature").val(),//课程性质
+                        dataall: 1
+                    }));
+                },
+                dataSrc: function (json) {
+                    json.recordsFiltered = json.total;  // 总行数
+                    json.recordsTotal = json.page; // 当前页数
+                    return json.list;
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+            },
+           createdRow: function (row, data, dataIndex) {
+               if (data.FCon.length > remarkShowLength) {//只有超长，才有td点击事件
+                   $(row).children('td').eq(3).attr('onclick', 'javascript:changeShowRemarks(this);');
+                   $(row).children('td').eq(3).css('word-wrap', 'break-word');
+                   $(row).children('td').eq(3).css('white-space', 'normal');
+                   $(row).children('td').eq(3).css('word-break', 'break-all');
+               }
+               $(row).children('td').eq(3).attr('content', data.FCon);
+           },
+            columns: [
+                {title: '创建时间', data: 'FCDATE'},
+                {title: '课程编号', data: 'FNo', width: 100,},
+                {title: '课程名称', data: 'FName', width: 150,},
+                {title: '英文名称', data: 'FYWName', width: 150,},
+                {title: '课程描述', data: 'FCon',
+                    render: function (data, type, full, row) {
+                        if (data.length > remarkShowLength) {//只有超长，才有td点击事件
+                            return getPartialRemarksHtml(data);//显示部分信息
+                        } else {
+                            return data;
+                        }
+                    }},
+                {
+                    title: '课程类别', data: 'FType', width: 80,
+                    render: function (data, type, row) {
+                        return row.FTypeName;
+                    }
+                },
+                {
+                    title: '课程性质', data: 'FCNature', width: 50,
+                    render: function (data, type, row) {
+                        return row.FCNatureName;
+                    }
+                },
+                {
+                    title: '版本号', width: 60, class: 'open-work-control2', data: 'FEdition',
+                    render: function (data, type, row) {
+                        if (row.FState == 0) {
+                            return '<span style="color: #0f9ae0"> ' + data + '</span>';
+                        }
+                        if (row.FState == 1) {
+                            return '<span style="color: #0c912b"> ' + data + '</span>';
+                        } else {
+                            return '<span style="color: #f0ad4e"> ' + data + '</span>';
+                        }
+
+                    }
+                },
+                {
+                    title: '历史版本',
+                    data: 'key',
+                    width: 50,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        var pid = row.FParentId;
+                        if (pid == '28B9AAF7482577208C920CF36440E8C3') {
+                            // pid = 0
+                            pid = row.key;
+                        }
+
+                        return '<button type="button" class="btn  size-MINI" onclick="onClickOpenVersionList(\''+pid+'\',\''+row.FName+'\')"><i class="fas fa-bars"></i> 查看</button>';
+                    }
+                },
+                {
+                    title: '是否有效', width: 60, class: 'open-work-control2', data: 'FValid',
+                    render: function (data, type, row) {
+                        if (data == 0) {
+                            return '<span class="label label-default radius">无效</span>';
+                        } else if (data == 1) {
+                            return '<span class="label label-success radius">有效</span>';
+                        }
+                    }
+                },
+                {
+                    title: '管理课程',
+                    data: 'FState',
+                    width: 90,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<button type="button" class="btn btn-default size-MINI" onclick="oppenadminister(\'' + row.key + '\',\'' + row.FName + '\',\'' + row.FState + '\')" style="background-color:#D9D9D9; color: #0a001f" >管理课程</button> ';
+                    }
+                },
+                {
+                    title: '状态',
+                    data: 'FState',
+                    width: 35,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        // if (data == 1) {
+                        //     return '<button type="button" class="btn btn-success size-MINI" onclick="onClickcourseBtnState(\'' + row.key + '\',' + row.FState + ',\'' + row.FName + '\')"><i class="fas fa-toggle-on"></i> 启用</button>';
+                        // } else {
+                        //     return '<button type="button" class="btn btn-warning size-MINI" onclick="onClickcourseBtnState(\'' + row.key + '\',' + row.FState + ',\'' + row.FName + '\')"><i class="fas fa-toggle-off"></i> 禁用</button>';
+                        // }
+                        if (data == 1) {
+                            return '<span class="label label-default radius">编辑</span>';
+                        } else if (data == 2) {
+                            return '<span class="label label-primary radius">发布</span>';
+                        }else{
+                            return '废弃';
+                        }
+                    }
+                },
+                {
+                    title: '操作',
+                    data: 'FState',
+                    width: 140,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        var fb = '<button type="button" class="btn  size-MINI" onclick="fabu(\'' + row.key + '\',\'' + row.FName + '\')"><i class="fa fa-location-arrow" aria-hidden="true"></i>发布</button> ';
+                        var banben = '<span class="dropDown dropDown_hover">' +
+                            '<a class="dropDown_A btn btn-default size-MINI my-btn" style="line-height: 16px;"><i class=" fa fa-caret-square-o-up"></i> 版本升级</a>' +
+                            '<ul class="dropDown-menu menu radius box-shadow">' +
+                            '<li><a href="#" onclick="VersionUp(\'' + row.key + '\',2,\'' + row.FName + '\')"><i class=" fa fa-long-arrow-up"></i> 小版本</a></li>' +
+                            '<li><a href="#" onclick="VersionUp(\'' + row.key + '\',1,\'' + row.FName + '\')"><i class=" fa fa-arrow-up"></i> 大版本</a></li>' +
+                            '</ul>' +
+                            '</span>';
+                        if(row.FState == 1){
+                            return fb + '<button type="button" class="btn btn-secondary size-MINI" onclick="Values(2,\'' + row.key + '\')"><i class="fas fa-edit"></i>编辑</button> ' +
+                                '<button type="button" class="btn btn-danger size-MINI" onclick="onClickBtnDel(\'' + row.key + '\',\'' + row.FName + '\')"><i class="fas fa-trash"></i>删除</button>';
+                        }else {
+
+
+                            return banben;
+                        }
+                    }
+                }
+            ],
+            scrollY: (document.body.clientHeight - 100) + 'px',
+            scrollX: true,
+            paging: true, // 是否开启本地分页
+            pageLength: 15, // 改变初始化页长度（每页多少条数据）
+            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+            lengthChange: false, // 是否允许因子改变表格每页显示的记录数
+            searching: false, // 是否允许Datatables开启本地搜索
+            ordering: true, // 是否允许Datatables开启排序
+            info: true, // 控制是否显示表格左下角的信息
+            order: [[0, 'desc'],[1,'asc']],
+            language: DataTablesLanguage
+        });
+        maintable.column(0).visible(false);
+        // 查询按钮点击事件
+        $('.btn-search-fun').on('click', function () {
+            $('#mainTable').DataTable().ajax.reload(null, false);
+        });
+
+    });
+
+    // 版本升级 1大版本 2小版本
+    function VersionUp(id, type, name) {
+        var text = '';
+        if (type == 1) {
+            text = '<b>' + name + '</b><br />确定要进行&nbsp;<b>大版本升级</b>&nbsp;吗?';
+        } else {
+            text = '<b>' + name + '</b><br />确定要进行&nbsp;<b>小版本升级</b>&nbsp;吗?';
+        }
+        layer.confirm(text, function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/course/upVersioncourse', // 调用地址
+                data: JSON.stringify({
+                    id,
+                    type
+                }),
+                async: false,
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#mainTable').DataTable().ajax.reload(null, false);
+                        toastr.success('版本升级成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error)
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+    //发布
+    function fabu(id, name) {
+        layer.confirm('<b>' + name + '</b><br />确定要发布吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/course/fabucourse',
+                data: JSON.stringify({
+                    id: id
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#mainTable').DataTable().ajax.reload(null, false);
+                        toastr.success('发布成功！');
+                        layer.close(layer.index);
+
+                    }
+                    if(data.result == 'fail'){
+                        mobanerror2(data.courseerror);
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error);
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+
+    function oppenadminister(key, name,state) {
+        xmname = name;
+        layer_show('课程管理编辑器', '/module/capability/course/courseminister.html?id=' + key + '&showtype=' + state, '', '');
+    }
+
+    // 新增或者修改点击事件
+    function Values(op, fKey) {
+        if (op == 1) { // 新增
+            layer_show('新增课程信息', '/module/capability/course/courseedit.html?op=1', '', '');
+        } else { // 修改
+            layer_show('修改课程信息', '/module/capability/course/courseedit.html?op=2&id=' + fKey, '', '');
+        }
+    }
+
+    // 删除按钮点击事件
+    function onClickBtnDel(id, name) {
+        layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/course/delcourse',
+                data: JSON.stringify({
+                    id: id
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#mainTable').DataTable().ajax.reload(null, false);
+                        toastr.success('删除成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error);
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+
+
+    function onClickcourseBtnState(id, state, name) {
+        var text = '';
+        if (state == 1) {
+            text = '<b>' + name + '</b><br />确定要&nbsp;<b>禁用</b>&nbsp;吗?';
+        } else {
+            text = '<b>' + name + '</b><br />确定要&nbsp;<b>启用</b>&nbsp;吗?';
+        }
+        layer.confirm(text, function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/course/statecourse',
+                data: JSON.stringify({
+                    id: id,
+                    state: state
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#mainTable').DataTable().ajax.reload(null, false);
+                        toastr.success('状态改变成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error)
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+
+
+    function mobanIn() {
+        layer_show('导入模板', 'courseMobanIn.html', '800', '200');
+    }
+
+    function mobanerror(studenterror) {
+        if (studenterror.length > 0) {
+            var str = "";//"<span style='color: red;'>导入成功：条；失败：条</span><br/>";
+            for (var i = 0; i < studenterror.length; i++) {
+                str += ">> <strong>课程编号： </strong>" + studenterror[i].FNo + " <br/>";
+                str += ">> <strong>课程名称： </strong>" + studenterror[i].FName + " <br/>";
+                str += ">> <span style='color: red;'><strong>错误内容： </strong>" + studenterror[i].error + "</span> <br/>";
+            }
+            // toastr.warning(str);
+            $("#datanr").empty();
+            $("#datanr").append(str);
+            $("#modal-title").text("导入错误信息");
+            $("#modal-demo").modal("show");
+        }
+    }
+    //发布后弹出模板
+    function mobanerror2(courseerror) {
+        if (courseerror.length > 0) {
+            var str = "";//"<span style='color: red;'>导入成功：条；失败：条</span><br/>";
+            for (var i = 0; i < courseerror.length; i++) {
+                str += ">> <strong>课程名称： </strong>" + courseerror[i].FName + " <br/>";
+                str += ">> <span style='color: red;'><strong>错误内容： </strong>" + courseerror[i].error + "</span> <br/>";
+            }
+            // toastr.warning(str);
+            $("#datanr").empty();
+            $("#datanr").append(str);
+            $("#modal-title").text("发布失败信息");
+            $("#modal-demo").modal("show");
+        }
+    }
+
+
+    function mobanOut() {
+
+        $("body").mLoading("show");
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json;charset=UTF-8',
+            url: '/s/course/courseabilitymoban',
+            data: JSON.stringify({
+                filenamestr: "课程信息导入模板",
+                filename: "course_info.xlsx",
+                ip: SERVERURL,
+            }),
+            success: function (data) {
+                if (data.result == 'success') {
+                    setTimeout(function () {
+                        $('.mloading-text').html('正在获取文件信息...');
+                        var newLink = document.createElement('a');
+                        newLink.href = data.url; // 设置 href 属性为文件链接
+                        newLink.download = data.filename; // 设置 download 属性为文件名
+                        newLink.style.display = 'none'; // 隐藏链接
+                        setTimeout(function () {
+                            $('.mloading-text').html('获取完成准备下载...');
+                            document.body.appendChild(newLink);
+                            newLink.click();
+                            setTimeout(function () {
+                                $('#mainTable').DataTable().ajax.reload(null, false);
+                                $("body").mLoading("hide");
+                                $(newLink).remove();
+                            }, 1000);
+                        }, 1000);
+                    }, 1000);
+                }
+                if (data.result == 'error') {
+                    toastr.error(data.error);
+                    $("body").mLoading("hide");
+                }
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+                $("body").mLoading("hide");
+            }
+        });
+    }
+
+    //切换显示备注信息，显示部分或者全部
+    function changeShowRemarks(obj) {//obj是td
+        var content = $(obj).attr("content");
+
+        if (content != null && content != '') {
+            if ($(obj).attr("isDetail") == 'true') {//当前显示的是详细备注，切换到显示部分
+                //$(obj).removeAttr('isDetail');//remove也可以
+                $(obj).attr('isDetail', false);
+                $(obj).html(getPartialRemarksHtml(content));
+            } else {//当前显示的是部分备注信息，切换到显示全部
+                $(obj).attr('isDetail', true);
+                $(obj).html(getTotalRemarksHtml(content));
+            }
+        }
+    }
+
+    //部分备注信息
+    function getPartialRemarksHtml(remarks) {
+        if (remarks.length > 0) {
+            return remarks.substr(0, remarkShowLength) + '&nbsp;&nbsp;<a href="javascript:void(0);" ><b>展开</b></a>';
+        }
+    }
+
+    //全部备注信息
+    function getTotalRemarksHtml(remarks) {
+        return remarks + '&nbsp;&nbsp;<a href="javascript:void(0);" ><b>收起</b></a>';
+    }
+
+    // 历史版本按钮点击事件
+    function onClickOpenVersionList(key, filename) {
+
+        layer_show('历史版本浏览：{' + filename + '}','/module/capability/course/courseversionList.html?parentId='+key,'','','layui-layer-molv');
+    }
+
+    function yijianfabu(){
+        layer.confirm('确定要发布所有课程吗?', function (index) {
+            $("body").mLoading("show");
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/course/yijianfabucourse',
+                data: JSON.stringify({
+                }),
+                success: function (data) {
+
+                    setTimeout(function () {
+                        $('.mloading-text').html('正在发布中...');
+                        if (data.result == 'success') {
+                            $('#mainTable').DataTable().ajax.reload(null, false);
+                            if(data.courseerror){
+                                mobanerror2(data.courseerror);
+                            }else{
+                                toastr.success('发布完成！');
+                            }
+                            layer.close(layer.index);
+
+                        }
+                        if (data.result == 'error') {
+                            toastr.error(data.error);
+                        }
+                        $("body").mLoading("hide");
+
+                    }, 1000);
+
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                    $("body").mLoading("hide");
+                }
+            });
+        });
+    }
+</script>
+</body>
+</html>

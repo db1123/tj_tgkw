@@ -1,0 +1,641 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+        <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+        <!--_only 独立样式 -->
+        <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+		<link rel="stylesheet" href="/plugins/daterangepicker/daterangepicker.css">
+        <!--/_only 独立样式 -->
+    </head>
+    <body>
+        <article class="page-container">
+            <form action="" method="post" class="form form-horizontal" id="myprojectForm">
+				<div class="row cl">
+					<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>项目名称：</label>
+					<div class="formControls col-xs-3 col-sm-4">
+						<input type="text" class="input-text" name="FName" id="FName" />
+					</div>
+					<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>项目编号：</label>
+					<div class="formControls col-xs-3 col-sm-4">
+						<input type="text" class="input-text" name="FNo" id="FNo" />
+					</div>
+				</div>
+<!--				<div class="row cl">-->
+<!--					<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>模具名称：</label>-->
+<!--					<div class="formControls col-xs-3 col-sm-4">-->
+<!--						<input type="text" class="input-text" name="FMName" id="FMName" />-->
+<!--					</div>-->
+<!--				</div>-->
+                <div class="row cl">
+<!--                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>客户：</label>-->
+<!--                    <div class="formControls col-xs-3 col-sm-4">-->
+<!--						<select name="FCustomerID"  id="FCustomerID"  class="" style="width: 100%;"></select>-->
+<!--                    </div>-->
+					<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>内部编码：</label>
+					<div class="formControls col-xs-3 col-sm-4">
+						<input type="text" class="input-text" name="FInsideNo" id="FInsideNo" />
+					</div>
+					<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>负责人：</label>
+					<div class="formControls col-xs-3 col-sm-4">
+						<select name="FLeadUserID" id="FLeadUserID"   class="" style="width: 100%;"></select>
+					</div>
+                </div>
+				<div class="row cl">
+					<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>计划开始：</label>
+					<div class="formControls col-xs-3 col-sm-4">
+						<input type="text" class="input-text" name="FSDate" id="FSDate" readonly="readonly" />
+					</div>
+					<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>计划完成：</label>
+					<div class="formControls col-xs-3 col-sm-4">
+						<input type="text" class="input-text" name="FEDate" id="FEDate" readonly="readonly" />
+					</div>
+				</div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>项目类型：</label>
+                    <div class="formControls col-xs-3 col-sm-4">
+						<select name="FTypeID" id="FTypeID"   class="" style="width: 100%;"></select>
+                    </div>
+					<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>项目等级：</label>
+					<div class="formControls col-xs-3 col-sm-4">
+						<select name="FLevelID"  id="FLevelID"  class="" style="width: 100%;"></select>
+					</div>
+                </div>
+				<div class="row cl">
+					<label class="form-label col-xs-3 col-sm-2">项目要求：</label>
+					<div class="formControls col-xs-3 col-sm-4">
+						<input type="text" class="input-text" name="FAsk" id="FAsk" />
+					</div>
+					<label class="form-label col-xs-3 col-sm-2">合同编号：</label>
+					<div class="formControls col-xs-3 col-sm-4">
+						<input type="text" class="input-text" name="FContractNo" id="FContractNo"/>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-3 col-sm-2">项目来源：</label>
+					<div class="formControls col-xs-3 col-sm-4">
+						<input type="text" class="input-text" name="FFrom" id="FFrom"/>
+					</div>
+					<label class="form-label col-xs-3 col-sm-2">项目经费：</label>
+					<div class="formControls col-xs-3 col-sm-4">
+						<input type="text" class="input-text" name="FFunds"  id="FFunds" onkeypress="if(!this.value.match(/^[\+\-]?\d*?\.?\d*?$/))this.value=this.t_value;else this.t_value=this.value;if(this.value.match(/^(?:[\+\-]?\d+(?:\.\d+)?)?$/))this.o_value=this.value" onkeyup="if(!this.value.match(/^[\+\-]?\d*?\.?\d*?$/))this.value=this.t_value;else this.t_value=this.value;if(this.value.match(/^(?:[\+\-]?\d+(?:\.\d+)?)?$/))this.o_value=this.value" onblur="if(!this.value.match(/^(?:[\+\-]?\d+(?:\.\d+)?|\.\d*?)?$/))this.value=this.o_value;else{if(this.value.match(/^\.\d+$/))this.value=0+this.value;if(this.value.match(/^\.$/))this.value=0;this.o_value=this.value}"/>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-3 col-sm-2">学科：</label>
+					<div class="formControls col-xs-3 col-sm-4">
+						<select name="FDeptID" id="FDeptID"  class="" style="width: 100%;"></select>
+					</div>
+					<label class="form-label col-xs-3 col-sm-2">课程：</label>
+					<div class="formControls col-xs-3 col-sm-4">
+						<select name="FCourseID" multiple="multiple" id="FCourseID" style="width: 100%;"></select>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-3 col-sm-2">密级：</label>
+					<div class="formControls col-xs-3 col-sm-4">
+						<select name="FSecret"  id="FSecret" class="" style="width: 100%;"></select>
+					</div>
+
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-3 col-sm-2">备注：</label>
+					<div class="formControls col-xs-8 col-sm-10">
+						<input type="text" class="input-text" name="FNote" id="FNote"/>
+					</div>
+				</div>
+                <div class="toolbar-bottom-line"></div>
+                <div class="toolbar-bottom-btn">
+                    <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+                    <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                           onclick="layer_close()"/>
+                </div>
+                <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+            </form>
+        </article>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+        <script src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+		<script type="text/javascript" src="/plugins/moment/moment.min.js"></script>
+		<script type="text/javascript" src="/plugins/daterangepicker/daterangepicker.js"></script>
+        <script type="text/javascript">
+            // 编辑框状态 1新建 2修改
+            var op = getQueryStringByName('op');
+			var fstate = getQueryStringByName('fstate');
+			var type= getQueryStringByName('type');
+
+
+			var SignUserInfo;
+
+			var selectFCourseID;
+
+			var fmajorID;
+
+            // 业务代码
+            $(function () {
+
+
+            	//获取当前登录用户信息
+				$.ajax({
+					type: 'POST',
+					contentType: 'application/json',
+					url: '/s/entry/showUserInfo',
+					async: false,
+					success : function(data) {
+						if(data.result == "success"){
+							SignUserInfo = data.user;
+						}
+					},
+					error : function(e){
+						console.log(e.status);
+						console.log(e.responseText);
+					}
+				});
+
+				$("#FDeptID").change(function() {
+					fmajorID = $(this).val();
+				});
+				selectFCourseID = $("#myprojectForm select[name='FCourseID']").select2({
+					placeholder: '请选择课程',
+					ajax: {
+						type: 'POST',
+						url: "/s/course/queryDataprojectCourseSelect",
+						dataType: 'json',
+						data: function (params) {
+							return {
+								search: params.term,
+								fmajorID:fmajorID
+							};
+						},
+						processResults: function (data) {
+							return {
+								results: data.list
+							};
+						},
+						delay: 800,
+						cache: true
+					},
+					language: "zh-CN"
+				});
+
+				// 初始化下拉菜单---------------------------------------------------------------------------------
+				//  计划开始
+				$("#myprojectForm input[name='FSDate']").daterangepicker({
+					singleDatePicker: true, // 设置为单日历，即无区间 默认false
+					showDropdowns: true, // 当设置值为true时，允许年份和月份通过下拉框的形式选择 默认false
+					autoUpdateInput: false, // 1.当设置为false的时候,不给与默认值(当前时间) 2.选择时间时,失去鼠标焦点,不会给与默认值 默认true
+					timePicker24Hour : true, // 设置小时为24小时制 默认false
+					timePicker : false, // 可选中时分 默认false
+					locale: {
+						format: "YYYY-MM-DD",
+						separator: " - ",
+						daysOfWeek: ["日","一","二","三","四","五","六"],
+						monthNames: ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"]
+					}
+				}).on('apply.daterangepicker', function(ev, picker) {
+					$("#myprojectForm input[name='FSDate']").val(picker.startDate.format('YYYY-MM-DD'));
+				});
+
+				//  计划开始
+				$("#myprojectForm input[name='FEDate']").daterangepicker({
+					singleDatePicker: true, // 设置为单日历，即无区间 默认false
+					showDropdowns: true, // 当设置值为true时，允许年份和月份通过下拉框的形式选择 默认false
+					autoUpdateInput: false, // 1.当设置为false的时候,不给与默认值(当前时间) 2.选择时间时,失去鼠标焦点,不会给与默认值 默认true
+					timePicker24Hour : true, // 设置小时为24小时制 默认false
+					timePicker : false, // 可选中时分 默认false
+					autoApply:true,
+					locale: {
+						format: "YYYY-MM-DD",
+						separator: " - ",
+						daysOfWeek: ["日","一","二","三","四","五","六"],
+						monthNames: ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"]
+					}
+				}).on('apply.daterangepicker', function(ev, picker) {
+					$("#myprojectForm input[name='FEDate']").val(picker.startDate.format('YYYY-MM-DD'));
+				});
+				// $("#myprojectForm select[name='FCustomerID']").select2({
+				// 	placeholder: '请选择客户',
+				// 	ajax: {
+				// 		type:'POST',
+				// 		url: "/s/customer/queryDatacustomerSelect",
+				// 		dataType: 'json',
+				// 		data: function (params) {
+				// 			return {
+				// 				search: params.term,
+				// 			};
+				// 		},
+				// 		processResults: function (data) {
+				// 			return {
+				// 				results: data.list
+				// 			};
+				// 		},
+				// 		delay: 800,
+				// 		cache: true
+				// 	},
+				// 	language: "zh-CN"
+				// });
+				$("#myprojectForm select[name='FTypeID']").select2({
+					placeholder: '请选择项目类型',
+					ajax: {
+						type:'POST',
+						url: "/s/projectType/queryDataprojectTypeSelect",
+						dataType: 'json',
+						data: function (params) {
+							return {
+								search: params.term,
+							};
+						},
+						processResults: function (data) {
+							return {
+								results: data.list
+							};
+						},
+						delay: 800,
+						cache: true
+					},
+					language: "zh-CN"
+				});
+				$("#myprojectForm select[name='FLeadUserID']").select2({
+					placeholder: '请选择负责人',
+					ajax: {
+						type:'POST',
+						url: "/s/user/queryDataUserSelect",
+						dataType: 'json',
+						data: function (params) {
+							return {
+								search: params.term,
+							};
+						},
+						processResults: function (data) {
+							return {
+								results: data.results
+							};
+						},
+						delay: 800,
+						cache: true
+					},
+					language: "zh-CN"
+				});
+				$("#myprojectForm select[name='FLevelID']").select2({
+					placeholder: '请选择项目等级',
+					ajax: {
+						type:'POST',
+						url: "/s/projectLevel/queryDataprojectLevelSelect",
+						dataType: 'json',
+						data: function (params) {
+							return {
+								search: params.term,
+							};
+						},
+						processResults: function (data) {
+							return {
+								results: data.list
+							};
+						},
+						delay: 800,
+						cache: true
+					},
+					language: "zh-CN"
+				});
+
+				//这里查询 专业
+				$("#myprojectForm select[name='FDeptID']").select2({
+					placeholder: '请选择学科',
+					ajax: {
+						type: 'POST',
+						url: "/s/major/queryDatamajorSelectsql",
+						dataType: 'json',
+						data: function (params) {
+							return {
+								search: params.term,
+							};
+						},
+						processResults: function (data) {
+							return {
+								results: data.list
+							};
+						},
+						delay: 800,
+						cache: true
+					},
+					language: "zh-CN"
+				});
+				$("#myprojectForm select[name='FSecret']").select2({
+					placeholder: '请选择密级',
+					ajax: {
+						type:'POST',
+						url: "/s/secret/queryDatasecretSelect",
+						dataType: 'json',
+						data: function (params) {
+							return {
+								search: params.term,
+							};
+						},
+						processResults: function (data) {
+							return {
+								results: data.list
+							};
+						},
+						delay: 800,
+						cache: true
+					},
+					language: "zh-CN"
+				});
+				//-------------------------------------------------------------------------------------------------
+
+                // 修改操作时读取表单信息
+                if (op == 2) {
+                    var id = getQueryStringByName('id');
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/myproject/querymyprojectInfo', // 调用地址
+                        data: JSON.stringify({
+                            id: id
+                        }),
+                        async: false,
+                        success: function (data) {
+							$('#FName').val(data.info.FName);
+							$('#FNo').val(data.info.FNo);
+							if(fstate ==0){
+								$('#FNo').prop("disabled", false);
+							}else{
+								$('#FNo').prop("disabled", true);
+							}
+							// $("#myprojectForm input[name='FMName']").val(data.info.FMaterialName);
+							$("#myprojectForm input[name='FSDate']").val(data.info.FSDate);
+							$("#myprojectForm input[name='FEDate']").val(data.info.FEDate);
+							$('#FContractNo').val(data.info.FContractNo);
+							$('#FFrom').val(data.info.FFrom);
+							$('#FFunds').val(data.info.FFunds);
+							$("#FAsk").val(data.info.FAsk);
+							$("#FNote").val(data.info.FNote);
+							$("#FInsideNo").val(data.info.FInsideNo);
+
+							// //客户
+							// var option = new Option(data.info.FCustomerName, data.info.FCustomerID, true, true);
+							// $("#FCustomerID").append(option);
+							// $("#FCustomerID").change();
+							//项目类型
+							var option1 = new Option(data.info.FTypeName, data.info.FTypeID, true, true);
+							$("#FTypeID").append(option1);
+							$("#FTypeID").change();
+							//项目等级
+							var option2 = new Option(data.info.FLevelName, data.info.FLevelID, true, true);
+							$("#FLevelID").append(option2);
+							$("#FLevelID").change();
+
+							//学科
+
+							let TCollegeName = data.info.TCollegeName;
+							let xueke="";
+							if(TCollegeName)
+								xueke =  TCollegeName + "/" + data.info.FDeptName
+							else
+								xueke = data.info.FDeptName;
+							var option3 = new Option(xueke, data.info.FDeptID, true, true);
+							$("#FDeptID").append(option3);
+							$("#FDeptID").change();
+
+							//密级
+							var option4 = new Option(data.info.FSecretName, data.info.FSecret, true, true);
+							$("#FSecret").append(option4);
+							$("#FSecret").change();
+							//负责人
+							var option5 = new Option(data.info.FLeadUserName, data.info.FLeadUserID, true, true);
+							$("#FLeadUserID").append(option5);
+							$("#FLeadUserID").change();
+                            $('#FKeyID').val(data.info.key);
+
+
+							if(selectFCourseID){
+								selectFCourseID.empty();
+								data.info.courselist.forEach(item => {
+									var option = new Option(item.name, item.id, true, true);
+									selectFCourseID.append(option);
+								});
+							}
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                }else{
+					var option4 = new Option(SignUserInfo.f_name,SignUserInfo.key, true, true);
+					$("#myprojectForm select[name='FLeadUserID']").append(option4);
+					$("#myprojectForm select[name='FLeadUserID']").change();
+				}
+
+				// jQuery.validator.methods.compareDate = function(value, element, param) {
+				// 	//var startDate = jQuery(param).val() + ":00";补全yyyy-MM-dd HH:mm:ss格式
+				// 	//value = value + ":00";
+				//
+				// 	var startDate = jQuery(param).val();
+				//
+				// 	var date1 = new Date(Date.parse(startDate.replace("-", "/")));
+				// 	var date2 = new Date(Date.parse(value.replace("-", "/")));
+				// 	return date1 < date2;
+				// };
+				jQuery.validator.addMethod("compareDate", function (value, element, param) {
+					var startDate = $("#myprojectForm input[name='FSDate']").val();
+
+					var date1 = new Date(Date.parse(startDate.replace("-", "/")));
+					var date2 = new Date(Date.parse(value.replace("-", "/")));
+
+					console.log('date1:'+date1+',date2'+date2);
+					if(date2>=date1){
+						return true;
+					}else{
+						return false;
+					}
+
+				}, $.validator.format("计划完成时间必须大于计划开始时间!"));
+				// 检验数据
+                var userValidate = $('#myprojectForm').validate({
+                    rules: {
+						FName: {
+                            required: true,
+                            levelLimit: false
+                        },
+						FNo: {
+							required: true,
+							levelLimit: false
+						},
+						FInsideNo: {
+							required: true,
+						},
+						FTypeID: {
+							required: true,
+							levelLimit: false
+						},
+						FLevelID: {
+							required: true,
+							levelLimit: false
+						},
+						FLeadUserID: {
+							required: true,
+							levelLimit: false
+						},
+						FSDate: {
+							required: true,
+							levelLimit: false
+						},
+						FEDate: {
+							required: true,
+							levelLimit: false,
+							compareDate: true
+						},
+						// FCustomerID: {
+						// 	required: true,
+						// 	levelLimit: false
+						// },
+
+						// FMName: {
+						// 	required: true,
+						// 	levelLimit: false
+						// },
+                    },
+                    messages: {
+						// FMName: {
+						// 	required: '*请输入模具名称'
+						// },
+						FName: {
+                            required: '*请输入项目名称'
+                        },
+						FInsideNo: {
+							required: '*请输入内部编码'
+						},
+						FNo: {
+							required: '*请输入项目编号'
+						},
+						// FCustomerID: {
+						// 	required: '*请选择客户'
+						// },
+						FTypeID: {
+							required: '*请选择项目类型'
+						},
+						FLevelID: {
+							required: '*请选择项目等级'
+						},
+						FLeadUserID: {
+							required: '*请选择项目负责人'
+						},
+						FSDate: {
+							required: '*请选择计划开始时间'
+						},
+						FEDate: {
+							required: '*请选择计划完成时间',
+							// compareDate: "计划完成时间必须大于计划开始时间!"
+						},
+                    },
+                    onfocusout: false, // 是否在获取焦点时验证
+                    onkeyup: false, // 是否在敲击键盘时验证
+                    focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+                    focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+                    success: 'valid',
+                    submitHandler: function () {
+                        // 获取参数
+                        var data = form2Json('myprojectForm');
+						var courselist = [];
+						if(selectFCourseID){
+							selectFCourseID.select2('data').forEach((item) => {
+								courselist.push(item.id);
+							});
+						}
+						data['FCourselist'] =  courselist;
+                        if (op == 1) { // 添加操作
+                            $.ajax({
+                                type: 'POST',
+                                contentType: 'application/json',
+                                url: '/s/myproject/addmyproject', // 调用地址
+                                data: JSON.stringify(data),
+                                async: false,
+                                success: function (data) {
+                                    if (data.result == 'success') {
+                                        parent.$('#mainTable').DataTable().ajax.reload(null, false);
+                                        parent.toastr.success('添加成功！');
+                                        layer_close();
+                                    } else if (data.result == 'fail') {
+										// modalalertdemo(data.faillist);
+										var str = "<span style='color: red;'>项目编号已被使用</span><br/>";
+										str +=">> 项目编号： "+data.faillist.FNo +" <br/>";
+										str +=">> 项目名称： "+data.faillist.FName +" <br/>";
+										str +=">> 项目发布人： "+data.faillist.FuserName +"<br/>";
+										toastr.warning(str);
+                                        // toastr.warning('项目编号重复，请重新输入');
+                                    } else if (data.result == 'error') {
+                                        toastr.error(data.error);
+                                    }
+                                },
+                                error: function (e) {
+                                    toastr.error(e.status);
+                                    toastr.error(e.responseText);
+                                }
+                            });
+                        } else {
+                            $.ajax({
+                                type: 'POST',
+                                contentType: 'application/json',
+                                url: '/s/myproject/updatemyproject', // 调用地址
+                                data: JSON.stringify(data),
+                                async: false,
+                                success: function (data) {
+                                    if (data.result == 'success') {
+                                    	if(type ==1){
+											parent.$('#mainTable').DataTable().ajax.reload(null, false);
+											parent.toastr.success('修改成功！');
+											layer_close();
+										}else if(type ==2){
+											parent.toastr.success('修改成功！');
+											layer_close();
+										}
+
+                                    } else if (data.result == 'fail') {
+										var str = "<span style='color: red;'>项目编号已被使用</span><br/>";
+										str +=">> 项目编号： "+data.faillist.FNo +" <br/>";
+										str +=">> 项目名称： "+data.faillist.FName +" <br/>";
+										str +=">> 项目发布人： "+data.faillist.FuserName +"<br/>";
+										toastr.warning(str);
+                                        // toastr.warning('项目编号重复，请重新输入');
+                                    } else if (data.result == 'error') {
+                                        toastr.error(data.error);
+                                    }
+                                },
+                                error: function (e) {
+                                    toastr.error(e.status);
+                                    toastr.error(e.responseText);
+                                }
+                            });
+                        }
+                    }
+                });
+            });
+
+			// function modalalertdemo(infolist) {
+			// 	var str = "<span style='color: red;'>项目编号已被使用</span><br/>";
+			// 	str +=">> 项目编号： "+infolist.FNo +" <br/>";
+			// 	str +=">> 项目名称： "+infolist.FName +" <br/>";
+			// 	str +=">> 项目发布人： "+infolist.FuserName +"<br/>";
+			// 	$("body").Huimodalalert({
+			// 		content: str,
+			// 		speed: 5000
+			// 	})
+			// }
+        </script>
+    </body>
+</html>

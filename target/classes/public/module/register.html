@@ -1,0 +1,565 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type="register";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+  
+    <!-- 引入外部资源 -->
+    <script src="/nui-ad/login/3.4.17"></script>
+    <link href="/nui-ad/login/fonts/font-awesome.min.css" rel="stylesheet">
+    <script src="/nui-ad/login/chart.umd.min.js"></script>
+    <!-- 引入select2库用于学院选择 -->
+	<link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+	<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0F3460', // 深色调主色，体现严谨专业
+                        secondary: '#1A73E8', // 辅助蓝色
+                        accent: '#E94560', // 强调色
+                        neutral: '#F8F9FA',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .bg-gradient-academic {
+                background: linear-gradient(135deg, #0F3460 0%, #16213E 100%);
+            }
+            .text-balance {
+                text-wrap: balance;
+            }
+            .input-focus {
+                @apply focus:border-secondary focus:ring-2 focus:ring-secondary/20 focus:outline-none transition-all duration-300;
+            }
+            .btn-hover {
+                @apply hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-300;
+            }
+            .form-group {
+                @apply relative;
+            }
+            .form-icon {
+                @apply absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg;
+            }
+            .form-input {
+                @apply w-full pl-12 pr-5 py-3 rounded-lg border border-gray-300 input-focus text-base;
+            }
+            .form-select {
+                @apply w-full pl-12 pr-12 py-3 rounded-lg border border-gray-300 input-focus text-base appearance-none bg-white;
+            }
+            .form-label {
+                @apply block text-gray-700 text-base font-medium mb-1.5;
+            }
+            .form-item {
+                @apply mb-4;
+            }
+            .form-item:last-of-type {
+                @apply mb-2;
+            }
+            .page-transition {
+                @apply transition-all duration-300 ease-in-out;
+            }
+        }
+    </style>
+    <style type="text/css">
+    	.form-group{
+    		width: 100%;
+    	}
+    
+    	.p-8{
+    	    margin-top: -30px;
+    	    }
+    	/* select2 样式调整 - 修复图标+统一字体大小 */
+    	.select2-container--default .select2-selection--single {
+    	    height: 45px !important;
+    	    border-radius: 0.5rem !important;
+    	    border: 1px solid #d1d5db !important;
+    	}
+    	/* 核心修改：将学院选择框文字大小设为text-base（与性别选择框一致） */
+    	.select2-container--default .select2-selection--single .select2-selection__rendered {
+    	    line-height: 45px !important;
+    	    padding-left: 3rem !important; /* 为左侧图标留空间 */
+    	    font-size: 1rem !important; /* text-base 对应 1rem = 16px，与.form-select字体一致 */
+    	    color: #1f2937 !important; /* 与性别选择框文字颜色匹配（gray-800） */
+    	}
+    	/* 下拉选项列表字体也同步放大，保持视觉一致 */
+    	.select2-results__option {
+    	    font-size: 1rem !important; /* 与选择框内文字大小一致 */
+    	    padding: 0.75rem 1rem !important; /* 同步调整选项内边距，避免文字拥挤 */
+    	}
+    	/* 下拉框占位符字体样式同步 */
+    	.select2-container--default .select2-selection--single .select2-selection__placeholder {
+    	    color: #6b7280 !important; /* 与性别选择框占位符颜色（gray-500）匹配 */
+    	    font-size: 1rem !important;
+    	}
+    	.select2-container--default .select2-selection--single .select2-selection__arrow {
+    	    top: 50% !important;
+    	    right: 1rem !important;
+    	    transform: translateY(-50%) !important;
+    	}
+    	.select2-container--focus .select2-selection--single {
+    	    border-color: #1A73E8 !important;
+    	    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2) !important;
+    	}
+    	/* 确保图标不会被select2遮挡 */
+    	.form-group .form-icon {
+    	    z-index: 10;
+    	}
+    </style>
+
+</head>
+<body class="bg-gray-100 min-h-screen font-sans text-gray-800 flex items-center justify-center p-4">
+    <!-- 主容器 -->
+    <div class="w-full max-w-2xl mx-auto">
+        <!-- 卡片容器 -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden page-transition">
+            <!-- 顶部装饰条 -->
+            <div class="h-1.5 bg-gradient-to-r from-primary to-secondary"></div>
+            
+            <!-- 注册表单区域 -->
+            <div class="p-8 md:p-10">
+                <!-- 标题区域 -->
+                <div class="mb-8 text-center" style="margin-bottom: 0rem;">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa fa-user-plus text-primary text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2" id="header">教师注册</h2>
+                    <p class="text-gray-500">请填写以下信息完成注册</p>
+                </div>
+                
+                <!-- 表单 -->
+                <form id="RegisterForm" method="post" class="space-y-1">
+                    <!-- 1. 用户名（工号） -->
+                    <div class="form-item">
+                        <label for="f_login" class="form-label">用户名（工号）</label>
+                        <div class="form-group">
+                            <span class="form-icon">
+                                <i class="fa fa-user"></i>
+                            </span>
+                            <input name="f_login" type="text" placeholder="请输入工号" 
+                                   class="form-input" required>
+                        </div>
+                    </div>
+
+                    <!-- 2. 教师姓名 -->
+                    <div class="form-item">
+                        <label for="f_name" class="form-label">教师姓名</label>
+                        <div class="form-group">
+                            <span class="form-icon">
+                                <i class="fa fa-id-card"></i>
+                            </span>
+                            <input name="f_name" type="text" placeholder="请输入真实姓名" 
+                                   class="form-input" required>
+                        </div>
+                    </div>
+
+                    <!-- 3. 密码 -->
+                    <div class="form-item">
+                        <label for="f_pass" class="form-label">密码</label>
+                        <div class="form-group">
+                            <span class="form-icon">
+                                <i class="fa fa-lock"></i>
+                            </span>
+                            <input name="f_pass" type="password" placeholder="至少6位字符" 
+                                   class="form-input" required>
+                        </div>
+                    </div>
+
+                    <!-- 4. 确认密码 -->
+                    <div class="form-item">
+                        <label for="f_pass_confirm" class="form-label">确认密码</label>
+                        <div class="form-group">
+                            <span class="form-icon">
+                                <i class="fa fa-lock"></i>
+                            </span>
+                            <input name="f_pass_confirm" type="password" placeholder="再次输入密码" 
+                                   class="form-input" required>
+                        </div>
+                    </div>
+
+                    <!-- 5. 学院选择 - 已同步字体大小 -->
+                    <div class="form-item">
+                        <label for="FCollegeID" class="form-label">学院 <span class="text-red-500">*</span></label>
+                        <div class="form-group">
+                            <span class="form-icon">
+                                <i class="fa fa-university"></i>
+                            </span>
+                            <select name="FCollegeID" id="FCollegeID" style="width: 100%;"></select>
+                        </div>
+                    </div>
+
+                    <!-- 6. 性别选择（基准样式） -->
+                    <div class="form-item">
+                        <label for="f_gender" class="form-label">性别</label>
+                        <div class="form-group">
+                            <span class="form-icon">
+                                <i class="fa fa-venus-mars"></i>
+                            </span>
+                            <select name="f_gender" class="form-select" required>
+                                <option value="">请选择性别</option>
+                                <option value="1">男</option>
+                                <option value="2">女</option>
+                            </select>
+                            <!-- 下拉箭头 -->
+                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                                <i class="fa fa-chevron-down"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- 7. 职称 -->
+                    <div class="form-item">
+                        <label for="f_title" class="form-label">职称</label>
+                        <div class="form-group">
+                            <span class="form-icon">
+                                <i class="fa fa-briefcase"></i>
+                            </span>
+                            <input name="f_title" type="text" placeholder="请输入职称（如：讲师）" 
+                                   class="form-input" required>
+                        </div>
+                    </div>
+
+                    <!-- 8. 电子邮箱 -->
+                    <div class="form-item">
+                        <label for="f_email" class="form-label">电子邮箱</label>
+                        <div class="form-group">
+                            <span class="form-icon">
+                                <i class="fa fa-envelope"></i>
+                            </span>
+                            <input name="f_email" type="email" placeholder="请输入邮箱（如：xxx@xxx.com）" 
+                                   class="form-input" required>
+                        </div>
+                    </div>
+
+                    <!-- 9. 联系电话 -->
+                    <div class="form-item">
+                        <label for="f_phone" class="form-label">联系电话</label>
+                        <div class="form-group">
+                            <span class="form-icon">
+                                <i class="fa fa-phone"></i>
+                            </span>
+                            <input name="f_phone" type="tel" placeholder="请输入11位手机号" 
+                                   class="form-input" required>
+                        </div>
+                    </div>
+
+                    <!-- 10. 在职状态 -->
+                    <div class="form-item">
+                        <label for="f_status" class="form-label">在职状态</label>
+                        <div class="form-group">
+                            <span class="form-icon">
+                                <i class="fa fa-check-circle"></i>
+                            </span>
+                            <select name="f_status" class="form-select" required>
+                                <option value="">请选择状态</option>
+                                <option value="1">在职</option>
+                                <option value="2">离职</option>
+                                <option value="3">休假</option>
+                            </select>
+                            <!-- 下拉箭头 -->
+                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                                <i class="fa fa-chevron-down"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- 11. 备注 -->
+                    <div class="form-item">
+                        <label for="f_note" class="form-label">备注（选填）</label>
+                        <div class="form-group">
+                            <span class="form-icon mt-2">
+                                <i class="fa fa-sticky-note"></i>
+                            </span>
+                            <textarea name="f_note" rows="3" placeholder="请输入备注（如：研究方向）" 
+                                      class="form-input pt-3 resize-none"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 12. 按钮组 -->
+                    <div class="pt-4 flex flex-col sm:flex-row gap-3">
+                        <button type="submit" 
+                                class="flex-1 bg-primary text-white font-medium py-3 px-6 rounded-lg btn-hover flex items-center justify-center text-base">
+                            <i class="fa fa-user-plus mr-2"></i> 完成注册
+                        </button>
+                        <button type="button" onclick="window.location.href='/module/login.html'"
+                                class="flex-1 bg-gray-100 text-gray-700 font-medium py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center text-base">
+                            <i class="fa fa-sign-in mr-2"></i> 已有账号？登录
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- 版权信息 -->
+        <div class="mt-6 text-center text-sm text-gray-500 opacity-80" id="footer">
+            © 2025 天津仁爱学院 数智传媒与设计艺术学院-教学多元数据管理系统平台
+        </div>
+    </div>
+
+    <!-- 表单验证及交互脚本 -->
+    <script type="text/javascript" src="/plugins/verify/js/verify.min.js"></script>
+    <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+    <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+    <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+    <script src="/nui-ad/login/toastr.min.js"></script>
+    <link href="/nui-ad/login/toastr.min.css" rel="stylesheet">
+    
+    <script type="text/javascript">
+        // 初始化页面标题和版权信息
+        document.title = WEB_TITLE;
+        document.getElementById("footer").innerHTML = FOOTER_TEXT;
+        document.getElementById("header").innerHTML = "教师注册";
+
+        // 初始化学院选择器
+        var FCollegeID = $("#FCollegeID").select2({
+            placeholder: '请选择学院',
+            ajax: {
+                type: 'POST',
+                url: "/s/college/queryDatacollegeSelect",
+                dataType: 'json',
+                data: function (params) {
+                    return {
+                        search: params.term,
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.list
+                    };
+                },
+                delay: 800,
+                cache: true
+            },
+            language: "zh-CN"
+        });
+
+        // 辅助函数：表单转JSON
+        function form2Json(formId) {
+            var jsonData = {};
+            var formArray = $("#" + formId).serializeArray();
+            $.each(formArray, function() {
+                if (jsonData[this.name]) {
+                    jsonData[this.name] = Array.isArray(jsonData[this.name]) 
+                        ? [...jsonData[this.name], this.value || ''] 
+                        : [jsonData[this.name], this.value || ''];
+                } else {
+                    jsonData[this.name] = this.value || '';
+                }
+            });
+            return jsonData;
+        }
+
+        // 初始化提示框
+        toastr.options = {
+            "positionClass": "toast-center-center",
+            "timeOut": "2000",
+            "preventDuplicates": true,
+            "progressBar": true
+        };
+
+        // 表单验证及提交逻辑
+        $(function(){
+            $('#RegisterForm').validate({
+                rules: {
+                    f_login: {
+                        required: true,
+                        minlength: 4,
+                        maxlength: 20
+                    },
+                    f_name: {
+                        required: true,
+                        minlength: 2,
+                        maxlength: 10
+                    },
+                    f_pass: {
+                        required: true,
+                        minlength: 6,
+                        maxlength: 20
+                    },
+                    f_pass_confirm: {
+                        required: true,
+                        equalTo: "[name='f_pass']"
+                    },
+                    FCollegeID: {
+                        required: true
+                    },
+                    f_gender: {
+                        required: true
+                    },
+                    f_title: {
+                        required: true,
+                        minlength: 2,
+                        maxlength: 20
+                    },
+                    f_email: {
+                        required: true,
+                        email: true
+                    },
+                    f_phone: {
+                        required: true,
+                        minlength: 11,
+                        maxlength: 11,
+                        digits: true
+                    },
+                    f_status: {
+                        required: true
+                    },
+                    f_note: {
+                        maxlength: 200
+                    }
+                },
+                messages: {
+                    f_login: {
+                        required: "请输入工号",
+                        minlength: "工号长度不能少于4个字符",
+                        maxlength: "工号长度不能超过20个字符"
+                    },
+                    f_name: {
+                        required: "请输入教师姓名",
+                        minlength: "姓名长度不能少于2个字符",
+                        maxlength: "姓名长度不能超过10个字符"
+                    },
+                    f_pass: {
+                        required: "请输入密码",
+                        minlength: "密码长度不能少于6个字符",
+                        maxlength: "密码长度不能超过20个字符"
+                    },
+                    f_pass_confirm: {
+                        required: "请确认密码",
+                        equalTo: "两次输入的密码不一致"
+                    },
+                    FCollegeID: {
+                        required: "请选择学院"
+                    },
+                    f_gender: {
+                        required: "请选择性别"
+                    },
+                    f_title: {
+                        required: "请输入职称",
+                        minlength: "职称长度不能少于2个字符",
+                        maxlength: "职称长度不能超过20个字符"
+                    },
+                    f_email: {
+                        required: "请输入电子邮箱",
+                        email: "请输入有效的电子邮箱地址"
+                    },
+                    f_phone: {
+                        required: "请输入联系电话",
+                        minlength: "请输入11位手机号码",
+                        maxlength: "请输入11位手机号码",
+                        digits: "请输入纯数字的手机号码"
+                    },
+                    f_status: {
+                        required: "请选择在职状态"
+                    },
+                    f_note: {
+                        maxlength: "备注信息不能超过200个字符"
+                    }
+                },
+                errorElement: "div",
+                errorPlacement: function(error, element) {
+                    // 处理select2的错误信息位置
+                    if (element.hasClass('select2-hidden-accessible')) {
+                        error.insertAfter(element.next('.select2-container'));
+                    } else {
+                        error.insertAfter(element);
+                    }
+                    error.addClass("text-red-500 text-xs mt-1");
+                },
+                highlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next('.select2-container').find('.select2-selection--single').addClass('border-red-500');
+                    } else {
+                        $(element).addClass("border-red-500");
+                    }
+                },
+                unhighlight: function(element) {
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next('.select2-container').find('.select2-selection--single').removeClass('border-red-500');
+                    } else {
+                        $(element).removeClass("border-red-500");
+                    }
+                },
+                onfocusout: function(element) {
+                    $(element).valid();
+                },
+                onkeyup: false,
+                focusInvalid: false,
+                focusCleanup: true,
+                submitHandler: function(){
+                    const submitBtn = $('button[type="submit"]');
+                    const originalText = submitBtn.html();
+                    submitBtn.html('<i class="fa fa-spinner fa-spin mr-2"></i> 提交中...');
+                    submitBtn.prop('disabled', true);
+                    
+                    var formData = form2Json('RegisterForm');
+                    delete formData.f_pass_confirm;
+                    
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/user/register',
+                        data: JSON.stringify(formData),
+                        success: function(data) {
+                            if (data.result === "success") {
+                                toastr.success('注册成功，2秒后跳转到登录页！');
+                                setTimeout(function() {
+                                    window.location.href = '/module/login.html';
+                                }, 2000);
+                            } else if (data.result === "fail") {
+                                toastr.error('注册失败：用户名（工号）已存在');
+                                submitBtn.html(originalText);
+                                submitBtn.prop('disabled', false);
+                            } else if (data.result === "error") {
+                                toastr.error('注册出错：' + (data.error || '服务器未知错误'));
+                                submitBtn.html(originalText);
+                                submitBtn.prop('disabled', false);
+                            } else if (data.result === "tp_user_fail") {
+                                toastr.error('图谱用户同步注册出错：' + (data.error || '错误'));
+                                submitBtn.html(originalText);
+                                submitBtn.prop('disabled', false);
+                            }
+                        },
+                        error: function(e) {
+                            toastr.error('网络错误：' + (e.status || '请求失败，请重试'));
+                            submitBtn.html(originalText);
+                            submitBtn.prop('disabled', false);
+                        }
+                    });
+                }
+            });
+
+            $('.form-input, .form-select').focus(function() {
+                $(this).closest('.form-group').addClass('scale-[1.005] transition-transform duration-200');
+            }).blur(function() {
+                $(this).closest('.form-group').removeClass('scale-[1.005]');
+            });
+
+            // 为select2添加焦点效果
+            $('#FCollegeID').on('select2:open', function() {
+                $(this).closest('.form-group').addClass('scale-[1.005] transition-transform duration-200');
+            }).on('select2:close', function() {
+                $(this).closest('.form-group').removeClass('scale-[1.005]');
+            });
+        });
+    </script>
+</body>
+</html>

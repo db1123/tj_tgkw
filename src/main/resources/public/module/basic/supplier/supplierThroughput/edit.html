@@ -1,0 +1,266 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<!--_global 公共配置文件 -->
+<script language="javascript">var golbal_type="admin";</script>
+<script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+<!--_only 独立样式 -->
+<link rel="stylesheet" href="/plugins/select2/css/select2.min.css" />
+<link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css" />
+<!--/_only 独立样式 -->
+</head>
+<body>
+<article class="page-container">
+  <form action="" method="post" class="form form-horizontal" id="supplierThroughputForm">
+    <div class="row cl">
+      <div class="col-xs-6 col-sm-6">
+        <div class="row cl">
+          <div class="formControls col-xs-12 col-sm-12 big">
+            <select name="materiel_id" style="width: 100%;"></select>
+          </div>
+        </div>
+        <div class="row cl">
+          <div class="formControls col-xs-12 col-sm-12">
+            <ul id="materielTreeUL" class="ztree" style="width:355px; height:280px; overflow:auto; border: 1px solid #617775; background: #f7f7f7;"></ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-6 col-sm-6">
+        <div class="row cl supplier-throughput-form-group-select-supplier-div" style="display: none;">
+          <label class="form-label col-xs-5 col-sm-4"><span class="c-red">*</span>企业：</label>
+          <div class="formControls col-xs-6 col-sm-7 big">
+            <select name="f_supplier_id" style="width: 100%;"></select>
+          </div>
+        </div>
+        <div class="row cl">
+          <label class="form-label col-xs-5 col-sm-4"><span class="c-red">*</span>生产能力(年)：</label>
+          <div class="formControls col-xs-6 col-sm-7">
+            <input type="text" class="input-text" name="f_throughput" />
+          </div>
+        </div>
+        <div class="row cl">
+          <label class="form-label col-xs-5 col-sm-4"><span class="c-red">*</span>质量水平：</label>
+          <div class="formControls col-xs-6 col-sm-7">
+            <input type="text" class="input-text" name="f_ppm" />
+          </div>
+        </div>
+        <div class="row cl">
+          <label class="form-label col-xs-5 col-sm-4"><span class="c-red">*</span>成功概率：</label>
+          <div class="formControls col-xs-6 col-sm-7">
+            <input type="text" class="input-text" name="f_probability" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="toolbar-bottom-line"></div>
+		<div class="toolbar-bottom-btn">
+			<input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;" />
+			<input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;" onclick="layer_close()" />
+		</div>
+    <input type="hidden" value="" name="f_key_id" />
+	</form>
+</article>
+
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script> 
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript">
+// 企业ID
+var sid = getQueryStringByName('sid');
+// 编辑框状态 1新建 2修改
+var op = getQueryStringByName('op');
+// 业务代码
+$(function(){
+  if (isNull(sid)) {
+    $('.supplier-throughput-form-group-select-supplier-div').show();
+    // 初始公司下拉列表(表单)
+    $("#supplierThroughputForm select[name='f_supplier_id']").select2({
+      placeholder: '请选择公司',
+      ajax: {
+        type:'POST',
+        url: "/s/supplier/queryDataSupplierSelect",
+        dataType: 'json',
+        data: function (params) {
+          return {
+            search: params.term,
+          };
+        },
+        delay: 800,
+        cache: true
+      },
+      language: "zh-CN"
+    });
+  }
+  // 初始公司下拉列表(表单)
+  $("#supplierThroughputForm select[name='materiel_id']").select2({
+    placeholder: '请选择BOM',
+    ajax: {
+      type:'POST',
+      url: "/s/materiel/queryDataMaterielSelect",
+      dataType: 'json',
+      data: function (params) {
+        return {
+          search: params.term,
+        };
+      },
+      delay: 800,
+      cache: true
+    },
+    language: "zh-CN"
+  });
+  $("#supplierThroughputForm select[name='materiel_id']").on("select2:select",function(e){
+    zTreeMaterielSetting.async.otherParam = ["f_m_id", e.params.data.id];
+    materielZTree = $.fn.zTree.init($('#materielTreeUL'), zTreeMaterielSetting);
+  });
+  // 初始化权限树
+  var zTreeMaterielSetting = {
+    async: {
+      enable: true,
+      url:"/s/materiel/showMaterielTree",
+      autoParam:["id", "name=n", "level=lv"],
+		  otherParam: ["f_m_id", -1]
+    },
+    check: {
+      chkStyle: "radio",
+      radioType: "all",
+      enable: true
+    },
+    data: {
+      simpleData: {
+        enable: true,
+        idKey: "id",
+        pIdKey: "pId",
+        rootPId: 0
+      }
+    }
+  };
+  var materielZTree = $.fn.zTree.init($('#materielTreeUL'), zTreeMaterielSetting);
+  // 修改操作时读取表单信息
+  if (op == 2) {
+    var id = getQueryStringByName('id');
+    $.ajax({
+      type: 'POST',
+      contentType: 'application/json',
+      url: '/s/supplierThroughput/querySupplierThroughputInfo', // 调用地址
+      data: JSON.stringify({
+        id
+      }),
+      async: false,
+      success: function(data) {
+        if (isNull(sid)) {
+          var option = new Option(data.info.supplier_name, data.info.f_supplier_id, true, true);
+          $("#supplierThroughputForm select[name='f_supplier_id']").append(option);
+          $("#supplierThroughputForm select[name='f_supplier_id']").change();
+        }
+        var materielOption = new Option(data.info.m_name, data.info.m_id, true, true);
+        $("#supplierThroughputForm select[name='materiel_id']").append(materielOption);
+        $("#supplierThroughputForm select[name='materiel_id']").change();
+        zTreeMaterielSetting.async.otherParam = ["f_m_id", data.info.m_id];
+        materielZTree = $.fn.zTree.init($('#materielTreeUL'), zTreeMaterielSetting);
+        setTimeout(function() {
+          var node = materielZTree.getNodeByParam('id', data.info.f_m_t_id);
+          materielZTree.selectNode(node);
+          materielZTree.checkNode(node, true, true);
+        }, 1000);
+        $("#supplierThroughputForm input[name='f_key_id']").val(data.info.key);
+        $("#supplierThroughputForm input[name='f_throughput']").val(data.info.f_throughput);
+        $("#supplierThroughputForm input[name='f_ppm']").val(data.info.f_ppm);
+        $("#supplierThroughputForm input[name='f_probability']").val(data.info.f_probability);
+      },
+      error : function(e) {
+        toastr.error(e.status);
+        toastr.error(e.responseText);
+      }
+    });
+  }
+  // 检验数据
+  $('#supplierThroughputForm').validate({
+    rules: {
+      f_throughput: { required: true },
+      f_ppm: { required: true },
+      f_probability: { required: true }
+    },
+    messages: {
+      f_throughput: { required: '*请输入生产能力(年)' },
+      f_ppm: { required: '*请输入质量水平(PPM)' },
+      f_probability: { required: '*请输入成功概率' }
+    },
+    onfocusout: false, // 是否在获取焦点时验证
+    onkeyup: false, // 是否在敲击键盘时验证
+    focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+    focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+    success: 'valid',
+    submitHandler:function(){
+      // 获取物料树选择情况
+      var nodes = materielZTree.getCheckedNodes(true).map((item)=>{
+        return item.id;
+      });
+      if(nodes.length == 1) {
+        // 获取参数
+        var data = form2Json('supplierThroughputForm');
+        data['f_m_t_id'] = nodes[0];
+        // 外部参数
+        if (!isNull(sid)) {
+          data['f_supplier_id'] = sid;
+        }
+        // 执行
+        if (op == 1) { // 添加操作
+          $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/supplierThroughput/addSupplierThroughput', // 调用地址
+            data: JSON.stringify(data),
+            async: false,
+            success: function(data) {
+              if (data.result == 'success') {
+                parent.$('#supplierThroughputTable').DataTable().ajax.reload(null, false);
+                parent.toastr.success('添加成功！');
+                layer_close();
+              } else if (data.result == 'error') {
+                toastr.error(data.error);
+              }
+            },
+            error : function(e){
+              toastr.error(e.status);
+              toastr.error(e.responseText);
+            }
+          });
+        }else {
+          $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/supplierThroughput/updateSupplierThroughput', // 调用地址
+            data: JSON.stringify(data),
+            async: false,
+            success: function(data) {
+              if (data.result == 'success') {
+                parent.$('#supplierThroughputTable').DataTable().ajax.reload(null, false);
+                parent.toastr.success('修改成功！');
+                layer_close();
+              } else if (data.result == 'error') {
+                toastr.error(data.error);
+              }
+            },
+            error : function(e){
+              toastr.error(e.status);
+              toastr.error(e.responseText);
+            }
+          });
+        }
+      } else {
+        toastr.error('请选择物料');
+      }
+    }
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,615 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <script type="text/javascript" src="/javascript/jquery.base64.js"></script>
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css"/>
+    <style type="text/css">
+        /* 整体页面基础样式 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            font-size: 14px;
+        }
+        
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        /* 关键词高亮样式 */
+        .highlight {
+            background-color: #fff0f0;
+            color: #d9534f;
+            padding: 0 3px;
+            border-radius: 2px;
+            font-weight: bold;
+            text-decoration: underline;
+            text-decoration-style: dotted;
+            text-decoration-color: #d9534f;
+        }
+
+        /* 搜索区域样式 */
+        .search-container {
+            text-align: center;
+            margin: 30px 0 40px;
+            margin-top: -15px;
+        }
+
+        .search-container h2 {
+            color: #0F3460;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .search-controls {
+            display: inline-flex;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* 搜索框样式 */
+        .doc-form-text-keyword {
+            height: 44px !important;
+            flex-grow: 1 !important;
+            padding: 0 15px !important;
+            font-size: 15px !important;
+            color: #333 !important;
+            border: 1px solid #ddd !important;
+            border-radius: 4px 0 0 4px !important;
+            outline: none !important;
+            margin-right: 0 !important;
+        }
+
+        .doc-form-text-keyword:focus {
+            border-color: #0F3460 !important;
+            box-shadow: inset 0 1px 1px rgba(0,0,0,0.075), 0 0 4px rgba(15, 52, 96, 0.2) !important;
+        }
+
+        /* 搜索按钮样式 */
+        .doc-btn-search-fun {
+            height: 44px !important;
+            padding: 0 25px !important;
+            font-size: 15px !important;
+            font-weight: 500 !important;
+            color: white !important;
+            background-color: #0F3460 !important;
+            border: 1px solid #0F3460 !important;
+            border-radius: 0 4px 4px 0 !important;
+            cursor: pointer;
+            transition: background-color 0.2s ease !important;
+        }
+
+        .doc-btn-search-fun:hover {
+            background-color: #0a2540 !important;
+            border-color: #0a2540 !important;
+        }
+
+        /* 文档预览弹窗样式 */
+        .doc-preview-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 1000;
+            overflow: auto;
+        }
+
+        .doc-preview-content {
+            position: relative;
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 1200px;
+            min-height: 600px;
+            border-radius: 4px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .close-preview {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #0F3460;
+            transition: color 0.2s ease;
+        }
+
+        .close-preview:hover {
+            color: #0a2540;
+        }
+
+        #previewTitle {
+            margin-top: 0;
+            color: #0F3460;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .doc-preview-iframe {
+            width: 100%;
+            height: 550px;
+            border: none;
+            border-top: 1px solid #eee;
+            margin-top: 15px;
+        }
+
+        /* 加载状态样式 */
+        .loading-shade {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 100;
+            text-align: center;
+            padding-top: 20%;
+        }
+
+        .loading-shade i.Hui-iconfont {
+            font-size: 36px;
+            color: #0F3460 !important;
+        }
+
+        .loading-shade p {
+            margin-top: 10px;
+            color: #0F3460 !important;
+            font-size: 16px;
+        }
+
+        /* 表格样式优化 */
+        #docTable {
+            border-collapse: collapse;
+            width: 99% !important;
+            margin-top: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        #docTable th {
+            background-color: #f5f7fa;
+            color: #0F3460 !important;
+            font-weight: 600 !important;
+            padding: 10px 8px !important;
+            text-align: left !important;
+            border-bottom: 2px solid #eaecef !important;
+            font-size: 12px !important;
+        }
+
+        #docTable td {
+            padding: 10px 8px !important;
+            border-bottom: 1px solid #eaecef !important;
+            font-size: 12px !important;
+            color: #333;
+        }
+
+        #docTable tr:hover {
+            background-color: #f8f9fa !important;
+        }
+
+        /* 操作按钮样式 */
+        .btn {
+            padding: 4px 8px !important;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            font-size: 11px !important;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: #0F3460 !important;
+            color: white !important;
+            border-color: #0F3460 !important;
+        }
+
+        .btn-primary:hover {
+            background-color: #0a2540 !important;
+            border-color: #0a2540 !important;
+        }
+
+        /* 适配小屏幕 */
+        @media (max-width: 768px) {
+            .search-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .doc-form-text-keyword,
+            .doc-btn-search-fun {
+                width: 100% !important;
+                border-radius: 4px !important;
+                margin-right: 0 !important;
+                margin-bottom: 10px;
+            }
+
+            .doc-btn-search-fun {
+                margin-bottom: 0;
+            }
+        }
+    </style>
+    <!--/_only 独立样式 -->
+</head>
+<body>
+<div class="page-container">
+    <!-- 加载遮罩层 -->
+    <div class="loading-shade" id="loadingShade">
+        <i class="Hui-iconfont">&#xe681;</i>
+        <p>正在搜索文档...</p>
+    </div>
+    
+    <!-- 搜索区域 - 无文档类型下拉框 -->
+    <div class="search-container">
+        <h2>跨资源检索</h2>
+        <div class="search-controls">
+            <input type="text" class="input-text doc-form-text-keyword" placeholder="输入关键词搜索文档..." />
+            <button type="button" class="btn doc-btn-search-fun"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+        </div>
+    </div>
+    
+    <!-- 搜索结果表格 -->
+    <div class="table-panel">
+        <table id="docTable" class="display compact"></table>
+    </div>
+</div>
+
+<!-- 文档预览弹窗 -->
+<div id="docPreviewModal" class="doc-preview-modal">
+    <div class="doc-preview-content">
+        <span class="close-preview">&times;</span>
+        <h3 id="previewTitle"></h3>
+        <iframe id="previewIframe" class="doc-preview-iframe" src=""></iframe>
+    </div>
+</div>
+
+<!-- 引入base64编码所需的js文件 -->
+<script type="text/javascript" src="/javascript/jquery.base64.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+    
+    
+    $(function () {
+        // 确保DataTablesLanguage已定义
+        window.DataTablesLanguage = window.DataTablesLanguage || {
+            "sProcessing": "处理中...",
+            "sLengthMenu": "显示 _MENU_ 项结果",
+            "sZeroRecords": "没有匹配结果",
+            "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+            "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+            "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+            "sInfoPostFix": "",
+            "sSearch": "搜索:",
+            "sUrl": "",
+            "sEmptyTable": "请输入关键词进行搜索",
+            "sLoadingRecords": "载入中...",
+            "sInfoThousands": ",",
+            "oPaginate": {
+                "sFirst": "首页",
+                "sPrevious": "上页",
+                "sNext": "下页",
+                "sLast": "末页"
+            },
+            "oAria": {
+                "sSortAscending": ": 以升序排列此列",
+                "sSortDescending": ": 以降序排列此列"
+            }
+        };
+
+        // 显式声明并初始化isBackendAvailable变量
+        let isBackendAvailable = false;
+        
+        // 初始化表格 - 初始为空
+        let docTable;
+        try {
+            docTable = $('#docTable').DataTable({
+                processing: false,
+                serverSide: false,
+                data: [],
+                columns: [
+                    {
+                        title: '文档名称', 
+                        data: null, 
+                        width: 150,
+                        render: function(data, type, row) {
+                            return row.fileName || '';
+                        } 
+                    },
+                    {
+                        title: '文件类型', 
+                        data: 'fileType', 
+                        width: 60,
+                        render: function(data) {
+                            return data ? data.toUpperCase() : '';
+                        }
+                    },
+                    {
+                        title: '上传时间', 
+                        data: 'uploadTime', 
+                        width: 140,
+                        render: function(data) {
+                            if (!data) return '';
+                            
+                            // 优化日期显示：只显示年月日
+                            try {
+                                const date = new Date(data.replace('CST ', ''));
+                                if (!isNaN(date.getTime())) {
+                                    const year = date.getFullYear();
+                                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                                    const day = String(date.getDate()).padStart(2, '0');
+                                    return `${year}-${month}-${day}`;
+                                }
+                            } catch (e) {
+                                console.log("日期格式化失败:", e);
+                            }
+                            
+                            return data.split(' ').slice(0, 3).join(' ');
+                        }
+                    },
+                    {
+                        title: '版本', 
+                        data: 'edition', 
+                        width: 60
+                    },
+                    {
+                        title: '来源表', 
+                        data: 'sourceTable', 
+                        width: 100
+                    },
+                    /* {
+                        title: '项目ID', 
+                        data: 'projectId', 
+                        width: 120,
+                        render: function(data) {
+                            return data ? (data.length > 15 ? data.substring(0, 15) + '...' : data) : '';
+                        }
+                    }, */
+                    {
+                        title: '内容预览', 
+                        data: 'contentPreview',
+                        render: function(data) {
+                            let previewText = data || '无预览内容';
+                            return previewText.length > 150 ? previewText.substring(0, 150) + '...' : previewText;
+                        }
+                    },
+                    {
+                        title: '操作',
+                        data: null,
+                        width: 80,
+                        orderable: false,
+                        render: function (data, type, row) {
+                            return `<button type="button" class="btn btn-primary size-MINI" onclick="yulan('${row.filePath}')"><i class="fas fa-eye"></i> 在线预览</button>`;
+                        }
+                    }
+                ],
+                paging: true,
+                pageLength: 20,
+                pagingType: 'full_numbers',
+                lengthChange: false,
+                searching: false,
+                ordering: true,
+                info: true,
+                language: DataTablesLanguage
+            });
+        } catch (e) {
+            console.log("DataTable初始化失败:", e);
+        }
+
+        // 获取当前搜索关键词
+        function getCurrentKeywords() {
+            return $(".doc-form-text-keyword").val() || "";
+        }
+
+        // 测试后端连接
+        function testBackendConnection() {
+            return new Promise((resolve) => {
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    url: '/s/solr/searchDocuments',
+                    data: JSON.stringify({page: 1, results: 1, keyword: ''}),
+                    success: function() {
+                        resolve(true);
+                    },
+                    error: function() {
+                        resolve(false);
+                    }
+                });
+            });
+        }
+
+        // 执行实际搜索请求
+        function performActualSearch(keyword) {
+            return new Promise((resolve, reject) => {
+                $('#loadingShade').show();
+                
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    url: '/s/solr/searchDocuments',
+                    data: JSON.stringify({
+                        page: 1,
+                        results: 20,
+                        keyword: keyword,
+                        sort: "relevance",
+                        highlight: true
+                    }),
+                    success: function(response) {
+                        $('#loadingShade').hide();
+                        resolve(response);
+                    },
+                    error: function(xhr, status, error) {
+                        $('#loadingShade').hide();
+                        reject({status, error, statusCode: xhr.status});
+                    }
+                });
+            });
+        }
+
+        // 执行搜索并高亮关键词
+        async function performSearch() {
+            const keyword = getCurrentKeywords();
+            
+            if (!keyword.trim()) {
+                docTable.clear().draw();
+                return;
+            }
+            
+            try {
+                if (isBackendAvailable) {
+                    const response = await performActualSearch(keyword);
+                    
+                    if (!response || typeof response !== 'object' || !Array.isArray(response.list)) {
+                        docTable.clear().rows.add([]).draw();
+                        return;
+                    }
+                    
+                    if (response.list.length === 0) {
+                        docTable.clear().rows.add([{
+                            id: "empty",
+                            fileName: "无匹配结果",
+                            fileType: "",
+                            uploadTime: "",
+                            edition: "",
+                            sourceTable: "",
+                            projectId: "",
+                            contentPreview: "没有找到与关键词匹配的文档，请尝试其他关键词"
+                        }]).draw();
+                    } else {
+                        docTable.clear().rows.add(response.list).draw();
+                    } 
+                } else {
+                    docTable.clear().rows.add([]).draw();
+                }
+            } catch (e) {
+                console.error("搜索失败:", e);
+                docTable.clear().rows.add([{
+                    id: "error",
+                    fileName: "搜索失败",
+                    fileType: "",
+                    uploadTime: "",
+                    edition: "",
+                    sourceTable: "",
+                    projectId: "",
+                    contentPreview: "搜索过程中发生错误，请稍后重试"
+                }]).draw();
+            }
+        }
+        
+        // 搜索按钮点击事件
+        $('.doc-btn-search-fun').on('click', performSearch);
+        
+        // 回车键触发搜索
+        $('.doc-form-text-keyword').keypress(function(e) {
+            if (e.which == 13) {
+                performSearch();
+                return false;
+            }
+        });
+        
+        // 初始化时测试后端连接
+        testBackendConnection().then(available => {
+            isBackendAvailable = available;
+        });
+        
+        // 关闭预览弹窗
+        try {
+            $('.close-preview').on('click', function() {
+                $('#docPreviewModal').hide();
+                $('#previewIframe').attr('src', '');
+            });
+            
+            $(window).on('click', function(event) {
+                if (event.target == document.getElementById('docPreviewModal')) {
+                    $('#docPreviewModal').hide();
+                    $('#previewIframe').attr('src', '');
+                }
+            });
+        } catch (e) {
+            console.log("弹窗事件绑定失败:", e);
+        }
+    });
+
+    // 关键词高亮处理函数
+    function highlightKeywords(text, keywords) {
+        try {
+            if (!text || !keywords || keywords.trim() === '') {
+                return text || '';
+            }
+            
+            const keywordArray = keywords.trim().split(/\s+/).filter(k => k);
+            if (keywordArray.length === 0) {
+                return text;
+            }
+            
+            const pattern = keywordArray.map(keyword => 
+                keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+            ).join('|');
+            
+            const regex = new RegExp(`(${pattern})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        } catch (e) {
+            console.log("高亮处理失败:", e);
+            return text || '';
+        }
+    }
+
+    // 预览文档
+    function yulan(file_path) {
+    	//var fileurl = YULANIP2 + 'onlinePreview?url=' + encodeURIComponent($.base64.encode((file_path2)));
+    	//window.open(fileurl);
+         $.ajax({
+            type: 'POST',
+            contentType: 'application/json;charset=UTF-8',
+            url: '/s/solr/solrurl_change',
+            data: JSON.stringify({
+            	url: file_path,
+                ip: YULANIP,
+               // ftype: 1,
+               // FProjectID: 1
+            }),
+            success: function (data) {
+                if (data.result == 'success') {
+                    var url = data.url;
+                    var fileurl = YULANIP2 + 'onlinePreview?url=' + encodeURIComponent($.base64.encode(url));
+                    window.open(fileurl);
+                }
+                if (data.result == 'error') {
+                    toastr.error(data.error);
+                }
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        }); 
+    }
+</script>
+</body>
+</html>

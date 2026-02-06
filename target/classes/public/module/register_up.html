@@ -1,0 +1,453 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <script language="javascript">var golbal_type="register";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script>
+  
+    <!-- 引入外部资源 -->
+    <script src="/nui-ad/login/3.4.17"></script>
+    <link href="/nui-ad/login/fonts/font-awesome.min.css" rel="stylesheet">
+    <script src="/nui-ad/login/xlsx.full.min.js"></script>
+    
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0F3460',
+                        secondary: '#1A73E8',
+                        accent: '#E94560',
+                        neutral: '#F8F9FA',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .bg-gradient-academic {
+                background: linear-gradient(135deg, #0F3460 0%, #16213E 100%);
+            }
+            .text-balance {
+                text-wrap: balance;
+            }
+            .btn-hover {
+                @apply hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-300;
+            }
+            .file-upload-area {
+                @apply border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-secondary transition-colors cursor-pointer;
+            }
+            .progress-container {
+                @apply h-2 bg-gray-200 rounded-full overflow-hidden mt-4 hidden;
+            }
+            .progress-bar {
+                @apply h-full bg-secondary rounded-full transition-all duration-300 w-0;
+            }
+        }
+    </style>
+    <style type="text/css">
+        /* 隐藏实际文件输入 */
+        #fileUpload {
+            display: none;
+        }
+    </style>
+
+</head>
+<body class="bg-gray-100 min-h-screen font-sans text-gray-800 flex items-center justify-center p-4">
+    <!-- 主容器 -->
+    <div class="w-full max-w-2xl mx-auto">
+        <!-- 卡片容器 -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden page-transition">
+            <!-- 顶部装饰条 -->
+            <div class="h-1.5 bg-gradient-to-r from-primary to-secondary"></div>
+            
+            <!-- 批量导入区域 -->
+            <div class="p-8 md:p-10">
+                <!-- 标题区域 -->
+                <div class="mb-8 text-center">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa fa-file-excel-o text-primary text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2" id="header">批量导入教师信息</h2>
+                    <p class="text-gray-500">上传Excel文件批量注册教师账号，支持单次导入多条数据</p>
+                </div>
+                
+                <!-- 核心上传区域 -->
+                <div class="mb-8">
+                    <div id="uploadArea" class="file-upload-area">
+                        <input type="file" id="fileUpload" accept=".xlsx,.xls" />
+                        <i class="fa fa-cloud-upload text-4xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-600 text-lg mb-2">点击或拖拽Excel文件到此处上传</p>
+                        <p class="text-gray-400">支持 .xlsx 和 .xls 格式，</p>
+                    </div>
+                    <a style="    float: right;" href="#" class="text-secondary font-medium" id="downloadTemplate">下载标准模板</a>
+                    
+                    <!-- 进度条 -->
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    
+                    <!-- 导入状态提示 -->
+                    <div id="importStatus" class="mt-3 text-sm hidden"></div>
+                </div>
+                
+                <!-- 操作按钮组 -->
+                <div class="pt-4 flex justify-center">
+                    <button type="button" onclick="window.location.href='/module/login.html'"
+                            class="bg-gray-100 text-gray-700 font-medium py-3 px-8 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center text-base">
+                        <i class="fa fa-sign-in mr-2"></i> 前往登录
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 版权信息 -->
+        <div class="mt-6 text-center text-sm text-gray-500 opacity-80" id="footer">
+            © 2025 天津仁爱学院 数智传媒与设计艺术学院-教学多元数据管理系统平台
+        </div>
+    </div>
+
+    <!-- 必要脚本资源 -->
+    <script src="/nui-ad/login/toastr.min.js"></script>
+    <link href="/nui-ad/login/toastr.min.css" rel="stylesheet">
+    
+    <script type="text/javascript">
+        // 初始化页面标题和版权信息
+        document.title = WEB_TITLE || "批量导入教师信息";
+        document.getElementById("footer").innerHTML = FOOTER_TEXT || "© 2025 天津仁爱学院 数智传媒与设计艺术学院-教学多元数据管理系统平台";
+
+        // 初始化提示框
+        toastr.options = {
+            "positionClass": "toast-center-center",
+            "timeOut": "2000",
+            "preventDuplicates": true,
+            "progressBar": true
+        };
+
+        // 批量导入核心功能
+        $(function() {
+            // 上传区域点击触发文件选择
+            $('#uploadArea').click(function() {
+                $('#fileUpload').click();
+            });
+
+            // 阻止上传区域的点击事件冒泡
+            $('#fileUpload').click(function(e) {
+                e.stopPropagation();
+            });
+
+            // 拖拽功能
+            $('#uploadArea').on('dragover', function(e) {
+                e.preventDefault();
+                $(this).addClass('border-secondary bg-secondary/5');
+            });
+
+            $('#uploadArea').on('dragleave', function() {
+                $(this).removeClass('border-secondary bg-secondary/5');
+            });
+
+            $('#uploadArea').on('drop', function(e) {
+                e.preventDefault();
+                $(this).removeClass('border-secondary bg-secondary/5');
+                
+                if (e.originalEvent.dataTransfer.files.length) {
+                    var file = e.originalEvent.dataTransfer.files[0];
+                    handleFileUpload(file);
+                }
+            });
+
+            // 文件选择变化时处理
+            $('#fileUpload').change(function() {
+                if (this.files.length) {
+                    handleFileUpload(this.files[0]);
+                }
+            });
+
+            // 下载模板
+            $('#downloadTemplate').click(function(e) {
+                e.preventDefault();
+                downloadExcelTemplate();
+            });
+        });
+
+        // 处理文件上传
+        function handleFileUpload(file) {
+            // 验证文件类型
+            if (!file.name.match(/\.(xlsx|xls)$/)) {
+                toastr.error('请上传Excel文件（.xlsx或.xls格式）');
+                return;
+            }
+
+            // 显示进度条和状态
+            $('#progressContainer').removeClass('hidden');
+            $('#progressBar').css('width', '0%');
+            $('#importStatus').removeClass('hidden').html('<span class="text-blue-500">正在解析文件...</span>');
+
+            var reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    // 解析Excel文件
+                    var data = new Uint8Array(e.target.result);
+                    var workbook = XLSX.read(data, { type: 'array' });
+                    var firstSheetName = workbook.SheetNames[0];
+                    var worksheet = workbook.Sheets[firstSheetName];
+                    var jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                    if (jsonData.length === 0) {
+                        toastr.warning('Excel文件中没有数据');
+                        resetUploadUI();
+                        return;
+                    }
+
+                    // 验证数据格式
+                    var validationResult = validateExcelData(jsonData);
+                    if (!validationResult.valid) {
+                        toastr.error(`数据格式错误：${validationResult.message}（行号：${validationResult.row}）`);
+                        resetUploadUI();
+                        return;
+                    }
+
+                    // 开始导入数据
+                    importExcelData(jsonData);
+                } catch (error) {
+                    console.error('文件解析错误:', error);
+                    toastr.error('文件解析失败，请检查文件格式');
+                    resetUploadUI();
+                }
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        // 验证Excel数据格式
+        function validateExcelData(data) {
+            // 必需的字段列表
+            var requiredFields = ['f_login', 'f_name', 'f_pass', 'FCollegeID', 'f_gender', 'f_title', 'f_email', 'f_phone', 'f_status'];
+            
+            for (var i = 0; i < data.length; i++) {
+                var row = data[i];
+                var rowNumber = i + 2; // 表格行号从2开始（1是表头）
+                
+                // 检查必需字段
+                for (var field of requiredFields) {
+                    if (row[field] === undefined || row[field] === null || row[field].toString().trim() === '') {
+                        return {
+                            valid: false,
+                            message: `缺少必填字段：${getFieldDisplayName(field)}`,
+                            row: rowNumber
+                        };
+                    }
+                }
+                
+                // 验证手机号
+                if (row.f_phone.toString().length !== 11 || isNaN(row.f_phone)) {
+                    return {
+                        valid: false,
+                        message: '联系电话格式不正确（必须是11位数字）',
+                        row: rowNumber
+                    };
+                }
+                
+                // 验证密码长度
+                if (row.f_pass.toString().length < 6) {
+                    return {
+                        valid: false,
+                        message: '密码长度不能少于6个字符',
+                        row: rowNumber
+                    };
+                }
+                
+                // 验证邮箱格式
+                var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(row.f_email.toString())) {
+                    return {
+                        valid: false,
+                        message: '电子邮箱格式不正确',
+                        row: rowNumber
+                    };
+                }
+            }
+            
+            return { valid: true };
+        }
+
+        // 获取字段显示名称
+        function getFieldDisplayName(field) {
+            var fieldNames = {
+                'f_login': '用户名（工号）',
+                'f_name': '教师姓名',
+                'f_pass': '密码',
+                'FCollegeID': '学院ID',
+                'f_gender': '性别',
+                'f_title': '职称',
+                'f_email': '电子邮箱',
+                'f_phone': '联系电话',
+                'f_status': '在职状态'
+            };
+            return fieldNames[field] || field;
+        }
+
+        // 导入Excel数据
+        function importExcelData(data) {
+            var total = data.length;
+            var successCount = 0;
+            var failCount = 0;
+            var failLogs = [];
+            
+            // 逐个导入数据
+            function importNext(index) {
+                if (index >= total) {
+                    // 全部导入完成
+                    var statusHtml = '';
+                    if (successCount === total) {
+                        statusHtml = `<span class="text-green-500 font-medium">导入完成：成功 ${successCount} 条，失败 ${failCount} 条</span>`;
+                        toastr.success(`全部导入成功，共 ${successCount} 条记录`);
+                        
+                        // 3秒后跳转到登录页
+                        setTimeout(function() {
+                            window.location.href = '/module/login.html';
+                        }, 3000);
+                    } else {
+                        statusHtml = `<span class="text-yellow-500 font-medium">导入完成：成功 ${successCount} 条，失败 ${failCount} 条</span>`;
+                        if (failLogs.length > 0) {
+                            statusHtml += '<div class="mt-2 text-red-500 text-xs max-h-20 overflow-y-auto p-2 bg-red-50 rounded">' + 
+                                          '失败记录：<br>' + failLogs.join('<br>') + 
+                                          '</div>';
+                        }
+                        toastr.warning(`部分导入成功，成功 ${successCount} 条，失败 ${failCount} 条`);
+                    }
+                    
+                    $('#importStatus').html(statusHtml);
+                    return;
+                }
+                
+                // 更新进度
+                var progress = Math.round(((index + 1) / total) * 100);
+                $('#progressBar').css('width', progress + '%');
+                $('#importStatus').html(`<span class="text-blue-500">正在导入第 ${index + 1}/${total} 条数据...</span>`);
+                
+                // 准备数据
+                var formData = { ...data[index] };
+                
+                // 转换性别值（文本转数字）
+                if (formData.f_gender === '男') formData.f_gender = 1;
+                if (formData.f_gender === '女') formData.f_gender = 2;
+                
+                // 转换在职状态（文本转数字）
+                if (formData.f_status === '在职') formData.f_status = 1;
+                if (formData.f_status === '离职') formData.f_status = 2;
+                if (formData.f_status === '休假') formData.f_status = 3;
+                
+                // 发送请求
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    url: '/s/user/register',
+                    data: JSON.stringify(formData),
+                    success: function(response) {
+                        if (response.result === "success") {
+                            successCount++;
+                        } else {
+                            failCount++;
+                            failLogs.push(`第 ${index + 2} 行：${response.error || '注册失败'}`);
+                        }
+                        importNext(index + 1);
+                    },
+                    error: function(e) {
+                        failCount++;
+                        failLogs.push(`第 ${index + 2} 行：网络错误 - ${e.statusText}`);
+                        importNext(index + 1);
+                    }
+                });
+            }
+            
+            // 开始导入第一个
+            importNext(0);
+        }
+
+        // 重置上传UI状态
+        function resetUploadUI() {
+            $('#progressContainer').addClass('hidden');
+            $('#progressBar').css('width', '0%');
+            $('#importStatus').addClass('hidden').html('');
+            $('#fileUpload').val('');
+        }
+
+     // 下载Excel模板
+        function downloadExcelTemplate() {
+            // 创建工作簿和工作表
+            var wb = XLSX.utils.book_new();
+            
+            // 模板数据（表头+示例）
+            var teacherData = [
+                {
+                    f_login: "工号（必填）",
+                    f_name: "姓名（必填）",
+                    f_pass: "密码（必填，≥6位）",
+                    FCollegeID: "学院ID（必填）",
+                    f_gender: "性别（必填，1=男/2=女）",
+                    f_title: "职称（必填）",
+                    f_email: "邮箱（必填）",
+                    f_phone: "手机号（必填，11位）",
+                    f_status: "状态（必填，1=在职/2=离职/3=休假）",
+                    f_note: "备注（选填）"
+                },
+                {
+                    f_login: "2023001",
+                    f_name: "张三",
+                    f_pass: "123456",
+                    FCollegeID: "1",
+                    f_gender: "1",
+                    f_title: "讲师",
+                    f_email: "zhangsan@example.com",
+                    f_phone: "13800138000",
+                    f_status: "1",
+                    f_note: "计算机应用技术专业"
+                }
+            ];
+            
+            // 学院ID映射数据
+            var collegeData = [
+                { "学院ID": "0184A48C8C3DA6316E3B0B52ED695C98EE73665B966AEC0DA381193A8120C438", "学院名称": "数智传媒与设计艺术学院" },
+                { "学院ID": "02B11C2E2B741A812881ACEA5042B80F110B09C027C6F28FC36FC2C72D045D08", "学院名称": "人工智能学院" },
+                { "学院ID": "501B380EAEE923E41B3A4A37D255631FBE7FCE8C7AAFFA8FB26574DE935095E7", "学院名称": "计算机科学与技术学院" },
+                { "学院ID": "BFC044FD36420E15A5CF95C99479E4A1C7FEDE592F986A869012745100BF19F5", "学院名称": "环境科学与工程学院" },
+                { "学院ID": "5D9B0A5B081AC8F382605DD0F9187CF2E2E51ECEA30FACE2A5D0492418A39382", "学院名称": "理学院" },
+                { "学院ID": "EA13945E6260685218D911C548C6E36B374944BC80348D1AE3C473ED9AAD4DF6", "学院名称": "管理与经济学部" },
+                { "学院ID": "02D00A3DA964533B497A6F419EE0744C9F6D38718AB69F8818CB0FA9378E7804", "学院名称": "材料科学与工程学院" },
+                { "学院ID": "7025736FA66C546EE589E9C04773539B7FBC08DDC159B318CD1DC044E2AC35E7", "学院名称": "化工学院" },
+                { "学院ID": "2D6EC00C7BD42B7F369D9C944D3858C0C0A1EAA3B1B96EF7C750208833D206FB", "学院名称": "建筑学院" },
+                { "学院ID": "26A7F588CD678C2B51DDA5623CDB88D7A81B37D4D0BA0D943031577BC03269C6", "学院名称": "建筑工程学院" },
+                { "学院ID": "CD8CB44B2D64D8B53099F5C021E9FA5C13E483C35EF375742BA29F574F8CA808", "学院名称": "电气自动化与信息工程学院" },
+                { "学院ID": "52F5D7F01FF05FD38EFE28EF716095A9F21220B15F55297CFD45C8564C3087ED", "学院名称": "精密仪器与光电子工程学院" },
+                { "学院ID": "365C2E2C6240E8B4FE5EB5572C460EAE374944BC80348D1AE3C473ED9AAD4DF6", "学院名称": "机械工程学院" }
+            ];
+            
+            // 创建两个工作表
+            var teacherWs = XLSX.utils.json_to_sheet(teacherData);
+            var collegeWs = XLSX.utils.json_to_sheet(collegeData);
+            
+            // 添加工作表到工作簿
+            XLSX.utils.book_append_sheet(wb, teacherWs, "教师信息");
+            XLSX.utils.book_append_sheet(wb, collegeWs, "学院名称对应ID");
+            
+            // 生成并下载文件
+            XLSX.writeFile(wb, "教师信息导入模板.xlsx");
+        }
+    </script>
+</body>
+</html>

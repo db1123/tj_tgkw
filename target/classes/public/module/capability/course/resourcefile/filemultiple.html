@@ -1,0 +1,416 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css"/>
+    <link rel="stylesheet" href="/plugins/uploader/css/jquery.dm-uploader.min.css">
+    <link rel="stylesheet" href="/plugins/uploader/css/uploader.css">
+    <!--/_only 独立样式 -->
+</head>
+<style>
+    .progress-bar {
+        transition: width 0.3s ease-in-out;
+    }
+    .tishidiv {
+
+        justify-content: center;
+        align-items: center;
+        background-color: #f5f5f5;
+        border: 2px dashed #ccc;
+        border-radius: 5px;
+        color: #666;
+        font-size: 16px;
+        text-align: center;
+    }
+
+</style>
+<body style="overflow-x: hidden;">
+<article class="page-container">
+    <div class="row cl">
+        <div class="col-xs-6 col-sm-6" style="padding-left: 10px; padding-right: 10px;">
+            <div id="entity-uploader-file" class="dm-uploader text-c" style="padding:50px">
+                <h3 class="mt-50 mb-50" style="color: #6c757d;">拖 &amp; 拽文件到此处</h3>
+                <div class="btn btn-primary mb-50">
+                    <span>打开文件浏览器</span>
+                    <input type="file"  title='单击此处添加文件'/>
+                </div>
+            </div><!-- /uploader -->
+            <div class="mt-5">
+                <a href="#" class="btn btn-primary" id="btnApiStart">
+                    <i class="fa fa-play"></i> 全部开始
+                </a>
+                <a href="#" class="btn btn-danger" id="btnApiCancel">
+                    <i class="fa fa-stop"></i> 全部停止
+                </a>
+            </div>
+            <div class="tishidiv mt-5"></div>
+
+        </div>
+        <div class="col-xs-6 col-sm-6" style="padding-left: 10px; padding-right: 10px;">
+            <div class="panel panel-primary">
+                <div class="panel-header" style="padding: 1px 10px; font-size: 15px;">文件列表</div>
+                <div class="panel-body" style="padding: 10px;">
+                    <ul id="entityFiles">
+                        <li class="text-c empty" style="color: #6c757d;">未上传文件</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div><!-- /file list -->
+    <!-- File item template -->
+    <script type="text/html" id="entity-files-template">
+        <li class="media">
+            <div class="mb-5">
+                <p class="mb-5">
+                    <strong>%%filename%%</strong> - 状态: <span class="status c-666">等待中</span>
+                </p>
+                <div class="progress mb-5" style="width: 100%;">
+                    <div class="progress-bar progress-bar-primary">
+                        <span class="sr-only progress-bar-striped" style="width:0%"></span>
+                    </div>
+                </div>
+                <p class="controls mb-5">
+                    <button href="#" class="btn btn-primary size-S start" role="button">开始</button>
+                    <button href="#" class="btn btn-danger size-S cancel" role="button" disabled="disabled">取消
+                    </button>
+                    <!-- 新增：移除按钮，与其他按钮样式一致 -->
+                    <button href="#" class="btn btn-danger size-S delete" role="button" >移除</button>
+                </p>
+                <hr class="mt-5 mb-5"/>
+            </div>
+        </li>
+    </script><!-- /File item template -->
+</article>
+
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/plugins/uploader/js/jquery.dm-uploader.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript" src="/javascript/jquery.base64.js"></script>
+<script type="text/javascript">
+    var FCourseID = getQueryStringByName('FCourseID');
+
+    var filefitter;
+    var filefitterd;
+
+    var allowename;//带.    png
+    var allowenamed;//不带.    .png
+
+    let wjnum = 10;
+    // 业务代码
+    $(function () {
+        /*********************** 上传组件 开始 ***********************/
+        // 创建一个新文件并将其添加到我们的列表中
+        function ui_multi_add_file(id, file) {
+            var template = $('#entity-files-template').text();
+            template = template.replace('%%filename%%', file.name);
+            template = $($.parseHTML(template));
+            template.prop('id', 'EntityUploaderFile' + id);
+            template.data('file-id', id);
+            $('#entityFiles').find('li.empty').fadeOut(); // remove the 'no files yet'
+            $('#entityFiles').prepend(template);
+        }
+
+        // 更改列表中的状态消息
+        function ui_multi_update_file_status(id, status, message) {
+            $('#EntityUploaderFile' + id).find('span.status').html(message).prop('class', 'status c-' + status);
+        }
+
+        // 更新文件进度，具体取决于它可能设置动画或更改颜色的参数。
+        function ui_multi_update_file_progress(id, percent, color) {
+            color = (typeof color === 'undefined' ? false : color);
+            var bar = $('#EntityUploaderFile' + id).find('div.progress-bar');
+            var span = bar.find('span');
+            span.width(percent + '%');
+            if (color !== false) {
+                bar.removeClass('progress-bar-success progress-bar-primary progress-bar-warning progress-bar-danger');
+                bar.addClass('progress-bar-' + color);
+            }
+        }
+
+        // 在一个特定文件上切换星号/取消按钮的禁用状态
+        function ui_multi_update_file_controls(id, start, cancel, wasError) {
+            wasError = (typeof wasError === 'undefined' ? false : wasError);
+            $('#EntityUploaderFile' + id).find('button.start').prop('disabled', !start);
+            $('#EntityUploaderFile' + id).find('button.cancel').prop('disabled', !cancel);
+            if (!start && !cancel) {
+                $('#EntityUploaderFile' + id).find('.controls').fadeOut();
+            } else {
+                $('#EntityUploaderFile' + id).find('.controls').fadeIn();
+            }
+            if (wasError) {
+                $('#EntityUploaderFile' + id).find('button.start').html('Retry');
+            }
+        }
+
+        //获取文件过滤信息
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/filefilter/queryFileFilterSelect_dian', // 调用地址
+            data: JSON.stringify({
+             
+            }),
+            async: false,
+            success: function (data) {
+                filefitter = data.list;
+                filefitterd = data.results;
+                allowename = data.listname;
+                allowenamed = data.listnamed;
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+        // console.log(allowenamed);
+
+        // 全局变量：存储文件信息、上传实例、已移除ID
+        const uploadedFilesMap = new Map();
+        let dmUploaderInstance = null;
+        const deletedFileIds = new Set();
+
+        // 配置：精准匹配DOM结构
+        const FILE_CONFIG = {
+            listContainer: '#entityFiles',       // 文件列表容器
+            fileItem: 'li.media',                // 单个文件项选择器
+            fileIdAttr: 'data-file-id',          // 存储文件ID的属性名
+            deleteBtn: '.controls .delete',      // 移除按钮选择器
+            templateId: 'entity-files-template'  // 模板ID
+        };
+
+        // 上传组件初始化
+        $('#entity-uploader-file').dmUploader({
+            url: '/s/courseresourcefile/addtabseFile',
+            fieldName: 'f_file',
+            maxFileSize: wjnum * 1024 * 1024, // 文件上限 ，目前为10M
+            auto: false, // 是否为自动上传（即选择文件后是否自动上传），默认为true
+            // allowedTypes:'png,jpg', //允许的文件类型,对应onFileTypeError事件
+            // extFilter: ['doc', 'docx', 'xls', 'xlsx', 'gif', 'jpeg', 'jpg', 'png', 'pdf', 'txt'], // 允许的文件后缀名
+            extFilter:filefitter, //['jpeg', 'jpg', 'png', 'bmp','webp','gif'], // 允许的文件后缀名
+            extraData: function () { // 参数列表
+                return {
+                    FCourseID: FCourseID,
+                };
+            },
+            onInit: function () {
+                dmUploaderInstance = this;       // 存储上传实例
+                // 等待 DOM 渲染完成后再设置 accept
+                setTimeout(() => {
+                    // 通过 jQuery 选择器获取动态创建的 input 元素
+                    $('#entity-uploader-file input[type="file"]').attr('accept', allowename);
+                    $(".tishidiv").text('支持上传文件('+allowename+'),文件大小不能超过'+wjnum+'M!');
+                }, 100); // 延迟 100ms 确保 input 已创建
+            },
+            onFileExtError: function (file) { // 当文件类型错误时回调次函数
+                // console.log("jpegjpegjpegjpegjpeg")
+                toastr.error('支持上传文件('+allowename+')');
+            },
+            // onFileTypeError: function (file) { // 当文件类型错误时回调次函数
+            //     console.log("jpegjpegjpegjpegjpeg")
+            //     toastr.error('支持上传文件('+allowename+')');
+            // },
+
+            onFileSizeError: function (file) { // 文件大小错误时回调次函数
+                toastr.error('文件大小不能超过'+wjnum+'M');
+            },
+            onDragEnter: function () { // 在DnD区域拖动对象时发生
+                this.addClass('active');
+            },
+            onDragLeave: function () { // 从DnD区域拖出某物时发生
+                this.removeClass('active');
+            },
+            onNewFile: function (id, file) { // 选择新文件时回调此函数
+                ui_multi_add_file(id, file);
+
+                // 2. 移除空列表提示
+                $(`${FILE_CONFIG.listContainer} .empty`).remove();
+                // 3. 存储文件信息到映射表
+                uploadedFilesMap.set(id, {
+                    name: file.name,
+                    size: formatFileSize(file.size),
+                    status: 'pending'
+                });
+                // 4. 强制绑定fileId到文件项（核心修复）
+                // 延长延迟确保模板渲染完成，循环检查直到DOM生成
+                const checkDOM = setInterval(() => {
+                    // 查找最新添加的文件项（通过文件名精准匹配，避免顺序问题）
+                    const $fileItem = $(`${FILE_CONFIG.listContainer} ${FILE_CONFIG.fileItem}`).filter(function() {
+                        return $(this).find('strong').text() === file.name;
+                    }).first();
+                    if ($fileItem.length) {
+                        // 绑定ID到data-file-id属性
+                        $fileItem.attr(FILE_CONFIG.fileIdAttr, id);
+                        // console.log(`文件ID绑定成功: ${fileId}，文件项:`, $fileItem[0]);
+                        clearInterval(checkDOM); // 停止检查
+                    }
+                }, 100); // 每100ms检查一次
+                // 防止无限循环，5秒后超时
+                setTimeout(() => clearInterval(checkDOM), 5000);
+            },
+            onBeforeUpload: function (id) { // 上传前调用此函数
+                // 上传前禁用移除和取消按钮
+                const $fileItem = getFileItem(id);
+                $fileItem.find('.cancel, .delete').prop('disabled', true);
+                ui_multi_update_file_status(id, 'primary', '上传中...');
+                ui_multi_update_file_progress(id, 0, 'primary');
+                ui_multi_update_file_controls(id, false, true);  // change control buttons status
+            },
+            onUploadProgress: function (id, percent) { // 上传过程中调用此函数
+                ui_multi_update_file_progress(id, percent);
+            },
+            onUploadSuccess: function (id, data) { // 上传成功回调函数
+                var jsonData = JSON.parse(data);
+                if (jsonData.result == 'success') {
+                    // parent.loadImages();
+                    ui_multi_update_file_status(id, 'success', '上传完成');
+                    ui_multi_update_file_progress(id, 100, 'success');
+                    ui_multi_update_file_controls(id, false, false);  // change control buttons status
+                    parent.shuaxin();
+                    // if(data.solrresult == 'success'){
+                    //     parent.toastr.success(data.solrmessage);
+                    // }else{
+                    //     parent.toastr.error(data.solrmessage);
+                    // }
+                    // 成功后禁用移除按钮
+                    getFileItem(id).find('.delete').prop('disabled', true);
+                } else if (jsonData.result == 'error') {
+                    ui_multi_update_file_status(id, 'error', jsonData.error);
+                    ui_multi_update_file_progress(id, 0, 'danger');
+                    ui_multi_update_file_controls(id, true, false, true); // change control buttons status
+
+                    // 失败后启用移除按钮
+                    getFileItem(id).find('.delete').prop('disabled', false);
+                }
+            },
+            onUploadCanceled: function (id) { // 取消上传回调函数
+                ui_multi_update_file_status(id, 'warning', '用户取消');
+                ui_multi_update_file_progress(id, 0, 'warning');
+                ui_multi_update_file_controls(id, true, false);
+
+                // 取消后启用移除按钮
+                getFileItem(id).find('.delete').prop('disabled', false);
+            },
+            onUploadError: function (id, xhr, status, message) { // 上传出错回调函数
+                let errorMsg = '上传失败，请检查网络连接';
+                if (xhr.status === 413) errorMsg = '文件过大，请压缩后重试';
+                ui_multi_update_file_status(id, 'error', errorMsg);
+                ui_multi_update_file_status(id, 'error', message);
+                ui_multi_update_file_progress(id, 0, 'danger');
+                ui_multi_update_file_controls(id, true, false, true); // change control buttons status
+
+                // 错误后启用移除按钮
+                getFileItem(id).find('.delete').prop('disabled', false);
+            },
+            extraData: function () {
+                if (!FCourseID  ) {
+                    toastr.error('缺少必要参数');
+                    throw new Error('FCourseID 未定义');
+                }
+                return {   FCourseID: FCourseID };
+            },
+        });
+        // 辅助函数：通过fileId获取文件项DOM
+        function getFileItem(fileId) {
+            return $(`${FILE_CONFIG.listContainer} ${FILE_CONFIG.fileItem}[${FILE_CONFIG.fileIdAttr}="${fileId}"]`);
+        }
+
+// 辅助函数：格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return `${bytes} B`;
+            if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+            return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+        }
+
+// 核心：移除文件函数
+        function deleteFile(fileId) {
+            if (!fileId) {
+                console.error('未获取到文件ID，移除失败');
+                return;
+            }
+            // 1. 标记为已移除
+            deletedFileIds.add(fileId);
+            // 2. 取消正在进行的上传
+            if (dmUploaderInstance?.cancel && uploadedFilesMap.get(fileId)?.status === 'uploading') {
+                dmUploaderInstance.cancel(fileId);
+            }
+            // 3. 从上传队列中移除
+            if (dmUploaderInstance?.files) delete dmUploaderInstance.files[fileId];
+            // 4. 从DOM中移除文件项
+            const $fileItem = getFileItem(fileId);
+            if ($fileItem.length) {
+                $fileItem.remove();
+                // console.log(`文件 ${fileId} 已从列表移除`);
+            }
+            // 5. 更新本地映射
+            uploadedFilesMap.delete(fileId);
+            // 6. 若列表为空，显示空提示
+            if ($(`${FILE_CONFIG.listContainer} ${FILE_CONFIG.fileItem}`).length === 0) {
+                $(FILE_CONFIG.listContainer).append('<li class="text-c empty" style="color: #6c757d;">未上传文件</li>');
+            }
+            toastr.success('文件已移除');
+        }
+
+// 绑定移除按钮点击事件（全局委托，确保动态元素能触发）
+        $(document).on('click', FILE_CONFIG.deleteBtn, function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            // 从父文件项中获取fileId
+            const $fileItem = $(this).closest(FILE_CONFIG.fileItem);
+            const fileId = $fileItem.attr(FILE_CONFIG.fileIdAttr);
+            // console.log('移除按钮点击，获取到的fileId:', fileId);
+            deleteFile(fileId);
+        });
+
+
+        // 全部开始上传
+        $('#btnApiStart').off('click').on('click', function (e) {
+            e.preventDefault();
+            console.log('btnApiStart:');
+            if (!dmUploaderInstance) return;
+            uploadedFilesMap.forEach((info, id) => {
+                if (!deletedFileIds.has(id) && info.status === 'pending') {
+                    // dmUploaderInstance.upload(fileId);
+                    console.log('btnApiStart:', id);
+                    $('#entity-uploader-file').dmUploader('start', id);
+                }
+            });
+        });
+        // // 全部开始
+        // $('#btnApiStart').on('click', function (evt) {
+        //     evt.preventDefault();
+        //     $('#entity-uploader-file').dmUploader('start');
+        // });
+        // // 全部停止
+        // $('#btnApiCancel').on('click', function (evt) {
+        //     evt.preventDefault();
+        //     $('#entity-uploader-file').dmUploader('cancel');
+        // });
+        // 文件列表开始按钮
+        $('#entityFiles').on('click', 'button.start', function (evt) {
+            evt.preventDefault();
+            var id = $(this).closest('li.media').data('file-id');
+            $('#entity-uploader-file').dmUploader('start', id);
+        });
+        // 文件列表取消按钮
+        $('#entityFiles').on('click', 'button.cancel', function (evt) {
+            evt.preventDefault();
+            var id = $(this).closest('li.media').data('file-id');
+            $('#entity-uploader-file').dmUploader('cancel', id);
+        });
+        /*********************** /上传组件 结束 ***********************/
+    });
+</script>
+</body>
+</html>

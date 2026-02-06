@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fun.server.mapper.TTrainingProgramCourseStMapper">
+  <resultMap id="BaseResultMap" type="fun.server.model.TTrainingProgramCourseSt">
+    <!--
+    @mbg.generated
+    -->
+    <constructor>
+      <idArg column="FKeyID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FUID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCDATE" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FUDATE" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FState" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FTMID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FTPID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCourseID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCourseName" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FOrder" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FXF" javaType="java.lang.Float" jdbcType="REAL" />
+      <arg column="FTotalHours" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FWeeklyStudyHours" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FTheoreticalStudyHours" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FPracticalStudyHours" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FPPState" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FYZState" javaType="java.lang.Integer" jdbcType="INTEGER" />
+    </constructor>
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <!--
+    @mbg.generated
+    -->
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <!--
+    @mbg.generated
+    -->
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    <!--
+    @mbg.generated
+    -->
+    FKeyID, FCID, FUID, FCDATE, FUDATE, FState, FTMID, FTPID, FCourseID, FCourseName, 
+    FOrder, FXF, FTotalHours, FWeeklyStudyHours, FTheoreticalStudyHours, FPracticalStudyHours, 
+    FPPState, FYZState
+  </sql>
+  <select id="getTrainingprogramCourseStData" parameterType="fun.server.model.customQuery.trainingprogram.TrainingprogramkcCS" resultType="fun.server.model.customQuery.trainingprogram.TrainingprogramkcstData">
+    SELECT ttpcst.FKeyID,ttpcst.FTMID,ttpcst.FTPID,ttpcst.FCourseID,ttpcst.FCourseName
+    ,ttpcst.FOrder,ttpcst.FXF,ttpcst.FTotalHours,ttpcst.FWeeklyStudyHours,ttpcst.FTheoreticalStudyHours
+    ,ttpcst.FPracticalStudyHours,ttpcst.FPPState,ttpcst.FYZState
+    ,tmj.FMajorName,tc.FNo,tc.FYWName,ifnull(tcc.FName,'') AS FTypeName,tcn.FName AS FCNatureName,ifnull(tc.FType,0) as FType,tc.FState as FCourseState,ifnull(tcsemster.FName,'') as FSemesterName
+    FROM t_training_program_course_st ttpcst
+    LEFT JOIN t_major tmj
+    ON ttpcst.FTMID = tmj.FKeyID
+    LEFT JOIN t_training_program ttp
+    ON ttpcst.FTPID = ttp.FKeyID
+    LEFT JOIN t_course tc
+    ON ttpcst.FCourseID = tc.FKeyID
+    LEFT JOIN t_course_nature tcn
+    ON tc.FCNature = tcn.FKeyID
+    LEFT JOIN t_course_category tcc
+    ON tc.FType = tcc.FKeyID
+    LEFT JOIN t_training_program_course_xnxq_st ttpcxn
+    on ttpcxn.FTPCSTID = ttpcst.FKeyID
+    LEFT JOIN t_course_semester tcsemster
+    on tcsemster.FKeyID = ttpcxn.FXNXQID
+    where 1=1
+    <choose>
+      <when test="FTPID != null and FTPID!='' and FTPID!='0' ">
+        and ttpcst.FTPID = #{FTPID}
+      </when>
+      <otherwise>
+        and ttpcst.FTPID = 0
+      </otherwise>
+    </choose>
+    <if test="FName != null and FName!=''">
+      and ttpcst.FCourseName like concat('%',#{FName},'%')
+    </if>
+    <if test="FNo != null and FNo!=''">
+      and tc.FNo like concat('%',#{FNo},'%')
+    </if>
+    <if test="FLTypeID != null and FLTypeID!='' and FLTypeID!='0' ">
+      AND tc.FType = #{FLTypeID}
+    </if>
+    <if test="FNatureID != null and FNatureID!='' and FNatureID!='0' ">
+      AND tc.FCNature = #{FNatureID}
+    </if>
+    <if test="orderBy != null and orderBy!=''">
+      order by ${orderBy}
+    </if>
+  </select>
+
+
+  <select id="getCourseYanZhengst" parameterType="fun.server.model.customQuery.trainingprogram.TrainingprogramcourseStyCS" resultType="fun.server.model.customQuery.trainingprogram.TrainingprogramcourseStyData">
+    SELECT
+    tcc.FKeyID,
+    tcc.FName,
+    tcc.FPID,
+    tcn.FName as FCNatureName,
+    SUM(ttc.FXF) AS FXF,
+    -- 各字段单独求和（含空值处理）
+    SUM(COALESCE(CAST(REGEXP_REPLACE(ttc.FTotalHours, '[^0-9.]', '') AS DECIMAL(10,0)), 0)) AS FTotalHours,
+    SUM(COALESCE(CAST(REGEXP_REPLACE(ttc.FWeeklyStudyHours, '[^0-9.]', '') AS DECIMAL(10,0)), 0)) AS FWeeklyStudyHours,
+    SUM(COALESCE(CAST(REGEXP_REPLACE(ttc.FTheoreticalStudyHours, '[^0-9.]', '') AS DECIMAL(10,0)), 0)) AS FTheoreticalStudyHours,
+    SUM(COALESCE(CAST(REGEXP_REPLACE(ttc.FPracticalStudyHours, '[^0-9.]', '') AS DECIMAL(10,0)), 0)) AS FPracticalStudyHours,
+    -- 汇总所有小时数（含精度控制）
+    ROUND(
+    SUM(
+
+    -- COALESCE(CAST(REGEXP_REPLACE(ttc.FWeeklyStudyHours, '[^0-9.]', '') AS DECIMAL(10,0)), 0) +
+    COALESCE(CAST(REGEXP_REPLACE(ttc.FTheoreticalStudyHours, '[^0-9.]', '') AS DECIMAL(10,0)), 0) +
+    COALESCE(CAST(REGEXP_REPLACE(ttc.FPracticalStudyHours, '[^0-9.]', '') AS DECIMAL(10,0)), 0)
+    ), 2
+    ) AS TotalAllHours
+    FROM t_training_program_course_st ttc
+    INNER JOIN t_course tc
+    ON ttc.FCourseID = tc.FKeyID
+    INNER JOIN t_course_category tcc
+    ON tc.FType = tcc.FKeyID
+    INNER JOIN t_course_nature tcn
+    ON tc.FCNature = tcn.FKeyID
+    where ttc.FPPState = 2
+    <choose>
+      <when test="FCNatureID != null and FCNatureID!='' and FCNatureID!='0' ">
+        AND tcn.FKeyID = #{FCNatureID}
+      </when>
+      <otherwise>
+        AND tcn.FKeyID = 0
+      </otherwise>
+    </choose>
+    GROUP BY tcc.FKeyID,tcc.FName,tcc.FPID,tcn.FName
+    <if test="orderBy != null and orderBy!=''">
+      order by ${orderBy}
+    </if>
+  </select>
+
+  <select id="getCourseYanZhengxt" parameterType="fun.server.model.customQuery.trainingprogram.TrainingprogramcourseStyCS" resultType="fun.server.model.customQuery.trainingprogram.TrainingprogramcourseStyData">
+    SELECT
+    tcc.FKeyID,
+    tcc.FName,
+    tcc.FPID,
+    tcn.FName as FCNatureName,
+    SUM(tc.FCredits) AS FXF,
+    -- 各字段单独求和（含空值处理）
+    SUM(COALESCE(CAST(REGEXP_REPLACE(tc.FTotalHours, '[^0-9.]', '') AS DECIMAL(10,0)), 0)) AS FTotalHours,
+    SUM(COALESCE(CAST(REGEXP_REPLACE(tc.FWeeklyStudyHours, '[^0-9.]', '') AS DECIMAL(10,0)), 0)) AS FWeeklyStudyHours,
+    SUM(COALESCE(CAST(REGEXP_REPLACE(tc.FTheoreticalStudyHours, '[^0-9.]', '') AS DECIMAL(10,0)), 0)) AS FTheoreticalStudyHours,
+    SUM(COALESCE(CAST(REGEXP_REPLACE(tc.FPracticalStudyHours, '[^0-9.]', '') AS DECIMAL(10,0)), 0)) AS FPracticalStudyHours,
+    -- 汇总所有小时数（含精度控制）
+    ROUND(
+    SUM(
+
+    -- COALESCE(CAST(REGEXP_REPLACE(tc.FWeeklyStudyHours, '[^0-9.]', '') AS DECIMAL(10,0)), 0) +
+    COALESCE(CAST(REGEXP_REPLACE(tc.FTheoreticalStudyHours, '[^0-9.]', '') AS DECIMAL(10,0)), 0) +
+    COALESCE(CAST(REGEXP_REPLACE(tc.FPracticalStudyHours, '[^0-9.]', '') AS DECIMAL(10,0)), 0)
+    ), 2
+    ) AS TotalAllHours
+    FROM t_training_program_course_st ttc
+    INNER JOIN t_course tc
+    ON ttc.FCourseID = tc.FKeyID
+    INNER JOIN t_course_category tcc
+    ON tc.FType = tcc.FKeyID
+    INNER JOIN t_course_nature tcn
+    ON tc.FCNature = tcn.FKeyID
+    where ttc.FPPState = 2
+    <choose>
+      <when test="FCNatureID != null and FCNatureID!='' and FCNatureID!='0' ">
+        AND tcn.FKeyID = #{FCNatureID}
+      </when>
+      <otherwise>
+        AND tcn.FKeyID = 0
+      </otherwise>
+    </choose>
+    GROUP BY tcc.FKeyID,tcc.FName,tcc.FPID,tcn.FName
+    <if test="orderBy != null and orderBy!=''">
+      order by ${orderBy}
+    </if>
+  </select>
+
+
+  <select id="getnatureList"  resultType="fun.server.model.customQuery.trainingprogram.TrainingprogramcourseStyData">
+    SELECT tcn.FKeyID,tcn.FName  FROM t_training_program_course_st ttc
+    INNER JOIN t_course tc
+               ON ttc.FCourseID = tc.FKeyID
+    INNER JOIN t_course_nature tcn
+               ON tc.FCNature = tcn.FKeyID
+    WHERE ttc.FPPState = 2
+    GROUP BY tcn.FKeyID,tcn.FName
+  </select>
+
+
+  <select id="getTTrainingprogramCourseGx" parameterType="fun.server.model.customQuery.trainingprogram.TTrainingprogramcourseGxCS" resultType="fun.server.model.customQuery.trainingprogram.TTrainingprogramcourseGxData">
+    SELECT tpcs.FKeyID,tpcs.FCourseID,tc.FName,tc.FNo,tcsem.FKKXQ,tc.FCNature
+    FROM t_training_program_course_st tpcs
+    LEFT JOIN t_course tc
+    ON tpcs.FCourseID = tc.FKeyID
+    LEFT JOIN t_training_program_course_xnxq_st tpcxnxq
+    ON tpcs.FKeyID = tpcxnxq.FTPCSTID
+    LEFT JOIN t_course_semester tcsem
+    ON tpcxnxq.FXNXQID = tcsem.FKeyID
+    WHERE tpcs.FPPState = 2
+    <choose>
+      <when test="FTPID != null and FTPID!='' and FTPID!='0' ">
+        AND tpcs.FTPID = #{FTPID}
+      </when>
+      <otherwise>
+        AND tpcs.FTPID = 0
+      </otherwise>
+    </choose>
+    <if test="orderBy != null and orderBy!=''">
+      order by ${orderBy}
+    </if>
+  </select>
+
+</mapper>

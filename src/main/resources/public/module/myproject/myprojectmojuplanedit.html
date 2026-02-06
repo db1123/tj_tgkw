@@ -1,0 +1,301 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+        <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+        <!--_only 独立样式 -->
+        <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+        <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+        <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+        <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+		<link rel="stylesheet" href="/plugins/daterangepicker/daterangepicker.css">
+        <!--/_only 独立样式 -->
+    </head>
+    <body>
+        <article class="page-container">
+            <form action="" method="post" class="form form-horizontal" id="projectmojuplanForm">
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>所属项目：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" name="Fname" id="Fname" disabled ="disabled"/>
+                    </div>
+                </div>
+				<div class="row cl">
+					<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>模具：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<select name="FMaterialID" id="FMaterialID" class="" style="width: 100%;"></select>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>计划类型：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<select style="width: 100%" name="FJHType" id="FJHType">
+							<option value="1" selected="selected" >模具计划：启动</option>
+							<option value="2">模具计划：设计依据</option>
+							<option value="3">模具计划：结构会签</option>
+							<option value="4">模具计划：实型图</option>
+							<option value="5">模具计划：实型完成</option>
+							<option value="6">模具计划：正式图</option>
+							<option value="7">模具计划：编程依据（加工依据）</option>
+							<option value="8">模具计划：铸铁件</option>
+							<option value="9">模具计划: 铸钢件</option>
+							<option value="10">模具计划：粗加工编程（粗程序）</option>
+							<option value="11">模具计划：数控编程（精编程）</option>
+							<option value="12">模具计划：部件依据</option>
+							<option value="13">模具计划：机装件采购</option>
+							<option value="14">模具计划：钳装件采购</option>
+							<option value="15">模具计划：锻件采购</option>
+							<option value="16">模具计划：部件加工</option>
+							<option value="17">模具计划：粗加工（一次粗）</option>
+							<option value="18">模具计划：机械加工（二次精）</option>
+							<option value="19">模具计划：模具装配（合模到底）</option>
+							<option value="20">模具计划：模具单初（研配）</option>
+							<option value="21">模具计划：调试自检（第三轮整改）</option>
+							<option value="22">模具计划：预验收时间</option>
+							<option value="23">模具计划：整理待发</option>
+							<option value="24">模具计划：签收</option>
+							<option value="25">模具计划：母线适配</option>
+							<option value="26">模具计划：品质提升</option>
+							<option value="27">模具计划：批量验证</option>
+							<option value="28">模具计划：终验收</option>
+							<option value="29">模具计划：质保期</option>
+						</select>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-3 col-sm-2">客户计划：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<input type="text" class="input-text" name="FKHDate" id="FKHDate" readonly="readonly"/>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-3 col-sm-2">调整计划：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<input type="text" class="input-text" name="FTZDate" id="FTZDate" readonly="readonly"/>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-3 col-sm-2">实际完成：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<input type="text" class="input-text" name="FSJDate" id="FSJDate" readonly="readonly"/>
+					</div>
+				</div>
+                <div class="toolbar-bottom-line"></div>
+                <div class="toolbar-bottom-btn">
+                    <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+                    <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                           onclick="layer_close()"/>
+                </div>
+                <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+
+            </form>
+        </article>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+        <script src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+		<script type="text/javascript" src="/plugins/moment/moment.min.js"></script>
+		<script type="text/javascript" src="/plugins/daterangepicker/daterangepicker.js"></script>
+        <script type="text/javascript">
+            // 编辑框状态 1新建 2修改
+            var op = getQueryStringByName('op');
+			var FProjectID = getQueryStringByName('FProjectID');
+			var FJHType = 1;
+			var FMID=-1;
+			var xmname = parent.xmname; //项目名称
+            // 业务代码
+            $(function () {
+
+            	$("#Fname").val(xmname);
+				$("#FJHType").select2({
+					placeholder: '请选择计划类型',
+					language: "zh-CN"
+				});
+				//  客户计划
+				$("#projectmojuplanForm input[name='FKHDate']").daterangepicker({
+					singleDatePicker: true, // 设置为单日历，即无区间 默认false
+					showDropdowns: true, // 当设置值为true时，允许年份和月份通过下拉框的形式选择 默认false
+					autoUpdateInput: false, // 1.当设置为false的时候,不给与默认值(当前时间) 2.选择时间时,失去鼠标焦点,不会给与默认值 默认true
+					timePicker24Hour: true, // 设置小时为24小时制 默认false
+					timePicker: false, // 可选中时分 默认false
+					locale: {
+						format: "YYYY-MM-DD",
+						separator: " - ",
+						daysOfWeek: ["日", "一", "二", "三", "四", "五", "六"],
+						monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]
+					}
+				}).on('apply.daterangepicker', function (ev, picker) {
+					$("#projectmojuplanForm input[name='FKHDate']").val(picker.startDate.format('YYYY-MM-DD'));
+				});
+
+
+				//  调整计划
+				$("#projectmojuplanForm input[name='FTZDate']").daterangepicker({
+					singleDatePicker: true, // 设置为单日历，即无区间 默认false
+					showDropdowns: true, // 当设置值为true时，允许年份和月份通过下拉框的形式选择 默认false
+					autoUpdateInput: false, // 1.当设置为false的时候,不给与默认值(当前时间) 2.选择时间时,失去鼠标焦点,不会给与默认值 默认true
+					timePicker24Hour: true, // 设置小时为24小时制 默认false
+					timePicker: false, // 可选中时分 默认false
+					autoApply: true,
+					locale: {
+						format: "YYYY-MM-DD",
+						separator: " - ",
+						daysOfWeek: ["日", "一", "二", "三", "四", "五", "六"],
+						monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]
+					}
+				}).on('apply.daterangepicker', function (ev, picker) {
+					$("#projectmojuplanForm input[name='FTZDate']").val(picker.startDate.format('YYYY-MM-DD'));
+				});
+				//实际完成
+				$("#projectmojuplanForm input[name='FSJDate']").daterangepicker({
+					singleDatePicker: true, // 设置为单日历，即无区间 默认false
+					showDropdowns: true, // 当设置值为true时，允许年份和月份通过下拉框的形式选择 默认false
+					autoUpdateInput: false, // 1.当设置为false的时候,不给与默认值(当前时间) 2.选择时间时,失去鼠标焦点,不会给与默认值 默认true
+					timePicker24Hour: true, // 设置小时为24小时制 默认false
+					timePicker: false, // 可选中时分 默认false
+					autoApply: true,
+					locale: {
+						format: "YYYY-MM-DD",
+						separator: " - ",
+						daysOfWeek: ["日", "一", "二", "三", "四", "五", "六"],
+						monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]
+					}
+				}).on('apply.daterangepicker', function (ev, picker) {
+					$("#projectmojuplanForm input[name='FSJDate']").val(picker.startDate.format('YYYY-MM-DD'));
+				});
+
+				$("#projectmojuplanForm select[name='FMaterialID']").select2({
+					placeholder: '请选择模具',
+					ajax: {
+						type: 'POST',
+						url: "/s/material/queryDatamaterialSelectprojectID",
+						dataType: 'json',
+						data: function (params) {
+							return {
+								search: params.term,
+								FProjectID:FProjectID
+							};
+						},
+						processResults: function (data) {
+							return {
+								results: data.list
+							};
+						},
+						delay: 800,
+						cache: true
+					},
+					language: "zh-CN"
+				});
+				$("#FJHType").attr("disabled", "disabled");
+				$('#FMaterialID').change(function () {
+					FMID = $(this).val();
+					$("#FJHType").removeAttr("disabled");
+				});
+				$('#FJHType').change(function () {
+					FJHType = $(this).val();
+					getplaninfo(FProjectID,FJHType,FMID);
+				});
+
+
+                // 检验数据
+                var userValidate = $('#projectmojuplanForm').validate({
+                    rules: {
+						FMaterialID: {
+                            required: true,
+                            levelLimit: false
+                        },
+						FJHType: {
+							required: true,
+							levelLimit: false
+						},
+                    },
+                    messages: {
+						FMaterialID: {
+							required: '*请选择模具'
+						},
+						FJHType: {
+							required: '*请选择计划类型'
+						},
+
+					},
+                    onfocusout: false, // 是否在获取焦点时验证
+                    onkeyup: false, // 是否在敲击键盘时验证
+                    focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+                    focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+                    success: 'valid',
+                    submitHandler: function () {
+                        // 获取参数
+                        var data = form2Json('projectmojuplanForm');
+
+						if(FMID ==-1){
+							toastr.error("请选择模具!");
+							return;
+						}
+						data['FMID'] =FMID;
+						data['FProjectID'] = FProjectID;
+						data['FType'] = FJHType;
+						$.ajax({
+							type: 'POST',
+							contentType: 'application/json',
+							url: '/s/projectmjplan/addprojectmjplan', // 调用地址
+							data: JSON.stringify(data),
+							async: false,
+							success: function (data) {
+								if (data.result == 'success') {
+									parent.$('#mainTable').DataTable().ajax.reload(null, false);
+									parent.toastr.success('录入成功！');
+									layer_close();
+								}else if (data.result == 'error') {
+									toastr.error(data.error);
+								}
+							},
+							error: function (e) {
+								toastr.error(e.status);
+								toastr.error(e.responseText);
+							}
+						});
+                    }
+                });
+            });
+
+
+            function getplaninfo(projectid,typeid,FMID) {
+				$.ajax({
+					type: 'POST',
+					contentType: 'application/json',
+					url: '/s/projectmjplan/queryprojectmjplanInfo', // 调用地址
+					data: JSON.stringify({
+						FProjectID: projectid,
+						typeid:typeid,
+						FMID:FMID
+
+					}),
+					async: false,
+					success: function (data) {
+						$("#projectmojuplanForm input[name='FKHDate']").val(data.info.FKHDate);
+						$("#projectmojuplanForm input[name='FTZDate']").val(data.info.FTZDate);
+						$("#projectmojuplanForm input[name='FSJDate']").val(data.info.FSJDate);
+						$('#FKeyID').val(data.info.key);
+					},
+					error: function (e) {
+						toastr.error(e.status);
+						toastr.error(e.responseText);
+					}
+				});
+			}
+        </script>
+    </body>
+</html>

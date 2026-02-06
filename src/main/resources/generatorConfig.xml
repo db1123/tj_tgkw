@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+
+    <!-- 导入属性配置 -->
+    <properties resource="db.properties" />
+
+    <!-- Mysql数据库配置 -->
+    <context id="mysqlTables" defaultModelType="flat" targetRuntime="MyBatis3">
+
+        <!-- 生成的Java文件的编码 -->
+        <property name="javaFileEncoding" value="UTF-8" />
+        <!-- 格式化java代码 -->
+        <property name="javaFormatter" value="org.mybatis.generator.api.dom.DefaultJavaFormatter" />
+        <!-- 格式化XML代码 -->
+        <property name="xmlFormatter" value="org.mybatis.generator.api.dom.DefaultXmlFormatter" />
+        <!-- 当表名或者字段名为SQL关键字的时候，可以设置该属性为true，MBG会自动给表名或字段名添加**分隔符** -->
+        <property name="autoDelimitKeywords" value="true" />
+
+        <!-- 是否使用通用 Mapper 提供的注释工具，默认 true 使用，设置 false 后会用默认的，或者可以配置自己的注释插件 -->
+        <property name="useMapperCommentGenerator" value="false" />
+        <!--通用 Mapper 插件，可以生成带注解的实体类-->
+        <plugin type="tk.mybatis.mapper.generator.MapperPlugin">
+            <!-- 配置后生成的 Mapper 接口都会自动继承上该接口 -->
+            <property name="mappers" value="tk.mybatis.mapper.common.Mapper" />
+            <!-- 是否区分大小写，默认值 false -->
+            <property name="caseSensitive" value="true" />
+            <!--  是否强制生成注解，默认 false，如果设置为 true，不管数据库名和字段名是否一致，都会生成注解（包含 @Table 和 @Column） -->
+            <property name="forceAnnotation " value="false" />
+        </plugin>
+
+        <!-- 生成的pojo，将implements Serializable,为生成的Java模型类添加序列化接口-->
+        <plugin type="org.mybatis.generator.plugins.SerializablePlugin" />
+        <!-- 为生成的Java模型创建一个toString方法 -->
+        <plugin type="org.mybatis.generator.plugins.ToStringPlugin" />
+        <!-- 生成 entity时，生成hashcode和equals方法 -->
+        <plugin type="org.mybatis.generator.plugins.EqualsHashCodePlugin" />
+
+        <!-- optional，旨在创建class时，对注释进行控制 -->
+        <commentGenerator type="fun.mbg.MyCommentGenerator">
+            <!-- 取消(设为true)时间戳suppressDate，避免重复提交SVN -->
+            <property name="suppressDate" value="true"/>
+            <!-- 是否去除自动生成的注释 true：是 ： false:否 -->
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>
+
+        <!-- 数据库链接URL，用户名、密码 -->
+        <jdbcConnection
+                driverClass="${ms.driver-class-name}"
+                connectionURL="${ms.jdbc-url}"
+                userId="${ms.username}"
+                password="${ms.password}">
+            <property name="nullCatalogMeansCurrent" value="true" />
+        </jdbcConnection>
+
+        <!--
+            非必需，类型处理器，指定JDBC类型和Java类型如何转换
+            属性有一个可以配置的<property>元素
+            可以配置的属性为forceBigDecimals，该属性可以控制是否强制DECIMAL和NUMERIC类型的字段转换为Java类型的java.math.BigDecimal,默认值为false，一般不需要配置。
+            默认情况下的转换规则为：
+                如果精度>0或者长度>18，就会使用java.math.BigDecimal
+                如果精度=0并且10<=长度<=18，就会使用java.lang.Long
+                如果精度=0并且5<=长度<=9，就会使用java.lang.Integer
+                如果精度=0并且长度<5，就会使用java.lang.Short
+            如果设置为true，那么一定会使用java.math.BigDecimal
+        -->
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+
+        <!--
+            生成model模型，对应的包路径，以及文件存放路径(targetProject)，targetProject可以指定具体的路径,如./src/main/java，
+            也可以使用“MAVEN”来自动生成，这样生成的代码会在target/generated-sources目录下
+         -->
+        <javaModelGenerator targetPackage="fun.server.model" targetProject="src/main/java">
+            <!-- optional.是否对model添加 构造函数 -->
+            <property name="constructorBased" value="true"/>
+            <!-- 是否允许子包，即targetPackage.schemaName.tableName -->
+            <property name="enableSubPackages" value="true"/>
+            <!-- optional.建立的Model对象是否 不可改变  即生成的Model对象不会有 setter方法，只有构造方法 -->
+            <property name="immutable" value="false"/>
+            <!-- 是否对类CHAR类型的列的数据进行trim操作 -->
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <!-- 生成映射文件的包名和位置 -->
+        <sqlMapGenerator targetPackage="mapper" targetProject="src/main/resources">
+            <!-- 如果true，MBG会根据catalog和schema来生成子包。如果false就会直接用targetPackage属性 -->
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+
+        <!--
+            生成DAO的包名和位置
+            type="ANNOTATEDMAPPER",生成Java Model 和基于注解的Mapper对象
+            type="MIXEDMAPPER",生成基于注解的Java Model 和相应的Mapper对象
+            type="XMLMAPPER",生成SQLMap XML文件和独立的Mapper接口
+        -->
+        <javaClientGenerator type="XMLMAPPER" targetPackage="fun.server.mapper" targetProject="src/main/java">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+
+        <!--
+            选择一个table来生成相关文件，可以有一个或多个table，必须要有table元素
+            选择的table会生成一下文件：
+            1，SQL map文件
+            2，生成一个主键类；
+            3，除了BLOB和主键的其他字段的类；
+            4，包含BLOB的类；
+            5，一个用户生成动态查询的条件类（selectByExample, deleteByExample），可选；
+            6，Mapper接口（可选）
+
+            tableName（必要）：要生成对象的表名；
+            注意：大小写敏感问题。正常情况下，MBG会自动的去识别数据库标识符的大小写敏感度，在一般情况下，MBG会
+                根据设置的schema，catalog或tablename去查询数据表，按照下面的流程：
+                1，如果schema，catalog或tablename中有空格，那么设置的是什么格式，就精确的使用指定的大小写格式去查询；
+                2，否则，如果数据库的标识符使用大写的，那么MBG自动把表名变成大写再查找；
+                3，否则，如果数据库的标识符使用小写的，那么MBG自动把表名变成小写再查找；
+                4，否则，使用指定的大小写格式查询；
+            另外的，如果在创建表的时候，使用的""把数据库对象规定大小写，就算数据库标识符是使用的大写，在这种情况下也会使用给定的大小写来创建表名；
+            这个时候，请设置delimitIdentifiers="true"即可保留大小写格式；
+
+            可选：
+            1，schema：数据库的schema；
+            2，catalog：数据库的catalog；
+            3，alias：为数据表设置的别名，如果设置了alias，那么生成的所有的SELECT SQL语句中，列名会变成：alias_actualColumnName
+            4，domainObjectName：生成的domain类的名字，如果不设置，直接使用表名作为domain类的名字；可以设置为somepck.domainName，那么会自动把domainName类再放到somepck包里面；
+            5，enableInsert（默认true）：指定是否生成insert语句；
+            6，enableSelectByPrimaryKey（默认true）：指定是否生成按照主键查询对象的语句（就是getById或get）；
+            7，enableSelectByExample（默认true）：MyBatis3Simple为false，指定是否生成动态查询语句；
+            8，enableUpdateByPrimaryKey（默认true）：指定是否生成按照主键修改对象的语句（即update)；
+            9，enableDeleteByPrimaryKey（默认true）：指定是否生成按照主键删除对象的语句（即delete）；
+            10，enableDeleteByExample（默认true）：MyBatis3Simple为false，指定是否生成动态删除语句；
+            11，enableCountByExample（默认true）：MyBatis3Simple为false，指定是否生成动态查询总条数语句（用于分页的总条数查询）；
+            12，enableUpdateByExample（默认true）：MyBatis3Simple为false，指定是否生成动态修改语句（只修改对象中不为空的属性）；
+            13，modelType：参考context元素的defaultModelType，相当于覆盖；
+            14，delimitIdentifiers：参考tableName的解释，注意，默认的delimitIdentifiers是双引号，如果类似MYSQL这样的数据库，使用的是`（反引号，那么还需要设置context的beginningDelimiter和endingDelimiter属性）
+            15，delimitAllColumns：设置是否所有生成的SQL中的列名都使用标识符引起来。默认为false，delimitIdentifiers参考context的属性
+
+            注意，table里面很多参数都是对javaModelGenerator，context等元素的默认属性的一个复写；
+         -->
+        <!-- <table schema="数据库" tableName="表名"><property name="ignoreQualifiersAtRuntime" value="true"/></table> -->
+<!--        <table catalog="student_capability_evaluation" tableName="t_ability_type">-->
+<!--            <property name="ignoreQualifiersAtRuntime" value="true"/>-->
+<!--        </table>-->
+<!--        <table catalog="student_capability_evaluation" tableName="t_ability_level">-->
+<!--            <property name="ignoreQualifiersAtRuntime" value="true"/>-->
+<!--        </table>-->
+        <table catalog="tj_tgkw" tableName="">
+            <property name="ignoreQualifiersAtRuntime" value="true"/>
+        </table>
+
+    </context>
+
+</generatorConfiguration>

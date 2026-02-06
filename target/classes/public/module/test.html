@@ -1,0 +1,73 @@
+// 用户信息
+var accessInfo = top.accessInfo;
+dataall:accessInfo.dataall
+//新建
+if (accessInfo.add == 0) {
+toastr.error(errormsg);
+return false;
+}
+//编辑
+if (accessInfo.edit == 0) {
+toastr.error(errormsg);
+return false;
+}
+//删除
+if (accessInfo.del == 0) {
+toastr.error(errormsg);
+return false;
+}
+//上传
+if (accessInfo.upload == 0) {
+toastr.error(errormsg);
+return false;
+}
+//下载
+if (accessInfo.download == 0) {
+toastr.error(errormsg);
+return false;
+}
+//重新上传
+if (accessInfo.reupload == 0) {
+toastr.error(errormsg);
+return false;
+}
+//预览
+if (accessInfo.preview == 0) {
+toastr.error(errormsg);
+return false;
+}
+//发布
+if (accessInfo.release == 0) {
+toastr.error(errormsg);
+return false;
+}
+//关闭
+if (accessInfo.close == 0) {
+toastr.error(errormsg);
+return false;
+}
+//禁用
+if (state == 1 && accessInfo.disable == 0) {
+toastr.error(errormsg);
+return false;
+}
+//启用
+if (state == 0 && accessInfo.enable == 0) {
+toastr.error(errormsg);
+return false;
+}
+//升版
+if (accessInfo.upversion == 0) {
+toastr.error(errormsg);
+return false;
+}
+//完成
+if (accessInfo.complete == 0) {
+toastr.error(errormsg);
+return false;
+}
+//全部数据
+if (accessInfo.dataall == 0) {
+toastr.error(errormsg);
+return false;
+}

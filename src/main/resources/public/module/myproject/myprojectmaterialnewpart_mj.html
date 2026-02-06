@@ -1,0 +1,538 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+        <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+        <!--_only 独立样式 -->
+        <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+        <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+        <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+        <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+        <link rel="stylesheet" href="/plugins/daterangepicker/daterangepicker.css">
+        <!--/_only 独立样式 -->
+    </head>
+    <body>
+        <article class="page-container">
+            <form action="" method="post" class="form form-horizontal" id="materialpartForm">
+                <div class="panel panel-default">
+                    <div class="panel-header">模具数据面板</div>
+                    <div class="panel-body">
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>零件：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <select name="FBOSID" class="" style="width: 100%;" id="FBOSID"></select>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>制号：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <input type="text" class="input-text" name="FNo"/>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>模具类型：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <select name="FMMType" class="" style="width: 100%;" id="FMMType"></select>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>工序号：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <select name="FPurNo" class="" style="width: 100%;" id="FPurNo"></select>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>工序名称：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <select name="FPurName" class="" style="width: 100%;" id="FPurName"></select>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2">型号：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <input type="text" class="input-text" name="FModel"/>
+                            </div>
+                            <label class="form-label col-xs-2 col-sm-2"> 规格：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <input type="text" class="input-text" name="FSpecs"/>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2"> 材料：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <input type="text" class="input-text" name="FTexture"/>
+                            </div>
+                            <label class="form-label col-xs-2 col-sm-2"> 尺寸：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <input type="text" class="input-text" name="FSize"/>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2">外观：</label>
+                            <div class="formControls col-xs-8 col-sm-4">
+                                <input type="text" class="input-text" name="FOutside"/>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2">备注：</label>
+                            <div class="formControls col-xs-8 col-sm-10">
+                                <input type="text" class="input-text" name="FNote"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-header">模具任务数据面板</div>
+                    <div class="panel-body">
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>负责人：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <select name="takeFLeadUserID" id="takeFLeadUserID" class="" style="width: 100%;"></select>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2">任务要求：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <input type="text" class="input-text" name="takeFAsk" id="takeFAsk"/>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>任务类型：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <select name="takeFTypeID" id="takeFTypeID" class="" style="width: 100%;"></select>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>制件类型：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <select name="takeFMType" id="takeFMType" class="" style="width: 100%;"></select>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>里程碑：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <select style="width: 100%" name="takeFISMilepost" id="takeFISMilepost">
+                                    <option value="0">否</option>
+                                    <option value="1">是</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>计划开始：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <input type="text" class="input-text" name="takeFSDate" id="takeFSDate" readonly="readonly"/>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>计划完成：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <input type="text" class="input-text" name="takeFEDate" id="takeFEDate" readonly="readonly"/>
+                            </div>
+                        </div>
+
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2">备注：</label>
+                            <div class="formControls col-xs-8 col-sm-10">
+                                <input type="text" class="input-text" name="takeFNote" id="FNote"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="height: 70px;"></div>
+                <div class="toolbar-bottom-line"></div>
+                <div class="toolbar-bottom-btn">
+                    <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+                    <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                           onclick="layer_close()"/>
+                </div>
+                <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+            </form>
+        </article>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+        <script src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+        <script type="text/javascript" src="/plugins/moment/moment.min.js"></script>
+        <script type="text/javascript" src="/plugins/daterangepicker/daterangepicker.js"></script>
+        <script type="text/javascript">
+            // 编辑框状态 1新建 2修改
+            var op = 1;
+            var FProjectID = getQueryStringByName('FProjectID');
+
+            var FLJID = getQueryStringByName('FLJID');
+            var FLJName = getQueryStringByName('FLJName');
+
+            var selectunit;
+            var selectfrom;
+            // 业务代码
+            $(function () {
+                // 初始化下拉菜单---------------------------------------------------------------------------------
+                if(FLJID){
+                    if(FLJName){
+                        var option = new Option(FLJName, FLJID, true, true);
+                        $('#FBOSID').append(option);
+                        $('#FBOSID').change();
+                    }
+                }
+
+                //  计划开始
+                $("#materialpartForm input[name='takeFSDate']").daterangepicker({
+                    singleDatePicker: true, // 设置为单日历，即无区间 默认false
+                    showDropdowns: true, // 当设置值为true时，允许年份和月份通过下拉框的形式选择 默认false
+                    autoUpdateInput: false, // 1.当设置为false的时候,不给与默认值(当前时间) 2.选择时间时,失去鼠标焦点,不会给与默认值 默认true
+                    timePicker24Hour: true, // 设置小时为24小时制 默认false
+                    timePicker: false, // 可选中时分 默认false
+                    locale: {
+                        format: "YYYY-MM-DD",
+                        separator: " - ",
+                        daysOfWeek: ["日", "一", "二", "三", "四", "五", "六"],
+                        monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]
+                    }
+                }).on('apply.daterangepicker', function (ev, picker) {
+                    $("#materialpartForm input[name='takeFSDate']").val(picker.startDate.format('YYYY-MM-DD'));
+                });
+
+
+                //  计划开始
+                $("#materialpartForm input[name='takeFEDate']").daterangepicker({
+                    singleDatePicker: true, // 设置为单日历，即无区间 默认false
+                    showDropdowns: true, // 当设置值为true时，允许年份和月份通过下拉框的形式选择 默认false
+                    autoUpdateInput: false, // 1.当设置为false的时候,不给与默认值(当前时间) 2.选择时间时,失去鼠标焦点,不会给与默认值 默认true
+                    timePicker24Hour: true, // 设置小时为24小时制 默认false
+                    timePicker: false, // 可选中时分 默认false
+                    autoApply: true,
+                    locale: {
+                        format: "YYYY-MM-DD",
+                        separator: " - ",
+                        daysOfWeek: ["日", "一", "二", "三", "四", "五", "六"],
+                        monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]
+                    }
+                }).on('apply.daterangepicker', function (ev, picker) {
+                    $("#materialpartForm input[name='takeFEDate']").val(picker.startDate.format('YYYY-MM-DD'));
+                });
+                $("#takeFISMilepost").select2({
+                    placeholder: '请选择是否为里程碑',
+                    language: "zh-CN"
+                });
+
+
+                $("#materialpartForm select[name='FBOSID']").select2({
+                    placeholder: '请选择零件',
+                    ajax: {
+                        type: 'POST',
+                        url: "/s/material/queryProjectMJmaterialSelect",
+                        dataType: 'json',
+                        data: function (params) {
+                            return {
+                                FProjectID:FProjectID,
+                                search: params.term,
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: data.list
+                            };
+                        },
+                        delay: 800,
+                        cache: true
+                    },
+                    language: "zh-CN"
+                });
+
+
+                $("#materialpartForm select[name='takeFLeadUserID']").select2({
+                    placeholder: '请选择负责人',
+                    ajax: {
+                        type: 'POST',
+                        url: "/s/user/queryDataUserSelect",
+                        dataType: 'json',
+                        data: function (params) {
+                            return {
+                                search: params.term,
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: data.results
+                            };
+                        },
+                        delay: 800,
+                        cache: true
+                    },
+                    language: "zh-CN"
+                });
+                $("#materialpartForm select[name='takeFMType']").select2({
+                    placeholder: '请选择制件类型',
+                    ajax: {
+                        type: 'POST',
+                        url: "/s/taskmaketype/queryDatataskmaketypeSelect",
+                        dataType: 'json',
+                        data: function (params) {
+                            return {
+                                search: params.term,
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: data.list
+                            };
+                        },
+                        delay: 800,
+                        cache: true
+                    },
+                    language: "zh-CN"
+                });
+                $("#materialpartForm select[name='takeFTypeID']").select2({
+                    placeholder: '请选择任务类型',
+                    ajax: {
+                        type: 'POST',
+                        url: "/s/tasktype/queryDatatasktypeSelect",
+                        dataType: 'json',
+                        data: function (params) {
+                            return {
+                                search: params.term,
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: data.list
+                            };
+                        },
+                        delay: 800,
+                        cache: true
+                    },
+                    language: "zh-CN"
+                });
+
+                $("#materialpartForm select[name='FMMType']").select2({
+                    placeholder: '请选择模具类型',
+                    ajax: {
+                        type: 'POST',
+                        url: "/s/materialMoldType/queryDatamaterialMoldTypeSelect",
+                        dataType: 'json',
+                        data: function (params) {
+                            return {
+                                search: params.term,
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: data.list
+                            };
+                        },
+                        delay: 800,
+                        cache: true
+                    },
+                    language: "zh-CN"
+                });
+
+                $("#materialpartForm select[name='FPurNo']").select2({
+                    placeholder: '请选择工序号',
+                    ajax: {
+                        type: 'POST',
+                        url: "/s/procedureNo/queryDataprocedureNoSelect",
+                        dataType: 'json',
+                        data: function (params) {
+                            return {
+                                search: params.term,
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: data.list
+                            };
+                        },
+                        delay: 800,
+                        cache: true
+                    },
+                    language: "zh-CN"
+                });
+
+                //
+                $("#materialpartForm select[name='FPurName']").select2({
+                    placeholder: '请选择工序名称',
+
+                    ajax: {
+                        type: 'POST',
+                        url: "/s/procedureName/queryDataprocedureNameSelect",
+                        dataType: 'json',
+                        data: function (params) {
+                            return {
+                                search: params.term,
+                            };
+                        },
+                        processResults: function (data) {
+                            //console.log(data.list);
+                            return {
+                                results: data.list
+                            };
+                        },
+                        delay: 800,
+                        cache: true
+                    },
+                    language: "zh-CN"
+                });
+                jQuery.validator.addMethod("compareDate", function (value, element, param) {
+                    var startDate = $("#materialpartForm input[name='takeFSDate']").val();
+
+                    var date1 = new Date(Date.parse(startDate.replace("-", "/")));
+                    var date2 = new Date(Date.parse(value.replace("-", "/")));
+                    if(date2>=date1){
+                        return true;
+                    }else{
+                        return false;
+                    }
+
+                }, $.validator.format("计划完成时间必须大于计划开始时间!"));
+
+                // 检验数据
+                var userValidate = $('#materialpartForm').validate({
+                    rules: {
+
+                        FBOSID: {
+                            required: true,
+                            levelLimit: false
+                        },
+                        FMMType: {
+                            required: true,
+                            levelLimit: false
+                        },
+                        FNo: {
+                            required: true,
+                            levelLimit: false
+                        },
+                        FPurNo: {
+                            required: true,
+                            levelLimit: false
+                        },
+                        FPurName: {
+                            required: true,
+                            levelLimit: false
+                        },
+                        takeFTypeID: {
+                            required: true,
+                            levelLimit: false
+                        },
+                        takeFLeadUserID: {
+                            required: true,
+                            levelLimit: false
+                        },
+                        takeFSDate: {
+                            required: true,
+                            levelLimit: false
+                        },
+                        takeFEDate: {
+                            required: true,
+                            levelLimit: false,
+                            compareDate: true
+                        },
+
+                        takeFISMilepost: {
+                            required: true,
+                            levelLimit: false
+                        },
+                        takeFMType: {
+                            required: true,
+                            levelLimit: false
+                        },
+
+                    },
+                    messages: {
+                        FBOSID: {
+                            required: '*请选择零件'
+                        },
+                        FMMType: {
+                            required: '*请选择模具类型'
+                        },
+                        FNo: {
+                            required: '*请输入制号'
+                        },
+                        FPurNo: {
+                            required: '*请选择工序号'
+                        },
+                        FPurName: {
+                            required: '*请选择工序名称'
+                        },
+                        takeFTypeID: {
+                            required: '*请选择任务类型'
+                        },
+                        takeFLeadUserID: {
+                            required: '*请选择负责人'
+                        },
+                        takeFSDate: {
+                            required: '*请选择计划开始时间'
+                        },
+                        takeFEDate: {
+                            required: '*请选择计划完成时间',
+                            // compareDate: "计划完成时间必须大于计划开始时间!"
+                        },
+
+                        takeFISMilepost: {
+                            required: '*请选择里程碑'
+                        },
+                        takeFMType: {
+                            required: '*请选择制件类型'
+                        }
+                    },
+                    onfocusout: false, // 是否在获取焦点时验证
+                    onkeyup: false, // 是否在敲击键盘时验证
+                    focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+                    focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+                    success: 'valid',
+                    submitHandler: function () {
+                        // 获取参数
+                        var data = form2Json('materialpartForm');
+
+                        data['FProjectID'] = FProjectID;
+
+                        data['fbosid'] = $("#materialpartForm select[name='FBOSID']").val();
+                        var url = '';
+                        url = '/s/material/addmyprojectmaterialmj2'; // 调用地址
+                        //console.log(url);
+
+                        if (op == 1) { // 添加操作
+                            $('body').mLoading('show');
+                            $.ajax({
+                                type: 'POST',
+                                contentType: 'application/json',
+                                url: url, // 调用地址
+                                data: JSON.stringify(data),
+                                async: false,
+                                success: function (data) {
+                                    if (data.result == 'success') {
+                                        setTimeout(function () {
+                                            $('.mloading-text').html('正在执行...');
+                                            setTimeout(function () {
+                                                top.myprojectmaterial.reload();
+                                                top.myprojectmaterial.toastr.success('添加成功！');
+                                                layer_close();
+                                                $("body").mLoading("hide");
+                                            }, 1000);
+                                        }, 1000);
+                                    } else if (data.result == 'fail') {
+                                        toastr.warning('制号重复，请重新输入');
+                                        $("body").mLoading("hide");
+                                    } else if (data.result == 'error') {
+                                        toastr.error(data.error);
+                                        $("body").mLoading("hide");
+                                    }
+
+                                },
+                                error: function (e) {
+                                    toastr.error(e.status);
+                                    toastr.error(e.responseText);
+                                    $("body").mLoading("hide");
+                                }
+                            });
+                        }
+
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>

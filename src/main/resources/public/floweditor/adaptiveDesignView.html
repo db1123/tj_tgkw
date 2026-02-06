@@ -1,0 +1,314 @@
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=5,IE=9" ><![endif]-->
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <!-- Toastr -->
+  <link rel="stylesheet" href="/plugins/toastr/toastr.min.css">
+  <!-- mloading -->
+  <link rel="stylesheet" href="/plugins/mloading/jquery.mloading.css">
+  <!-- GraphEditor -->
+  <link rel="stylesheet" href="styles/grapheditor.css">
+
+  <style type="text/css">
+    body,html { margin:0; height:100%; }
+  </style>
+  <!-- jQuery -->
+  <script src="/nui-ad/lib/jquery/1.9.1/jquery.min.js"></script>
+  <!-- Toastr -->
+  <script src="/plugins/toastr/toastr.min.js"></script>
+  <!-- mloading -->
+  <script src="/plugins/mloading/jquery.mloading.js"></script>
+  <!-- GraphEditor -->
+	<script type="text/javascript" src="js/Init.js"></script>
+	<script type="text/javascript" src="/plugins/mxgraph/mxClient.min.js"></script>
+	<script type="text/javascript" src="js/Graph.js"></script>
+	<script type="text/javascript" src="js/Shapes.js"></script>
+  <!-- 功能代码 -->
+  <script src="/javascript/tools.js"></script>
+  <script src="/javascript/flow/adaptiveDesign.js"></script>
+  <!-- 打开自适应模型 -->
+  <script type="text/javascript">
+    function main(container) {
+      $('body').mLoading('show');
+      setTimeout(function(){
+        var id = getQueryStringByName('id');
+        var graph = new mxGraph(container);
+        var parent = graph.getDefaultParent(); // 获取根节点
+        graph.setHtmlLabels(true); // 支持传入HTML
+        graph.setEnabled(false); // 禁用流程图
+        graph.panningHandler.ignoreCell = true; // 鼠标拖拽图层-开启
+        graph.foldingEnabled = false; // 禁用折叠
+        graph.recursiveResize = true; // 递归化
+        var style = graph.getStylesheet().getDefaultVertexStyle();
+        style[mxConstants.STYLE_FILLCOLOR] = '#ffffff';
+        $.ajax({
+          type: 'POST',
+          contentType: 'application/json',
+          url: '/s/relations/yuanshijiuge', // 调用地址
+          data: JSON.stringify({
+            fmid: id
+          }),
+          async: false,
+          success: function(data) {
+            if (data.result == 'success') {
+              setTimeout(function(){
+                //----------【第四步：生成分组】----------
+                $('.mloading-text').html('分组模块创建中...');
+                graph.getModel().beginUpdate();
+                try
+                {
+                  // 生成分组 0功能树 1结构BOM 2参数
+                  var group_0 = graph.insertVertex(parent, null, '', 0, 0, 0, 0, "rounded=0;whiteSpace=wrap;html=1;strokeColor=none;fillColor=none;");
+                  group_0['classifyId'] = 'group';
+                  var group_2 = graph.insertVertex(parent, null, '', 0, 100, 0, 0, "rounded=0;whiteSpace=wrap;html=1;strokeColor=none;fillColor=none;");
+                  group_2['classifyId'] = 'group';
+                  var group_1 = graph.insertVertex(parent, null, '', 0, 200, 0, 0, "rounded=0;whiteSpace=wrap;html=1;strokeColor=none;fillColor=none;");
+                  group_1['classifyId'] = 'group';
+                } finally {
+                  graph.getModel().endUpdate();
+                }
+                setTimeout(function(){
+                  //----------【第五步：生成节点】----------
+                  $('.mloading-text').html('模型节点创建中...');
+                  graph.getModel().beginUpdate();
+                  try
+                  {
+                    var list = data.json.list;
+                    for (var i=0; i<list.length; i++) {
+                      var item = list[i];
+                      var nodeStyle = '';
+                      var width = 100;
+                      var height = 50;
+                      switch (item.type) {
+                        case 0: // 功能树
+                          nodeStyle = 'rounded=1;whiteSpace=wrap;html=1;';
+                          break;
+                      
+                        case 1: // 结构BOM
+                          nodeStyle = 'shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;';
+                          break;
+                    
+                        case 2: // 参数
+                          if (item['Classify'] == 4) { // 公式
+                            nodeStyle = 'rounded=0;whiteSpace=wrap;html=1;';
+                          } else { // 其他
+                            nodeStyle = 'ellipse;whiteSpace=wrap;html=1;aspect=fixed;';
+                            width = 60;
+                            height = 60;
+                          }
+                          break;
+                            
+                        default:
+                          break;
+                      }
+                      // 初始化节点值
+                      var value = '';
+                      if (item['Classify']) {
+                        switch (parseInt(item['Classify'])) {
+                          case 1: // 普通参数
+                            switch (parseInt(item['ValueType'])) {
+                              case 1: // 无值
+                                value = '';
+                                break;
+                            
+                              case 2: // 固定值
+                                value = item['FValue'];
+                                break;
+                          
+                              case 3: // 区间
+                                value = item['MinValue'];
+                                break;
+                        
+                              case 4: // 输入值
+                                value = '';
+                                break;
+                                      
+                              default:
+                                break;
+                            }
+                            break;
+                    
+                          case 4: // 公式&约束
+                            value = '';
+                            break;
+                    
+                          default:
+                            break;
+                        }
+                      }
+                      // 显示文本
+                      var valueStr = createAdaptiveCellView(item, value);
+                      // 创建节点
+                      eval("var v" + item.id + " = graph.insertVertex(group_" + item.type + ", null, '" + valueStr + "', 0, 0, " + width + ", " + height + ", '" + nodeStyle + "');");
+                      eval("v" + item.id + "['vertex'] = true;");
+                      eval("v" + item.id + "['classifyId'] = 'adaptive" + item.type + "';");
+                      eval("v" + item.id + "['adaptiveData'] = " + JSON.stringify(item) + ";");
+                      eval("v" + item.id + "['adaptiveKey'] = '" + item.id + "';");
+                      eval("v" + item.id + "['adaptiveValue'] = '" + value + "';");
+                      eval("v" + item.id + "['adaptiveType'] = '" + item.type + "';");
+                      eval("v" + item.id + "['adaptiveClassify'] = '" + item.Classify + "';");
+                      //eval("console.log(v" + item.id + ")");
+                      // 创建标注
+                      if (item.Subtitle) {
+                        var note = item.Subtitle;
+                        if (note.length > 10) {
+                          note = note.substring(0, 10) + '...';
+                        }
+                        eval("var v" + item.id + "no = graph.insertVertex(v" + item.id + ", null, '" + note + "', 1, 1, 0, 0, 'align=left;verticalAlign=top;labelBackgroundColor=lightgrey;labelBorderColor=black', true);");
+                        var LenPx = getLenPx(note, 12);
+                        eval("v" + item.id + "no['classifyId'] = 'paramNote';");
+                        if (width == 100) {
+                          eval("v" + item.id + "no.geometry.offset = new mxPoint(" + (-53-(LenPx/2)) + ", -15);");
+                        }
+                        if (width == 60) {
+                          eval("v" + item.id + "no.geometry.offset = new mxPoint(" + (-33-(LenPx/2)) + ", -20);");
+                        }
+                      }
+                    }
+                  } finally {
+                    graph.getModel().endUpdate();
+                  }
+                  setTimeout(function(){
+                    //----------【第六步：初步布局】----------
+                    $('.mloading-text').html('对节点进行初步布局...');
+                    graph.getModel().beginUpdate();
+                    try
+                    {
+                      // 功能树布局
+                      var stack_0 = new mxStackLayout(graph, true); //分层布局
+                      stack_0.spacing = 10; // 间距
+                      stack_0.execute(group_0);
+                      // 参数布局
+                      var stack_2 = new mxStackLayout(graph, true); //分层布局
+                      stack_2.spacing = 10; // 间距
+                      stack_2.execute(group_2);
+                      // 结构BOM
+                      var stack_1 = new mxStackLayout(graph, true); //分层布局
+                      stack_1.spacing = 10; // 间距
+                      stack_1.execute(group_1);
+                    } finally {
+                      graph.getModel().endUpdate();
+                    }
+                    setTimeout(function(){
+                      //----------【第七步：生成关系连线】----------
+                      $('.mloading-text').html('节点关系连线生成中...');
+                      graph.getModel().beginUpdate();
+                      try
+                      {
+                        var relationship = data.json.relationship;
+                        for (var i=0; i<relationship.length; i++) {
+                          var item = relationship[i];
+                          var eId = getRandomNum(1000, 99999);
+                          var lineStyle = '';
+                          if (item.abtype == 1) {
+                            lineStyle = 'rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;strokeWidth=2;';
+                          } else {
+                            lineStyle = 'edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=none;endFill=0;strokeColor=#CCCCCC;strokeWidth=2;';
+                          }
+                          eval("var e" + eId + " = graph.insertEdge(parent, null, '', v" + item.a + ", v" + item.b + ",'" + lineStyle + "');");
+                          eval("graph.orderCells(true, [e" + eId + "]);");
+                        }
+                      } finally {
+                        graph.getModel().endUpdate();
+                      }
+                      setTimeout(function(){
+                        //----------【第八步：设置功能树布局】----------
+                        $('.mloading-text').html('对功能节点进行分析布局...');
+                        graph.getModel().beginUpdate();
+                        try
+                        {
+                          // 功能树布局
+                          var hierarchicalLayout_0 = new mxHierarchicalLayout(graph); //分层布局
+                          hierarchicalLayout_0.resizeParent = true; // 调整父对象的大小
+                          hierarchicalLayout_0.execute(group_0);
+                          // 根节点对分组节点进行布局排版
+                          var stackLayout_parent = new mxStackLayout(graph, true); // 堆栈布局
+                          stackLayout_parent.horizontal = false; // 垂直
+                          stackLayout_parent.spacing = 100; // 间距
+                          stackLayout_parent.execute(parent);
+                        } finally {
+                          graph.getModel().endUpdate();
+                        }
+                        setTimeout(function(){
+                          //----------【第九步：设置参数布局】----------
+                          $('.mloading-text').html('对参数进行分析布局...');
+                          graph.getModel().beginUpdate();
+                          try
+                          {
+                            // 参数布局
+                            var hierarchicalLayout_2 = new mxHierarchicalLayout(graph); //分层布局
+                            hierarchicalLayout_2.resizeParent = true; // 调整父对象的大小
+                            hierarchicalLayout_2.execute(group_2);
+                            // 根节点对分组节点进行布局排版
+                            var stackLayout_parent = new mxStackLayout(graph, true); // 堆栈布局
+                            stackLayout_parent.horizontal = false; // 垂直
+                            stackLayout_parent.spacing = 100; // 间距
+                            stackLayout_parent.execute(parent);
+                          } finally {
+                            graph.getModel().endUpdate();
+                          }
+                          setTimeout(function(){
+                            //----------【第十步：设置结构BOM布局】----------
+                            $('.mloading-text').html('对结构BOM进行分析布局...');
+                            graph.getModel().beginUpdate();
+                            try
+                            {
+                              // 结构BOM
+                              var hierarchicalLayout_1 = new mxHierarchicalLayout(graph); //分层布局
+                              hierarchicalLayout_1.resizeParent = true; // 调整父对象的大小
+                              hierarchicalLayout_1.execute(group_1);
+                              // 根节点对分组节点进行布局排版
+                              var stackLayout_parent = new mxStackLayout(graph, true); // 堆栈布局
+                              stackLayout_parent.horizontal = false; // 垂直
+                              stackLayout_parent.spacing = 100; // 间距
+                              stackLayout_parent.execute(parent);
+                            } finally {
+                              graph.getModel().endUpdate();
+                            }
+                            setTimeout(function(){
+                              // 回执
+                              $('body').mLoading('hide');
+                              toastr.success('完成自适应模型设计图加载！');
+                            }, 500);
+                          }, 1000);
+                        }, 1000);
+                      }, 1000);
+                    }, 1000);    
+                  }, 1000);
+                }, 1000);
+              }, 100);
+            } else {
+              toastr.error(data.error);
+            }
+          },
+          error : function(e){
+            $('body').mLoading('hide');
+            toastr.error(e.status);
+            toastr.error(e.responseText);
+          }
+        });
+        var btn1 = mxUtils.button('+', function(){
+          graph.zoomIn();
+        });
+        btn1.style.position = 'absolute';
+        btn1.style.top = '8px';
+        btn1.style.left = '2px';
+        document.body.appendChild(btn1);
+        var btn2 = mxUtils.button('-', function(){
+          graph.zoomOut();
+        });
+        btn2.style.position = 'absolute';
+        btn2.style.top = '8px';
+        btn2.style.left = '32px';
+        document.body.appendChild(btn2);
+      }, 100);
+      
+		};
+  </script>
+</head>
+<body onload="main(document.getElementById('graphContainer'))">
+  <div id="graphContainer" style="position:relative;overflow:hidden;width:100%;height:100%;background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2QwZDBkMCIgb3BhY2l0eT0iMC4yIiBzdHJva2Utd2lkdGg9IjEiLz48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZDBkMGQwIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=);cursor:default;"></div>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <!--/_only 独立样式 -->
+</head>
+<style>
+    /* 屏幕显示样式 */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 2rem;
+    }
+
+    .page-title {
+        text-align: center;
+        color: #2c3e50;
+        margin: 1rem 0 0.5rem;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+
+    .print-btn {
+        padding: 12px 24px;
+        background: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-bottom: 1rem;
+        transition: transform 0.2s;
+    }
+
+    .print-btn:hover {
+        background: #45a049;
+        transform: translateY(-1px);
+    }
+
+    .course-table {
+        width: 100%;
+        border-collapse: collapse;
+        box-shadow: 0 1px 12px rgba(0,0,0,0.1);
+    }
+
+    .course-table th {
+        background: #f8f9fa;
+        padding: 12px;
+        text-align: left;
+        border-bottom: 2px solid #dee2e6;
+        color: #34495e;
+    }
+
+    .course-table td {
+        padding: 10px;
+        border-bottom: 1px solid #dee2e6;
+        color: #2c3e50;
+    }
+
+    /* 屏幕显示样式 */
+    .course-table th {
+        font-weight: 600; /* 屏幕端加粗 */
+    }
+
+    /* 打印优化样式 */
+    @media print {
+        @page {
+            margin: 1cm;
+        }
+
+        body {
+            margin: 0.5cm;
+            padding: 0 !important;
+        }
+
+        .print-btn {
+            display: none;
+        }
+
+        .page-title {
+            color: #000;
+            font-size: 22pt;
+            margin: 0 0 10pt;
+            page-break-after: avoid;
+        }
+
+        .course-table {
+            width: 100% !important;
+            font-size: 10pt;
+            box-shadow: none;
+        }
+
+        .course-table th,
+        .course-table td {
+            padding: 6px;
+            page-break-inside: avoid;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
+        /* 横向打印适配 */
+        @page :landscape {
+            margin: 0.8cm;
+        }
+
+        @media (orientation: landscape) {
+            .course-table {
+                font-size: 11pt;
+            }
+        }
+        .course-table th {
+            font-weight: 700 !important; /* 打印加粗增强 */
+            -webkit-print-color-adjust: exact; /* 确保颜色渲染 */
+        }
+    }
+</style>
+<body>
+<h1 class="page-title"></h1>
+<button class="print-btn" onclick="window.print()">打印表格</button>
+<table class="course-table" id="courseTable"></table>
+</body>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+
+<script type="text/javascript">
+
+
+    var FTPID = getQueryStringByName('FTPID');
+
+    // 业务代码
+    $(function () {
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/trainingprogramcourse/querytrainingprogramcoursesqldy', // 调用地址
+            data: JSON.stringify({
+                tpID: FTPID
+            }),
+            async: false,
+            success: function (data) {
+                const courseData = data.courseData;
+
+                $(".page-title").text(data.courseData[0].FPYName + '课程安排');
+                const table = document.getElementById('courseTable');
+                table.innerHTML = ''; // 清空原有内容
+
+                // 创建表头
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+
+
+
+                const headers = [
+                    "课程类别", "课程编号", "课程名称", "课程英文名称", "课程性质",
+                    "学分", "实践周数", "是否停课", "学年学期", "课程描述"
+                ];
+
+                headers.forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText;
+                    headerRow.appendChild(th);
+                });
+
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+
+                // 创建表格内容
+                const tbody = document.createElement('tbody');
+
+                courseData.forEach(course => {
+
+                    const row = document.createElement('tr');
+
+                    headers.forEach(header => {
+                        const td = document.createElement('td');
+                        let content = course[header];
+
+                        // 处理布尔值显示
+                        if (header === '是否停课') {
+                            content = course[header] === 2 ? '是' : '否';
+                        }
+
+                        td.textContent = content || '/';
+                        row.appendChild(td);
+                    });
+
+                    tbody.appendChild(row);
+                });
+
+                table.appendChild(tbody);
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+    });
+</script>
+</body>
+</html>

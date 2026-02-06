@@ -1,0 +1,233 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<!--_global 公共配置文件 -->
+<script language="javascript">var golbal_type="admin";</script>
+<script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+<!--_only 独立样式 -->
+<link rel="stylesheet" href="/plugins/select2/css/select2.min.css" />
+<link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css" />
+<link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css" />
+<!--/_only 独立样式 -->
+</head>
+<body>
+<article class="page-container">
+  <form action="" method="post" class="form form-horizontal" id="urlForm">
+    <div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>类型：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<select name="f_type" style="width: 100%;"><option></option></select>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>标题：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="f_title" />
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2">URL：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="f_url" />
+			</div>
+		</div>
+    <div class="toolbar-bottom-line"></div>
+		<div class="toolbar-bottom-btn">
+			<input class="btn btn-success-outline radius mr-20" type="button" value="&nbsp;&nbsp;获取数据测试&nbsp;&nbsp;" onclick="URLExamRun()" />
+			<input class="btn btn-primary radius radius" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;" />
+			<input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;" onclick="layer_close()" />
+		</div>
+    <input type="hidden" value="" name="f_key_id" />
+	</form>
+</article>
+
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript" src="/javascript/ReturnData.js"></script>
+<script type="text/javascript">
+// 编辑框状态 1新建 2修改
+var op = getQueryStringByName('op');
+// 业务代码
+$(function(){
+  // 初始化类型树形下拉框
+  $.ajax({
+    type: 'POST',
+    contentType: 'application/json',
+    url: '/s/paramType/queryParamTypeALL', // 调用地址
+    async: false,
+    success: function(data) {
+      $("#urlForm select[name='f_type']").select2ztree({
+        textField : 'name',
+        titleField : 'name',
+        placeholder: '请选择类型',
+        ztree: {
+          setting: {
+            view: {
+              dblClickExpand: false
+            },
+            data: {
+              simpleData: {
+                enable: true,
+                idKey: "id",
+                pIdKey: "pId",
+                rootPId: 0
+              }
+            }
+          },
+          zNodes: data.zNodes
+        },
+        language: "zh-CN"
+      });
+    },
+    error : function(e) {
+      toastr.error(e.status);
+      toastr.error(e.responseText);
+    }
+  });
+  // 修改操作时读取表单信息
+  if (op == 2) {
+    var id = getQueryStringByName('id');
+    $.ajax({
+      type: 'POST',
+      contentType: 'application/json',
+      url: '/s/param/queryParamInfo', // 调用地址
+      data: JSON.stringify({
+        id
+      }),
+      async: false,
+      success: function(data) {
+        $("#urlForm select[name='f_type']").select2ztree('val', [data.info.f_type]);
+        $("#urlForm input[name='f_title']").val(data.info.f_title);
+        $("#urlForm input[name='f_url']").val(data.info.f_url);
+        $("#urlForm input[name='f_key_id']").val(data.info.key);
+      },
+      error : function(e) {
+        toastr.error(e.status);
+        toastr.error(e.responseText);
+      }
+    });
+  }
+  // 检验数据
+  $('#urlForm').validate({
+    rules: {
+      f_type: {
+        required: true
+      },
+      f_title: {
+        required: true
+      },
+      f_url: {
+        required: true
+      }
+    },
+    messages: {
+      f_type: {
+        required: '*请选择类型'
+      },
+      f_title: {
+        required: '*请编写标题'
+      },
+      f_url: {
+        required: '*请编写网址'
+      }
+    },
+    onfocusout: false, // 是否在获取焦点时验证
+    onkeyup: false, // 是否在敲击键盘时验证
+    focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+    focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+    success: 'valid',
+    submitHandler:function(){
+      // 获取参数
+      var JsonData = form2Json('urlForm');
+      JsonData['f_classify'] = 5;
+      // 执行
+      if (op == 1) { // 添加操作
+        $.ajax({
+          type: 'POST',
+          contentType: 'application/json',
+          url: '/s/param/addParam', // 调用地址
+          data: JSON.stringify(JsonData),
+          async: false,
+          success: function(data) {
+            if (data.result == 'success') {
+              parent.$('#paramTable').DataTable().ajax.reload(null, false);
+              parent.toastr.success('添加成功！');
+              layer_close();
+            } else if (data.result == 'error') {
+              toastr.error(data.error);
+            }
+          },
+          error : function(e){
+            toastr.error(e.status);
+            toastr.error(e.responseText);
+          }
+        });
+      }else {
+        $.ajax({
+          type: 'POST',
+          contentType: 'application/json',
+          url: '/s/param/updateParam', // 调用地址
+          data: JSON.stringify(JsonData),
+          async: false,
+          success: function(data) {
+            if (data.result == 'success') {
+              parent.$('#paramTable').DataTable().ajax.reload(null, false);
+              parent.toastr.success('修改成功！');
+              layer_close();
+            } else if (data.result == 'error') {
+              toastr.error(data.error);
+            }
+          },
+          error : function(e){
+            toastr.error(e.status);
+            toastr.error(e.responseText);
+          }
+        });
+      }
+    }
+  });
+});
+// 测试查询结果
+function URLExamRun() {
+  // 获取参数
+  var JsonData = form2Json('urlForm');
+  // 执行
+  $('body').mLoading('show');
+  setTimeout(function(){
+    // 设置为自定义类型
+    JsonData['f_classify'] = 5;
+    // 执行
+    var data = getURLData(JsonData);
+    if (data) {
+      var returnData = data.returnData;
+      if (returnData) {
+        parent.layer.open({
+          type: 2,
+          area: ['1000px', '580px'],
+          fix: false, //不固定
+          shade: 0.4,
+          title: '运行结果展示',
+          content: returnData
+        });
+      } else {
+        toastr.error("执行结果异常");
+      }
+    }
+    $('body').mLoading('hide');
+  }, 200);
+}
+</script>
+</body>
+</html>

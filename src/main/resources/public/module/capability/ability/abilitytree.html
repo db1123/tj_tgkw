@@ -1,0 +1,717 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/demo.css" type="text/css">
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/metroStyle/metroStyle.css" type="text/css">
+    <!--/_only 独立样式 -->
+</head>
+<style type="text/css">
+    ul.ztree {
+        margin-left: 20px;
+        border: 1px solid #617775;
+        background: #f0f6e4;
+        width: 28vw;
+        height: 69vh;
+        overflow-y: scroll;
+        overflow-x: auto;
+    }
+
+    /* 自定义图标样式 */
+    .ztree li a span[class*="_ico_open"],
+    .ztree li a span[class*="_ico_close"],
+    .ztree li a span[class*="_ico_docu"] {
+        background-size: 18px 18px; /* 背景图片的大小 */
+        width: 18px;
+        height: 18px;
+    }
+
+    .ztree li a span.school-icon_ico_open,
+    .ztree li a span.school-icon_ico_close,
+    .ztree li a span.school-icon_ico_docu{
+        background-image: url("images/ability.png") !important;
+    }
+
+    .ztree li a span.college-icon_ico_open,
+    .ztree li a span.college-icon_ico_close,
+    .ztree li a span.college-icon_ico_docu {
+        background-image: url("images/dengji.png") !important;
+    }
+
+    .ztree li a span.major-icon_ico_open,
+    .ztree li a span.major-icon_ico_close,
+    .ztree li a span.major-icon_ico_docu {
+        background-image: url("images/tiaojian.png") !important;
+    }
+
+    .ztree li a span.class-icon_ico_docu {
+        background-image: url("images/kaohe.png") !important;
+    }
+
+    .ztree li a span[class*="_bt"] {
+        background-size: 16px 16px; /* 调整图标大小 */
+        width: 16px;
+        height: 16px;
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 5px; /* 调整按钮与文本的间距 */
+        cursor: pointer; /* 设置鼠标指针为手型 */
+    }
+
+    /* 定义编辑按钮图标样式 */
+    .ztree li a span.studentadd-button_bt{
+        background-image: url("images/mti_add.png") !important;
+    }
+
+    /* 定义编辑按钮图标样式 */
+    .ztree li a span.tiaojianz-button_bt{
+        background-image: url("images/tiaojianadd.png") !important;
+
+    }
+
+    iframe {
+        width: 60vw;
+        height: 60vh;
+        border: none; /* 去掉 iframe 的边框 */
+    }
+</style>
+<body>
+<div class="page-container">
+    <div class="f-l " style="width: 98.8%; padding-top: 1px;">
+        <div class="row cl">
+            <div class="col-md-4">
+                <div class="card-body">
+                    <div class="zTreeDemoBackground left">
+                        <input type="text" id="key" value="" class="empty input-text" placeholder="请输入关键字"
+                               style="margin-left: 19px;width: 405px;"/><br/>
+                        <ul id="treeDemo" class="ztree"></ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card-body" style="margin-top: 10px;">
+                    <div class="panel panel-default">
+                        <div class="panel-header"><strong class="typename">无</strong>
+                        </div>
+                        <div class="panel-body">
+                            <div id="infoxx">
+                                <iframe width="100%;" height="100%;" frameborder="0" id="iframeinfoxx"></iframe>
+                            </div>
+<!--                            <table id="mainTable" class="display compact"-->
+<!--                                   style="width: 99.8%; margin-top: 5px;"></table>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/fuzzysearch.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+    var xfno;
+    var showtype = getQueryStringByName('showtype');
+    var projectid = getQueryStringByName('id');//能力ID
+    var zNodes = [];
+    var treesetting = {};
+    var treeObj = null;
+    var ftypeid = -1;
+    var ftypename = "";
+    var pfstate = -1;
+
+
+    var filename = "";//文件名称
+    var feditionNo = 1;//当前版本
+
+
+    var xmname;
+
+    var parentId;
+    var parentName;
+    // 保存搜索关键字
+    let searchKeyword = '';
+
+    var abilityName;
+    var LevelName;
+
+    var ConditionName;
+
+    var fjdname;
+
+    var FAbilityLevelId;
+    // 业务代码
+    $(function () {
+
+        if(getQueryStringByName('FAbilityLevelId')){
+            FAbilityLevelId = getQueryStringByName('FAbilityLevelId');
+        }
+
+
+        $("#newadd").attr("style", "display:none;"); //隐藏
+
+        $("#downloada").hide();
+
+
+        if (pfstate == 1 && showtype == 2) {
+            if (ftypeid != -1 && projectid) {
+                $("#newadd").attr("style", "display:block;"); //显示
+            } else {
+                $("#newadd").attr("style", "display:none;"); //隐藏
+            }
+
+        } else {
+            $("#newadd").attr("style", "display:none;"); //隐藏
+        }
+
+        treesetting = {
+            view: {
+                addHoverDom: addHoverDom,
+                removeHoverDom: removeHoverDom,
+                selectedMulti: false,
+                showIcon: true // 显示图标
+            },
+            check: {
+                enable: false
+            },
+            data: {
+                simpleData: {
+                    enable: true
+                }
+            },
+            edit: {
+                enable: false
+            },
+            callback: {
+                onClick: zTreeOnClick
+            }
+        };
+        gettreedata(1);
+        $('#key').on('input', function () {
+            searchKeyword = $(this).val();
+        });
+    });
+    function addHoverDom(treeId, treeNode) {
+        if(showtype ==1){
+            var sObj = $("#" + treeNode.tId + "_span");
+            if (treeNode.ftype == -1) {
+                //能力
+                if ($("#addBtn4_" + treeNode.tId).length > 0) return
+                var addStr = "<span class='button add' id='addBtn4_" + treeNode.tId
+                    + "' title='新增能力等级' onfocus='this.blur();'></span>";
+                sObj.after(addStr);
+                var btn = $("#addBtn4_" + treeNode.tId);
+                if (btn) btn.bind("click", function () {
+                    xmname = rename(treeNode.name);
+                    ftypeid = treeNode.id;
+                    abilityName  = xmname;
+                    $(".typename").text("已选能力：" + xmname);
+                    //新增能力等级
+                    var index = layer.open({
+                        type: 2,
+                        area: ['1000px', '600px'],
+                        fix: false, //不固定
+                        shade: 0.4,
+                        title: '新增能力等级信息',
+                        content: '/module/capability/ability/abilitylevel2edit.html?op=1&FAbilityID=' + treeNode.id +'&tree2=1'+'&showtype=' + showtype
+                        , end: function () {
+                            gettreedata(2);
+                        }
+                    });
+                    // layer.full(index);
+                    return false;
+                });
+
+
+            }
+            else if (treeNode.ftype == 1) {
+                //能力等级
+                if ($("#addBtn_" + treeNode.tId).length > 0) return
+                if ($("#delBtn_" + treeNode.tId).length > 0) return;
+                var addStr = "<span class='button add' id='addBtn_" + treeNode.tId
+                    + "' title='新增考核条件' onfocus='this.blur();'></span>" +
+                    "<span class='button remove' id='delBtn_" + treeNode.tId
+                    + "' title='删除能力等级''></span>"
+                ;
+                sObj.after(addStr);
+                var btn = $("#addBtn_" + treeNode.tId);
+                if (btn) btn.bind("click", function () {
+                    xmname = rename(treeNode.name);
+                    ftypeid = treeNode.id;
+                    abilityName = treeNode.AbilityName;
+                    LevelName = xmname;
+                    $(".typename").text("已选能力等级：" + xmname);
+
+                    //新增能力等级下考核条件
+                    var index = layer.open({
+                        type: 2,
+                        area: ['800px', '500px'],
+                        fix: false, //不固定
+                        shade: 0.4,
+                        title: '新增能力等级考核条件信息',
+                        content: '/module/capability/ability/tiaojianedit.html?op=1&FAbilityID=' + treeNode.pID + '&FAbilityLevelID=' + treeNode.id + '&op=1&tree2=1'+'&showtype=' + showtype
+                        , end: function () {
+                            gettreedata(2);
+                        }
+                    });
+                    // layer.full(index);
+                    return false;
+                });
+                var btn2 = $("#delBtn_" + treeNode.tId);
+                if (btn2) btn2.bind("click", function () {
+                    xmname = rename(treeNode.name);
+                    ftypeid = treeNode.id;
+                    $(".typename").text("已选能力等级：" + xmname);
+                    //删除能力等级信息
+                    onClickBtnDel(ftypeid,xmname);
+                    $(".typename").text("无");
+                    $('#iframeinfoxx').attr('src', '');
+                    return false;
+                });
+
+            } else if (treeNode.ftype == 3) { //考核方式
+                if ($("#delBtn2_" + treeNode.tId).length > 0) return;
+                var remove2 = "<span class='button remove' id='delBtn2_" + treeNode.tId
+                    + "' title='删除考核方式''></span>";
+                sObj.after(remove2);
+                var btn3 = $("#delBtn2_" + treeNode.tId);
+                if (btn3) btn3.bind("click", function () {
+                    xmname = rename(treeNode.name);
+                    ftypeid = treeNode.id;
+                    $(".typename").text("已选考核方式：" + xmname);
+                    onClickBtnuserfsDel(ftypeid,treeNode.MethodName,treeNode.ConditionName);
+                    return false;
+                });
+            } else if (treeNode.ftype == 2) {//考核条件
+
+                if ($("#delBtn3_" + treeNode.tId).length > 0) return;
+                if ($("#addBtn3_" + treeNode.tId).length > 0) return;
+                if ($("#addBtn33_" + treeNode.tId).length > 0) return;
+                var addStr2 = "<span class='button add' id='addBtn3_" + treeNode.tId
+                    + "' title='新增考核方式' onfocus='this.blur();'></span>";
+                var upStr2 = "<span class='button remove' id='delBtn3_" + treeNode.tId
+                    + "' title='删除考核条件''></span>";
+                var addStr3 = "<span class='button tiaojianz-button_bt' id='addBtn33_" + treeNode.tId
+                    + "' title='新增考核子条件' onfocus='this.blur();'></span>";
+                sObj.after(upStr2);
+                sObj.after(addStr2);
+                sObj.after(addStr3);
+                var btn = $("#addBtn3_" + treeNode.tId);
+                if (btn) btn.bind("click", function () {
+                    xmname = rename(treeNode.name);
+                    ftypeid = treeNode.id;
+                    abilityName = treeNode.AbilityName;
+                    LevelName= treeNode.LevelName;
+                    ConditionName = treeNode.ConditionName;
+                    $(".typename").text("已选考核条件：" + xmname);
+                    var index = layer.open({
+                        type: 2,
+                        area: ['800px', '500px'],
+                        fix: false, //不固定
+                        shade: 0.4,
+                        title: '新增能力等级考核方式信息',
+                        content: '/module/capability/ability/kaohefangshiedit.html?op=1&FAbilityLevelID=' + treeNode.pId + '&FAbilityConditionID=' + treeNode.id+'&tree2=1&ftype='+treeNode.ftypes+'&showtype=' + showtype
+                        , end: function () {
+                            gettreedata(2);
+                        }
+                    });
+                    // layer.full(index);
+                    return false;
+                });
+                var btn2 = $("#delBtn3_" + treeNode.tId);
+                if (btn2) btn2.bind("click", function () {
+                    xmname = rename(treeNode.name);
+                    ftypeid = treeNode.id;
+                    $(".typename").text("已选考核条件：" + xmname);
+                    onClickBtnuserlcDel(ftypeid,xmname,1);
+
+                    return false;
+                });
+                var btn3 = $("#addBtn33_" + treeNode.tId);
+                if (btn3) btn3.bind("click", function () {
+                    xmname = rename(treeNode.name);
+                    ftypeid = treeNode.id;
+                    abilityName = treeNode.AbilityName;
+                    LevelName = xmname;
+                    $(".typename").text("已选考核条件：" + xmname);
+
+                    //新增能力等级下考核条件
+                    var index = layer.open({
+                        type: 2,
+                        area: ['1200px', '600px'],
+                        fix: false, //不固定
+                        shade: 0.4,
+                        title: '新增能力等级考核条件子级信息',
+                        content: '/module/capability/ability/abilityCondition/abilityconditiontree.html?op=1&FCID=' + treeNode.id+'&ftypes=' +treeNode.ftypes+'&tree=1'+'&showtype=' + showtype
+                        , end: function () {
+                            gettreedata(2);
+                        }
+                    });
+                    // layer.full(index);
+                    return false;
+                });
+
+            }else if (treeNode.ftype == 4) {//考核子条件
+
+                if ($("#delBtn4_" + treeNode.tId).length > 0) return;
+                if ($("#addBtn4_" + treeNode.tId).length > 0) return;
+                var addStr2 = "<span class='button add' id='addBtn4_" + treeNode.tId
+                    + "' title='新增考核方式' onfocus='this.blur();'></span>";
+                var upStr2 = "<span class='button remove' id='delBtn4_" + treeNode.tId
+                    + "' title='删除考核子条件''></span>";
+                sObj.after(upStr2);
+                sObj.after(addStr2);
+                var btn = $("#addBtn4_" + treeNode.tId);
+                if (btn) btn.bind("click", function () {
+                    xmname = rename(treeNode.name);
+                    ftypeid = treeNode.id;
+                    abilityName = treeNode.AbilityName;
+                    LevelName= treeNode.LevelName;
+                    ConditionName = treeNode.ConditionName;
+                    $(".typename").text("已选考核子条件：" + xmname);
+                    var index = layer.open({
+                        type: 2,
+                        area: ['800px', '500px'],
+                        fix: false, //不固定
+                        shade: 0.4,
+                        title: '新增能力等级考核方式信息',
+                        content: '/module/capability/ability/kaohefangshiedit.html?op=1&FAbilityLevelID=' + treeNode.LevelID + '&FAbilityConditionID=' + treeNode.id+'&tree2=1&ftype='+treeNode.ftypes+'&showtype=' + showtype
+                        , end: function () {
+                            gettreedata(2);
+                        }
+                    });
+                    // layer.full(index);
+                    return false;
+                });
+                var btn2 = $("#delBtn4_" + treeNode.tId);
+                if (btn2) btn2.bind("click", function () {
+                    xmname = rename(treeNode.name);
+                    ftypeid = treeNode.id;
+                    $(".typename").text("已选考核条件：" + xmname);
+                    onClickBtnuserlcDel(ftypeid,xmname,2);
+
+                    return false;
+                });
+
+            }
+        }
+
+    }
+
+    function removeHoverDom(treeId, treeNode) {
+        if(showtype ==1){
+            $("#addBtn_" + treeNode.tId).unbind().remove();
+            $("#delBtn_" + treeNode.tId).unbind().remove();
+
+            $("#delBtn2_" + treeNode.tId).unbind().remove();
+
+            $("#addBtn3_" + treeNode.tId).unbind().remove();
+            $("#delBtn3_" + treeNode.tId).unbind().remove();
+            $("#addBtn33_" + treeNode.tId).unbind().remove();
+
+            $("#addBtn4_" + treeNode.tId).unbind().remove();
+            $("#delBtn4_" + treeNode.tId).unbind().remove();
+        }
+
+    }
+
+    function gettreedata(type) {
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json;charset=UTF-8',
+            url: '/s/abilitycondition/querabilitytree',
+            data: JSON.stringify({
+                FAbilityID: projectid,
+                FAbilityLevelId:FAbilityLevelId
+            }),
+            success: function (data) {
+                if (data.result == 'success') {
+                    zNodes = data.zNodes;
+                    if (type == 1) {
+                        treeObj = $.fn.zTree.init($("#treeDemo"), treesetting, zNodes);
+                        fuzzySearch('treeDemo', '#key', null, true); //初始化模糊搜索方法
+                    } else if (type == 2) {
+                        updateTree(zNodes);
+                        $("#key").val("");
+                        // 如果关键字存在，重新触发搜索
+                        if (searchKeyword) {
+                            $("#key").val(searchKeyword); // 设置关键字到输入框
+                            fuzzySearch('treeDemo', '#key', null, true, 2); //初始化模糊搜索方法
+                        }
+                    }
+
+
+                    // treeObj.expandAll(true);
+                    // var nodes = treeObj.getSelectedNodes();
+                    //
+                    // if (nodes.length > 0) {
+                    //     for (var i = 0; i < nodes.length; i++) {
+                    //         treeObj.expandNode(nodes[i], true, true, true);
+                    //     }
+                    // }
+                }
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+    }
+
+    // 更新 zTree 数据
+    function updateTree(newNodes) {
+        var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
+
+        // 获取当前选中的节点
+        var selectedNodes = treeObj.getSelectedNodes();
+        var selectedNodeId = selectedNodes.length > 0 ? selectedNodes[0].id : null;
+
+        // 获取当前展开的节点
+        var expandedNodes = [];
+        var allNodes = treeObj.transformToArray(treeObj.getNodes());
+        allNodes.forEach(function (node) {
+            if (node.open) {
+                expandedNodes.push(node.id);
+            }
+        });
+
+        // 清空当前树
+        treeObj.destroy();
+
+        // 重新初始化 zTree
+        treeObj = $.fn.zTree.init($("#treeDemo"), treesetting, newNodes);
+
+        // 恢复展开状态
+        expandedNodes.forEach(function (id) {
+            var node = treeObj.getNodeByParam("id", id);
+            if (node) {
+                treeObj.expandNode(node, true, false, false);
+            }
+        });
+
+        // 恢复选中状态
+        if (selectedNodeId) {
+            var selectedNode = treeObj.getNodeByParam("id", selectedNodeId);
+            if (selectedNode) {
+                treeObj.selectNode(selectedNode);
+            }
+        }
+    }
+
+    function zTreeOnClick(event, treeId, treeNode) {
+
+        if (treeNode.ftype == 1) {
+            $(".typename").text("已选能力等级：" + rename(treeNode.name));
+        } else if (treeNode.ftype == 2) {
+            $(".typename").text("已选考核条件：" + rename(treeNode.name));
+        } else if (treeNode.ftype == 3) {
+            $(".typename").text("已选考核方式：" + rename(treeNode.name));
+        }else if (treeNode.ftype == -1) {
+            $(".typename").text("已选能力：" + rename(treeNode.name));
+        }else if (treeNode.ftype == 4) {
+            $(".typename").text("已选考核子条件：" + rename(treeNode.name));
+        }
+
+        if(treeNode.ftype == 1) {
+            abilityName = treeNode.AbilityName;
+            $('#iframeinfoxx').attr('src', 'abilitylevel2edit.html?op=2&FAbilityID=' + treeNode.pId + '&id=' + treeNode.id+'&tree=1' +'&showtype='+showtype);
+        }else if(treeNode.ftype == 2) {
+            abilityName = treeNode.AbilityName;
+            LevelName = treeNode.LevelName;
+            $('#iframeinfoxx').attr('src', 'tiaojianedit.html?op=2&FAbilityID=' + treeNode.AbilityID + '&FAbilityLevelID=' + treeNode.pId + '&id=' + treeNode.id+'&tree=1'+'&showtype='+showtype);
+        }
+        else if(treeNode.ftype == 3) {
+            abilityName = treeNode.AbilityName;
+            LevelName = treeNode.LevelName;
+            ConditionName = treeNode.ConditionName;
+            $('#iframeinfoxx').attr('src', 'kaohefangshiedit.html?op=2&FAbilityLevelID=' + treeNode.LevelID + '&FAbilityConditionID=' + treeNode.pId + '&id=' + treeNode.id+'&tree=1'+'&showtype='+showtype);
+        }else if(treeNode.ftype == -1) {
+            abilityName = treeNode.AbilityName;
+            $('#iframeinfoxx').attr('src', 'abilityedit.html?op=2&id=' + treeNode.id+'&tree=1' +'&showtype='+showtype);
+        }else if(treeNode.ftype == 4) {
+            abilityName = treeNode.AbilityName;
+            LevelName = treeNode.LevelName;
+            fjdname = treeNode.fjdname;
+            console.log(fjdname);
+            $('#iframeinfoxx').attr('src', '/module/capability/ability/abilityCondition/tiaojianedit2.html?FAbilityLevelID=' + treeNode.LevelID +'&FPID=' +treeNode.pId+'&ftype=' +treeNode.ftypes +  '&op=2&tree=1&id='+treeNode.id+'&showtype='+showtype);
+        }
+    }
+
+    function shuaxin() {
+        $('#mainTable').DataTable().ajax.reload(null, false);
+    }
+
+    function shuaxin2() {
+        gettreedata(2);
+    }
+
+    function adduser() {
+        if (ftypeid != -1) {
+            var index = layer.open({
+                type: 2,
+                area: ['800px', '400px'],
+                fix: false, //不固定
+                shade: 0.4,
+                title: '添加学生信息',
+                content: '/module/capability/student/classstudent/classstudentedit4.html?id=' + ftypeid + '&op=2'
+                // , end: function () {
+                //     gettreedata(2);
+                // }
+            });
+        } else {
+            toastr.error("选择班级后，再添加学生！");
+        }
+    }
+
+    function delcalssstudent(fkeyid, name) {
+        layer.confirm('<b>' + name + '</b><br />确定要移除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/tclass/delclassstudent',
+                data: JSON.stringify({
+                    id: fkeyid
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#mainTable').DataTable().ajax.reload(null, false);
+                        toastr.success('删除成功！');
+                        layer.close(layer.index);
+
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error);
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+    //删除能力等级
+    function onClickBtnDel(id, name) {
+        layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/abilitylevel/delabilitylevel',
+                data: JSON.stringify({
+                    id: id
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        toastr.success('删除成功！');
+                        shuaxin2();
+                        $(".typename").text("无");
+                        $('#iframeinfoxx').attr('src', '');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error);
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+
+    function onClickBtnuserlcDel(id, name,ftype) {
+        var url = "";
+        if(ftype ==1){
+            url ='/s/abilitycondition/delabilityCondition';
+        }else{
+            url ='/s/abilityconditions/delabilityConditions';
+        }
+        //考核条件删除
+        layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: url,
+                data: JSON.stringify({
+                    id: id
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        toastr.success('删除成功！');
+                        shuaxin2();
+                        $(".typename").text("无");
+                        $('#iframeinfoxx').attr('src', '');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error);
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+
+    function onClickBtnuserfsDel(id, name, name2) {
+        //考核方式删除
+        layer.confirm('<b>' + name2 + '-->' + name + '</b><br />确定要删除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/abilityconditionassessmentmethod/delabilityConditionAssessmentmethod',
+                data: JSON.stringify({
+                    id: id
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        toastr.success('删除成功！');
+                        shuaxin2();
+                        $(".typename").text("无");
+                        $('#iframeinfoxx').attr('src', '');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error);
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+
+    function rename(name) {
+        var newname;
+        newname = name.replace(/<span[^>]*>([\s\S]*?)<\/span>/g, '$1');
+        return newname;
+    }
+</script>
+</body>
+</html>

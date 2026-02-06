@@ -1,0 +1,202 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <!--/_only 独立样式 -->
+</head>
+<body>
+<article class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="usergroupsrelationshipForm">
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>用户组：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+               <input type="text" class="input-text" value="" readonly="readonly" id="FUserGroupName" name="FUserGroupName"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>用户：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <select name="FName" multiple="multiple" style="width: 100%;"></select>
+            </div>
+        </div>
+
+        <div class="toolbar-bottom-line"></div>
+        <div class="toolbar-bottom-btn">
+            <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+            <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                   onclick="layer_close()"/>
+        </div>
+        <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+        <input type="hidden" value="" name="FUGID" id="FUGID"/>
+
+    </form>
+</article>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript">
+    // 编辑框状态 1新建 2修改
+    var op = getQueryStringByName('op');
+    var FUGID = getQueryStringByName('id');
+    var selectUser;
+    var FUserGroupName = parent.FUserGroupName;
+    // 业务代码
+    $(function () {
+        $("#FUGID").val(FUGID);
+        $("#FUserGroupName").val(FUserGroupName);
+        // 初始用户配置化
+        selectUser = $("#usergroupsrelationshipForm select[name='FName']").select2({
+            placeholder: '请选择用户',
+            ajax: {
+                type: 'POST',
+                url: "/s/user/queryDataUserSelect",
+                dataType: 'json',
+                data: function (params) {
+                    return {
+                        search: params.term,
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.results
+                    };
+                },
+                delay: 800,
+                cache: true
+            },
+            language: "zh-CN"
+        });
+        // 修改操作时读取表单信息
+        if (op == 2) {
+            var id = getQueryStringByName('id');
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/usergroups/queryusergroupsInfo', // 调用地址
+                data: JSON.stringify({
+                    id: id
+                }),
+                async: false,
+                success: function (data) {
+                    selectUser.empty();
+                    data.info.userz.forEach(item => {
+                        var option = new Option(item.name, item.id, true, true);
+                        selectUser.append(option);
+                    });
+                    $('#FKeyID').val(data.info.key);
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        }
+        // 检验数据
+        var userValidate = $('#usergroupsrelationshipForm').validate({
+            rules: {
+                FName: {
+                    required: true,
+                    levelLimit: false
+                },
+            },
+            messages: {
+                FName: {
+                    required: '*请选择用户'
+                },
+
+            },
+            onfocusout: false, // 是否在获取焦点时验证
+            onkeyup: false, // 是否在敲击键盘时验证
+            focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+            focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+            success: 'valid',
+            submitHandler: function () {
+                // 获取参数
+                // 获取用户信息
+                var roles = [];
+                selectUser.select2('data').forEach((item) => {
+                    roles.push(item.id);
+                });
+                var data = form2Json('usergroupsrelationshipForm');
+                data['userzid'] = roles;
+                data['FUGID'] = FUGID;
+
+                if (op == 1) { // 添加操作
+                    $('body').mLoading('show');
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/usergroups/addusergroupsuser', // 调用地址
+                        data: JSON.stringify(data),
+                        async: false,
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                // parent.$('#mainTable').DataTable().ajax.reload(null, false);
+                                parent.reloadtable(data.FUGID,FUserGroupName);
+                                parent.toastr.success('添加成功！');
+                                layer_close();
+                            }
+                            // else if (data.result == 'fail') {
+                            //     toastr.warning('用户组名称重复，请重新输入');
+                            // }
+                            else if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                            $("body").mLoading("hide");
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                            $("body").mLoading("hide");
+                        }
+                    });
+                } else {
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/usergroups/updateusergroups', // 调用地址
+                        data: JSON.stringify(data),
+                        async: false,
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                parent.$('#mainTable').DataTable().ajax.reload(null, false);
+                                parent.toastr.success('修改成功！');
+                                layer_close();
+                            } else if (data.result == 'fail') {
+                                toastr.warning('用户组名称重复，请重新输入');
+                            } else if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

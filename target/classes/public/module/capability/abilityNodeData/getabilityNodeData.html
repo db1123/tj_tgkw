@@ -1,0 +1,162 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+    <!--/_only 独立样式 -->
+</head>
+<body>
+<div class="page-container" style="padding: 2px;">
+    <div class="f-l" style="width: 100%; margin-top: 3px;">
+
+        <div class="bk-gray radius">
+            <select style="width:200px" placeholder="能力类型" class="abilitytype"
+                    id="abilitytype"> </select>
+
+            <button type="button" class="btn btn-default size-S my-btn btn-search-fun" onclick="huoqu()">
+                获取数据
+            </button>
+            <button type="button" class="btn btn-default size-S my-btn btn-search-fun" id="copyButton">复制JSON内容</button>
+        </div>
+        <div class="bk-gray radius mt-10">
+            <textarea id="FNote" name="FNote" rows="4" style="width: 100%; height: 550px;box-sizing: border-box; border: solid 1px #ddd;" placeholder="返回结果..." maxlength="4000000" readonly="readonly"></textarea><br><br>
+        </div>
+
+    </div>
+</div>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+
+    var ftypeid;
+    // 业务代码
+    $(function () {
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/abilitytype/queryabilityTypeALL', // 调用地址
+            async: false,
+            success: function (data) {
+                var newObj2 = Object.assign([], data.zNodes);
+                // newObj2.push({id: 1, pId: 0, name: '全部', open: true});
+                $('#abilitytype').select2ztree({
+                    textField: 'name',
+                    titleField: 'name',
+                    placeholder: '请选择能力类型',
+                    ztree: {
+                        setting: {
+                            view: {
+                                dblClickExpand: false
+                            },
+                            data: {
+                                simpleData: {
+                                    enable: true,
+                                    idKey: "id",
+                                    pIdKey: "pId",
+                                    rootPId: 0
+                                }
+                            }
+                        },
+                        zNodes: newObj2
+                    },
+                    language: "zh-CN"
+                });
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+
+
+        $('#copyButton').click(function() {
+            const $button = $(this);
+            const originalText = $button.text();
+            const $textarea = $('#FNote');
+
+            // 现代浏览器使用Clipboard API
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText($textarea.val())
+                    .then(function() {
+                        // 复制成功反馈
+                        $button.text('已复制!').addClass('copied');
+                        setTimeout(function() {
+                            $button.text(originalText).removeClass('copied');
+                        }, 2000);
+                    })
+                    .catch(function(err) {
+                        console.error('复制失败:', err);
+                        fallbackCopy($textarea, $button, originalText);
+                    });
+            } else {
+                // 旧浏览器回退方案
+                fallbackCopy($textarea, $button, originalText);
+            }
+        });
+
+        // 旧浏览器的复制方法
+        function fallbackCopy($textarea, $button, originalText) {
+            $textarea.select();
+            document.execCommand('copy');
+
+            // 提供视觉反馈
+            $button.text('已复制!').addClass('copied');
+            setTimeout(function() {
+                $button.text(originalText).removeClass('copied');
+            }, 2000);
+
+            // 取消选中状态
+            window.getSelection().removeAllRanges();
+        }
+    });
+
+
+    function huoqu(){
+        if($("#abilitytype").val() != null){
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/abilitytree/getAbilitTreeData',
+                data: JSON.stringify({
+                    ftypeid:$("#abilitytype").val()
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $("#FNote").val(JSON.stringify(data.zjsonArray, null, 2));
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error)
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        }else{
+            toastr.error("请选择类型后在获取数据");
+        }
+
+    }
+</script>
+</body>
+</html>

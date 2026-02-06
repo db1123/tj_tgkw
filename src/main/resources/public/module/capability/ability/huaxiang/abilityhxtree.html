@@ -1,0 +1,163 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <!--/_only 独立样式 -->
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/metroStyle/metroStyle.css" type="text/css">
+</head>
+<style>
+    ul.ztree {
+        /*margin-left: 20px;*/
+        border: 1px solid #cccccc;
+        background: #f7f7f7;
+        width: 27.2vw;
+        height: 79vh;
+        overflow-y: scroll;
+        overflow-x: auto;
+    }
+
+    ul.ztree2 {
+        /*margin-left: 20px;*/
+        border: 1px solid #cccccc;
+        background: #f7f7f7;
+        width: 59vw;
+        height: 79vh;
+        overflow-y: scroll;
+        overflow-x: auto;
+    }
+</style>
+<body>
+<div class="page-container">
+    <div class="f-l " style="width: 98.8%; padding-top: 1px;">
+        <div class="row cl">
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-header">能力类型
+                    </div>
+                    <div class="panel-body">
+                        <input type="text" id="key" value="" class="empty input-text mb-5" placeholder="请输入关键字" style="width: 28vw;"/><br/>
+                        <ul id="abilityTypeTree" class="ztree"></ul>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-8">
+                <div class="panel panel-default">
+                    <div class="panel-header">能力树
+                    </div>
+                    <div class="panel-body">
+                        <input type="text" id="key2" value="" class="empty input-text mb-5" placeholder="请输入关键字" style="width: 59.7vw;"/><br/>
+
+                        <ul id="abilityTree" class="ztree2 ztree"></ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/fuzzysearch.js"></script>
+<script type="text/javascript">
+    var abilityTypeTree;
+    var abilityFTypeID;
+    var treeObj;
+    var treesetting;
+
+    // 保存搜索关键字
+    let searchKeyword = '';
+    let searchKeyword2 = '';
+    // 业务代码
+    $(function () {
+        var zTreeSetting = {
+            async: {
+                enable: true,
+                type: 'post',
+                contentType: 'application/json',
+                url: '/s/abilitytype/queryabilityType',
+                autoParam: ['id', 'name=n', 'level=lv']
+            },
+            data: {
+                simpleData: {
+                    enable: true,
+                    idKey: 'id',
+                    pIdKey: 'pId',
+                    rootPId: 0
+                }
+            }, callback: {
+                onClick: zTreeOnClick
+            }
+        };
+
+        abilityTypeTree = $.fn.zTree.init($('#abilityTypeTree'), zTreeSetting);
+        fuzzySearch('abilityTypeTree','#key',null,true); //初始化模糊搜索方法
+        $('#key').on('input', function() {
+            searchKeyword =  $(this).val();
+        });
+        treesetting = {
+            view: {
+                selectedMulti: false,
+                showIcon: true // 显示图标
+            },
+            check: {
+                enable: false
+            },
+            data: {
+                simpleData: {
+                    enable: true,
+                    idKey: 'id',
+                    pIdKey: 'pId',
+                    rootPId: 0
+                }
+            },
+        };
+        $('#key2').on('input', function() {
+            searchKeyword2 =  $(this).val();
+        });
+    });
+
+    function zTreeOnClick(event, treeId, treeNode) {
+        abilityFTypeID = treeNode.id;
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json;charset=UTF-8',
+            url: '/s/abilitytree/getAbilitTreeDataz',
+            data: JSON.stringify({
+                abilityFTypeID: abilityFTypeID
+            }),
+            success: function (data) {
+                if (data.result == 'success') {
+                    treeObj = $.fn.zTree.init($("#abilityTree"), treesetting, data.zNodes);
+                    if(searchKeyword2){
+                        $("#key2").val(searchKeyword2); // 设置关键字到输入框
+                        fuzzySearch('abilityTree','#key2',null,true,2); //初始化模糊搜索方法
+                    }else{
+                        fuzzySearch('abilityTree','#key2',null,true); //初始化模糊搜索方法
+                    }
+
+                }
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+    }
+</script>
+</body>
+</html>

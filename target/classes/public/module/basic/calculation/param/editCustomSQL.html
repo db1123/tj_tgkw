@@ -1,0 +1,293 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<!--_global 公共配置文件 -->
+<script language="javascript">var golbal_type="admin";</script>
+<script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+<!--_only 独立样式 -->
+<link rel="stylesheet" href="/plugins/select2/css/select2.min.css" />
+<link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css" />
+<link rel="stylesheet" href="/plugins/codemirror/lib/codemirror.css" />
+<link rel="stylesheet" href="/plugins/codemirror/theme/dracula.css" />
+<link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css" />
+<link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css" />
+<!--/_only 独立样式 -->
+</head>
+<body>
+<article class="page-container">
+  <form action="" method="post" class="form form-horizontal" id="customSQLForm">
+    <div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>类型：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<select name="f_type" style="width: 100%;"><option></option></select>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>标题：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="f_title" />
+			</div>
+		</div>
+    <div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>数据库：</label>
+			<div class="formControls col-xs-8 col-sm-9 big">
+				<select name="f_server_id" style="width: 100%;"></select>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2">SQL语句：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<textarea name="f_sql" class="textarea"></textarea>
+			</div>
+		</div>
+    <div class="toolbar-bottom-line"></div>
+		<div class="toolbar-bottom-btn">
+			<input class="btn btn-success-outline radius mr-20" type="button" value="&nbsp;&nbsp;获取数据测试&nbsp;&nbsp;" onclick="CustomSQLExamRun()" />
+			<input class="btn btn-primary radius radius" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;" />
+			<input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;" onclick="layer_close()" />
+		</div>
+    <input type="hidden" value="" name="f_key_id" />
+	</form>
+</article>
+
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script type="text/javascript" src="/plugins/codemirror/lib/codemirror.js"></script>
+<script type="text/javascript" src="/plugins/codemirror/mode/sql/sql.js"></script>
+<script type="text/javascript" src="/plugins/codemirror/addon/selection/active-line.js"></script>
+<script type="text/javascript" src="/plugins/codemirror/addon/edit/matchbrackets.js"></script>
+<script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript" src="/javascript/ReturnData.js"></script>
+<script type="text/javascript">
+// 编辑框状态 1新建 2修改
+var op = getQueryStringByName('op');
+// 代码编辑器
+var sqlCodeMirror;
+// 业务代码
+$(function(){
+  // 初始化类型树形下拉框
+  $.ajax({
+    type: 'POST',
+    contentType: 'application/json',
+    url: '/s/paramType/queryParamTypeALL', // 调用地址
+    async: false,
+    success: function(data) {
+      $("#customSQLForm select[name='f_type']").select2ztree({
+        textField : 'name',
+        titleField : 'name',
+        placeholder: '请选择类型',
+        ztree: {
+          setting: {
+            view: {
+              dblClickExpand: false
+            },
+            data: {
+              simpleData: {
+                enable: true,
+                idKey: "id",
+                pIdKey: "pId",
+                rootPId: 0
+              }
+            }
+          },
+          zNodes: data.zNodes
+        },
+        language: "zh-CN"
+      });
+    },
+    error : function(e) {
+      toastr.error(e.status);
+      toastr.error(e.responseText);
+    }
+  });
+  // 初始化数据库下拉列表
+  $("#customSQLForm select[name='f_server_id']").select2({
+    placeholder: '请选择使用数据库',
+    ajax: {
+      type:'POST',
+      url: "/s/paramServer/queryParamServerSelect",
+      dataType: 'json',
+      data: function (params) {
+        return {
+          search: params.term,
+        };
+      },
+      delay: 800,
+      cache: true
+    },
+    language: "zh-CN"
+  });
+  // 初始化代码编辑器
+  sqlCodeMirror = CodeMirror.fromTextArea($("#customSQLForm textarea[name='f_sql']")[0], {
+    lineNumbers: true,// 是否显示行号
+    mode: 'text/x-sql', // 编辑器语言
+    theme: 'dracula', // 编辑器主题
+    matchBrackets: true, // 匹配括号
+    styleActiveLine: true // 设置光标所在行高亮
+  });
+  // 修改操作时读取表单信息
+  if (op == 2) {
+    var id = getQueryStringByName('id');
+    $.ajax({
+      type: 'POST',
+      contentType: 'application/json',
+      url: '/s/param/queryParamInfo', // 调用地址
+      data: JSON.stringify({
+        id
+      }),
+      async: false,
+      success: function(data) {
+        $("#customSQLForm select[name='f_type']").select2ztree('val', [data.info.f_type]);
+        $("#customSQLForm input[name='f_title']").val(data.info.f_title);
+        var option = new Option(data.info.server_name, data.info.f_server_id, true, true);
+        $("#customSQLForm select[name='f_server_id']").append(option);
+        $("#customSQLForm select[name='f_server_id']").change();
+        sqlCodeMirror.setValue(data.info.f_sql);
+        $("#customSQLForm input[name='f_key_id']").val(data.info.key);
+      },
+      error : function(e) {
+        toastr.error(e.status);
+        toastr.error(e.responseText);
+      }
+    });
+  }
+  // 检验数据
+  $('#customSQLForm').validate({
+    rules: {
+      f_type: {
+        required: true
+      },
+      f_title: {
+        required: true
+      },
+      f_server_id: {
+        required: true
+      }
+    },
+    messages: {
+      f_type: {
+        required: '*请选择类型'
+      },
+      f_title: {
+        required: '*请编写标题'
+      },
+      f_server_id: {
+        required: '*请选择数据库'
+      }
+    },
+    onfocusout: false, // 是否在获取焦点时验证
+    onkeyup: false, // 是否在敲击键盘时验证
+    focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+    focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+    success: 'valid',
+    submitHandler:function(){
+      // 获取参数
+      var JsonData = form2Json('customSQLForm');
+      JsonData['f_classify'] = 3;
+      JsonData['f_sql'] = sqlCodeMirror.getValue();
+      // 判断是否继续执行
+      if(sqlCodeMirror.getValue() == '') {
+        toastr.error('请填写 自定义Sql语句');
+      } else {
+        // 执行
+        if (op == 1) { // 添加操作
+          $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/param/addParam', // 调用地址
+            data: JSON.stringify(JsonData),
+            async: false,
+            success: function(data) {
+              if (data.result == 'success') {
+                parent.$('#paramTable').DataTable().ajax.reload(null, false);
+                parent.toastr.success('添加成功！');
+                layer_close();
+              } else if (data.result == 'error') {
+                toastr.error(data.error);
+              }
+            },
+            error : function(e){
+              toastr.error(e.status);
+              toastr.error(e.responseText);
+            }
+          });
+        }else {
+          $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/param/updateParam', // 调用地址
+            data: JSON.stringify(JsonData),
+            async: false,
+            success: function(data) {
+              if (data.result == 'success') {
+                parent.$('#paramTable').DataTable().ajax.reload(null, false);
+                parent.toastr.success('修改成功！');
+                layer_close();
+              } else if (data.result == 'error') {
+                toastr.error(data.error);
+              }
+            },
+            error : function(e){
+              toastr.error(e.status);
+              toastr.error(e.responseText);
+            }
+          });
+        }
+      }
+    }
+  });
+});
+// 测试查询结果
+function CustomSQLExamRun() {
+  // 获取参数
+  var JsonData = form2Json('customSQLForm');
+  JsonData['f_classify'] = 3;
+  JsonData['f_sql'] = sqlCodeMirror.getValue();
+  var selectOption = $("#customSQLForm select[name='f_server_id']").select2('data');
+  // 判断是否继续执行
+  if (!selectOption[0]) {
+    toastr.error('请选择数据库');
+  } else if(sqlCodeMirror.getValue() == '') {
+    toastr.error('请填写 自定义Sql语句');
+  } else {
+    $('body').mLoading('show');
+    setTimeout(function(){
+      // 执行
+      var data = getCustomSQLData(JsonData, 2);
+      if (data) {
+        layer.open({
+          title: '查询结果展示',
+          content: 
+            '<div id="serverParamModel-json"></div>' +
+            '<div class="Huialert Huialert-info">' +
+              '<h5><i class="fas fa-info"></i> <b>单次运行时间:</b> <span id="serverParamModel-time"></span>毫秒</h5>' +
+              '<div style="color: red; font-size: 8px; font-weight: 600;">' +
+                '注：连续执行的情况下除首个参数获取较慢其它后续参数获取会比单次运行时间少1秒左右' +
+              '</div>' +
+            '</div>',
+          area: ['800px', '400px'],
+          scrollbar: true,
+        });
+        var json = {cols: data.cols, returnData: data.returnData};
+        $("#serverParamModel-json").JSONView(json, {collapsed: true, nl2br: true});
+        $('#serverParamModel-time').html(data.time);
+      }
+      $('body').mLoading('hide');
+    }, 200);
+  }
+}
+</script>
+</body>
+</html>

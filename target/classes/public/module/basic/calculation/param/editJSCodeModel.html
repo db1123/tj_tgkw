@@ -1,0 +1,336 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<!--_global 公共配置文件 -->
+<script language="javascript">var golbal_type="admin";</script>
+<script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+<!--_only 独立样式 -->
+<link rel="stylesheet" href="/plugins/select2/css/select2.min.css" />
+<link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css" />
+<link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css" />
+<!--/_only 独立样式 -->
+</head>
+<body>
+<article class="page-container">
+  <form action="" method="post" class="form form-horizontal" id="modelForm">
+    <div class="row cl">
+      <label class="form-label col-xs-3 col-sm-2">参数类型：</label>
+      <div class="formControls col-xs-8 col-sm-9">
+        <select name="f_type" style="width: 100%;"><option></option></select>
+      </div>
+    </div>
+    <div class="row cl">
+      <label class="form-label col-xs-3 col-sm-2">参数分类：</label>
+      <div class="formControls col-xs-8 col-sm-9">
+        <select name="f_classify" style="width: 100%;">
+          <option value="-1">全部分类</option>
+          <option value="1">普通节点</option>
+          <option value="2">标准SQL</option>
+          <option value="3">自定义SQL</option>
+          <option value="4">公式&约束</option>
+          <option value="5">URL引用</option>
+        </select>
+      </div>
+    </div>
+    <div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>参数：</label>
+			<div class="formControls col-xs-8 col-sm-9 big">
+				<select name="model" style="width: 100%;"></select>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>变量名：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="variableName" />
+			</div>
+		</div>
+    <div class="toolbar-bottom-line"></div>
+		<div class="toolbar-bottom-btn">
+      <input class="btn btn-success-outline radius mr-20" type="button" value="&nbsp;&nbsp;获取数据测试&nbsp;&nbsp;" onclick="ModelExamRun()" />
+			<input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;" />
+			<input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;" onclick="layer_close()" />
+		</div>
+    <input type="hidden" value="" name="f_key_id" />
+	</form>
+</article>
+
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript" src="/javascript/ReturnData.js"></script>
+<script type="text/javascript">
+// 编辑框状态 1新建 2修改
+var op = getQueryStringByName('op');
+// 业务代码
+$(function(){
+  // 初始化类型树形下拉框
+  $.ajax({
+    type: 'POST',
+    contentType: 'application/json',
+    url: '/s/paramType/queryParamTypeALL', // 调用地址
+    async: false,
+    success: function(data) {
+      var newObj2 = Object.assign([], data.zNodes);
+      newObj2.push({id: 1, pId: 0, name: '全部', open: true});
+      $("#modelForm select[name='f_type']").select2ztree({
+        textField: 'name',
+        titleField: 'name',
+        placeholder: '请选择类型',
+        ztree: {
+          setting: {
+            view: {
+              dblClickExpand: false
+            },
+            data: {
+              simpleData: {
+                enable: true,
+                idKey: "id",
+                pIdKey: "pId",
+                rootPId: 0
+              }
+            }
+          },
+          zNodes: newObj2
+        },
+        language: "zh-CN"
+      }).on("change", function (e, data) {
+        select2ModelCreate();
+       });
+    },
+    error : function(e) {
+      toastr.error(e.status);
+      toastr.error(e.responseText);
+    }
+  });
+  // 初始化分类下拉框
+  $("#modelForm select[name='f_classify']").select2({
+    placeholder: '请选择分类',
+    language: "zh-CN"
+  });
+  $("#modelForm select[name='f_classify']").on("select2:select",function(e){
+    select2ModelCreate();
+  })
+  // 初始化参数下拉列表
+  function select2ModelCreate() {
+    $("#modelForm select[name='model']").empty();
+    $("#modelForm select[name='model']").select2({
+      placeholder: '请选择使用参数',
+      ajax: {
+        type:'POST',
+        url: "/s/param/queryParamSelect",
+        dataType: 'json',
+        data: function (params) {
+          return {
+            search: params.term,
+            type: $("#modelForm select[name='f_type']").val(),
+            classify: $("#modelForm select[name='f_classify']").val()
+          };
+        },
+        delay: 800,
+        cache: true
+      },
+      language: "zh-CN"
+    });
+  }
+  select2ModelCreate();
+  // 初始化表单
+  if (op == 1) {
+    $("#modelForm input[name='variableName']").val(getDefaultVariableName(parent.$('#paramTable').dataTable()));
+  } else {
+    var id = getQueryStringByName('id');
+    var row;
+    var data = parent.$('#paramTable').dataTable().fnGetData();
+    for (var i=0; i<data.length; i++) {
+      if (id == data[i]['key']) {
+        row =  data[i];
+      }
+    }
+    if (!row.f_variable_name || row.f_variable_name == '') {
+      $("#modelForm input[name='variableName']").val(getDefaultVariableName(parent.$('#paramTable').dataTable()));
+    } else {
+      $("#modelForm input[name='variableName']").val(row.f_variable_name);
+    }
+    var option = new Option(row.f_title, id, true, true);
+    $("#modelForm select[name='model']").append(option);
+    $("#modelForm input[name='f_key_id']").val(id);
+    // 禁用下拉框
+    $("#modelForm select[name='model']").prop("disabled", true);
+  }
+  // 检验数据
+  $('#modelForm').validate({
+    rules: {
+      model: {
+        required: true
+      },
+      variableName: {
+        required: true
+      }
+    },
+    messages: {
+      model: {
+        required: '*请选择参数'
+      },
+      variableName: {
+        required: '*请编写变量名'
+      }
+    },
+    onfocusout: false, // 是否在获取焦点时验证
+    onkeyup: false, // 是否在敲击键盘时验证
+    focusInvalid: false, // 提交表单后，（第一个）未通过验证的表单获得焦点
+    focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+    success: 'valid',
+    submitHandler:function(){
+      // 获取参数
+      var JsonData = form2Json('modelForm');
+      // 手动检查
+      var go = true;
+      if (op == 1) { // 添加
+        // 判断参数是否重复引用
+        if (checkParamName(parent.$('#paramTable').dataTable(), JsonData['model']) == false) {
+          toastr.error('请不要重复引用参数');
+          go = false;
+        } else {
+          // 判断变量名是否重复
+          if (checkVariableName(parent.$('#paramTable').dataTable(), JsonData['variableName']) == false) {
+            toastr.error('变量名重复');
+            go = false;
+          }
+        }
+      } else { // 修改
+        // 判断变量名是否重复
+        if (checkVariableName(parent.$('#paramTable').dataTable(), JsonData['variableName'], $("#modelForm input[name='f_key_id']").val()) == false) {
+          toastr.error('变量名重复');
+          go = false;
+        }
+      }
+      // 执行
+      if (go) {
+        // 创建行模型
+        var row = {};
+        row['f_variable_name'] = JsonData['variableName'];
+        // 获取参数明细
+        $.ajax({
+          type: 'POST',
+          contentType: 'application/json',
+          url: '/s/param/queryParamInfo', // 调用地址
+          data: JSON.stringify({
+            id: op == 1 ? JsonData['model'] : $("#modelForm input[name='f_key_id']").val()
+          }),
+          async: false,
+          success: function(data) {
+            row['key'] = data.info.key;
+            row['f_type'] = data.info.f_type;
+            row['type_name'] = data.info.type_name;
+            row['f_classify'] = data.info.f_classify;
+            row['f_title'] = data.info.f_title;
+            row['f_subtitle'] = data.info.f_subtitle ? data.info.f_subtitle : '';
+            row['f_value_type'] = data.info.f_value_type;
+            row['f_value'] = data.info.f_value;
+            row['f_min_value'] = data.info.f_min_value;
+            row['f_max_value'] = data.info.f_max_value;
+            row['f_server_id'] = data.info.f_server_id;
+            row['server_name'] = data.info.server_name;
+            row['f_table'] = data.info.f_table;
+            row['f_search_id'] = data.info.f_search_id;
+            row['search_name'] = data.info.search_name;
+            row['f_where'] = data.info.f_where;
+            row['f_sql'] = data.info.f_sql;
+            row['f_calculation'] = data.info.f_calculation;
+            row['f_url'] = data.info.f_url;
+            row['f_memo'] = data.info.f_memo;
+          },
+          error : function(e) {
+            toastr.error(e.status);
+            toastr.error(e.responseText);
+          }
+        });
+        // 执行
+        if (op == 1) { // 添加操作
+          parent.$('#paramTable').dataTable().fnAddData(row, true);
+          parent.RefreshParamVariableName(); // 刷新变量名
+          layer_close();
+        } else { // 修改操作
+          var index;
+          var data = parent.$('#paramTable').dataTable().fnGetData();
+          for (var i=0; i<data.length; i++) {
+            if (row['key'] == data[i]['key']) {
+              index = i;
+            }
+          }
+          parent.$('#paramTable').dataTable().fnUpdate(row, index);
+          parent.RefreshParamVariableName(); // 刷新变量名
+          layer_close();
+        }
+      }
+    }
+  });
+});
+// 测试查询结果-模板
+function ModelExamRun() {
+  // 获取参数
+  var JsonData = form2Json('modelForm');
+  var modelOption = $("#modelForm select[name='model']").select2('data');
+  // 判断是否继续执行
+  if (!modelOption[0]) {
+    toastr.error('请先选择参数');
+  } else {
+    $('body').mLoading('show');
+    setTimeout(function(){
+      // 获取参数明细
+      var row = {};
+      $.ajax({
+        type: 'POST',
+        contentType: 'application/json',
+        url: '/s/param/queryParamInfo', // 调用地址
+        data: JSON.stringify({
+          id: op == 1 ? JsonData['model'] : $("#modelForm input[name='f_key_id']").val()
+        }),
+        async: false,
+        success: function(data) {
+          row['key'] = data.info.key;
+          row['f_type'] = data.info.f_type;
+          row['type_name'] = data.info.type_name;
+          row['f_classify'] = data.info.f_classify;
+          row['f_title'] = data.info.f_title;
+          row['f_value_type'] = data.info.f_value_type;
+          row['f_value'] = data.info.f_value;
+          row['f_min_value'] = data.info.f_min_value;
+          row['f_max_value'] = data.info.f_max_value;
+          row['f_server_id'] = data.info.f_server_id;
+          row['server_name'] = data.info.server_name;
+          row['f_table'] = data.info.f_table;
+          row['f_search_id'] = data.info.f_search_id;
+          row['search_name'] = data.info.search_name;
+          row['f_where'] = data.info.f_where;
+          row['f_sql'] = data.info.f_sql;
+          row['f_calculation'] = data.info.f_calculation;
+          row['f_url'] = data.info.f_url;
+          row['f_memo'] = data.info.f_memo;
+        },
+        error : function(e) {
+          toastr.error(e.status);
+          toastr.error(e.responseText);
+        }
+      });
+      // 获取参数执行结果
+      var data = getAutoData(row);
+      // 展示
+      getAutoShow(row, data, parent.parent);
+      // 隐藏加载中面板
+      $('body').mLoading('hide');
+    }, 200);
+  }
+}
+</script>
+</body>
+</html>

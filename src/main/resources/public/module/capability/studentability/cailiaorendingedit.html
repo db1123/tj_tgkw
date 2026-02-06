@@ -1,0 +1,421 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/daterangepicker/daterangepicker.css">
+    <!--/_only 独立样式 -->
+</head>
+<style>
+
+
+    /* 默认错误样式 */
+    label.error-message {
+        position: absolute;
+        right: 18px;
+        top: 5px;
+        color: #ef392b;
+        font-size: 12px;
+        z-index: 1;
+        padding-right: 15px;
+    }
+
+    /* 特定字段的自定义样式 */
+    label.custom-error {
+        position: absolute;
+        right: 128px;
+        top: 5px;
+        color: #ef392b;
+        font-size: 12px;
+        z-index: 1;
+        padding-right: 15px;
+    }
+
+
+</style>
+<body>
+<article class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="zhijierendingForm">
+
+
+<!--        <div class="row cl">-->
+<!--            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>能力：</label>-->
+<!--            <div class="formControls col-xs-8 col-sm-9">-->
+<!--                <select name="FAbilityID" id="FAbilityID" style="width: 100%;"></select>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div class="row cl">-->
+<!--            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>能力水平：</label>-->
+<!--            <div class="formControls col-xs-8 col-sm-9">-->
+<!--                <select name="FAbilityLevelID" id="FAbilityLevelID" style="width: 100%;"></select>-->
+<!--            </div>-->
+<!--        </div>-->
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>能力条件：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <select name="FConditionID" id="FConditionID" style="width: 100%;"></select>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>学生：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <!--                <select name="studentID" id="studentID" style="width: 100%;"></select>-->
+                <input type="text" class="input-text" name="studentID" id="studentID" style="width: 80%;" readonly="readonly" />
+                <div id="addxsdiv" style="float: right;display: none;">
+<!--                    <input type="button" id="studentinfo" onclick="openStudent()" style="width: 15%;height: 31px;" value="学生信息"/>-->
+                    <button type="button" class="btn btn-primary size-S" onclick="openStudent()">学生信息</button>
+                </div>
+
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>填写时间：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="FDate" id="FDate" readonly="readonly"/>
+            </div>
+        </div>
+        <div class="row cl" >
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>证书附件：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                        <span class="btn-upload form-group">
+                            <input class="input-text upload-url radius" type="text" name="uploadfile-1" id="uploadfile-1" readonly><a
+                                href="#" class="btn btn-primary radius"><i class="fa fa-cloud-upload" aria-hidden="true"></i> 浏览文件</a>
+                            <input type="file" multiple name="file-1" class="input-file" id="uploadfile"  accept="*">
+                        </span>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>状态：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="radio" value="1" name="fstate" checked="checked"/>获取
+                <input type="radio" value="2" name="fstate" disabled="disabled"/>注销
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">能力描述：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="FAbilityInf" id="FAbilityInf"/>
+            </div>
+        </div>
+        <div class="row cl" id="tishirenshudiv" style="display: none;">
+            <label class="form-label col-xs-3 col-sm-2"></label>
+            <div class="formControls col-xs-8 col-sm-9 ">
+                <span class="badge badge-warning radius">当前已选学生人数：<span id="yxstudentnum">0</span>人</span>
+            </div>
+        </div>
+        <div class="toolbar-bottom-line"></div>
+        <div class="toolbar-bottom-btn">
+            <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+            <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                   onclick="layer_close()"/>
+        </div>
+        <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+        <input type="hidden" value="" name="studentID2" id="studentID2"/>
+    </form>
+</article>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/moment/moment.min.js"></script>
+<script type="text/javascript" src="/plugins/daterangepicker/daterangepicker.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript">
+    // 编辑框状态 1新建 2修改
+    var op = getQueryStringByName('op');
+    var studentID;
+
+    var selectedIds = [];
+    var selectedNames = [];
+
+    top.studentabilitypage = this;
+    var selectedcondition;
+    // 业务代码
+    $(function () {
+
+        if(op==2){
+            $("#addxsdiv").hide();
+            $("#studentID").css("width","100%");
+
+        }else if (op==1){
+            $("#addxsdiv").show();
+            $("#studentID").css("width","87%");
+
+        }
+        var FDaterangepicker = $("#FDate").daterangepicker({
+            minYear: 1949,
+            singleDatePicker: true,
+            showDropdowns: true,
+            locale: DataTablesPublicLocale
+        }, function (start, end, label) {
+        });
+        //学生
+        // var selectstudentID = $("#studentID").select2({
+        //     placeholder: '请选择学生',
+        //     ajax: {
+        //         type: 'POST',
+        //         url: "/s/tstudent/queryDatatstudentSelect",
+        //         dataType: 'json',
+        //         data: function (params) {
+        //             return {
+        //                 search: params.term,
+        //             };
+        //         },
+        //         processResults: function (data) {
+        //             return {
+        //                 results: data.list
+        //             };
+        //         },
+        //         delay: 800,
+        //         cache: true
+        //     },
+        //     language: "zh-CN"
+        // });
+        //能力
+        /*var selectability = $("#FAbilityID").select2({
+            placeholder: '请选择能力',
+            ajax: {
+                type: 'POST',
+                url: "/s/ability/queryDataabilitySelect",
+                dataType: 'json',
+                data: function (params) {
+                    return {
+                        search: params.term,
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.list
+                    };
+                },
+                delay: 800,
+                cache: true
+            },
+            language: "zh-CN"
+        });
+        // 能力水平
+        var selectabilityLevel = $("#FAbilityLevelID").select2({
+            placeholder: '请选择能力水平',
+            language: "zh-CN"
+        });
+        //能力与能力水平联动
+        selectability.on("select2:select", function (e) {
+            if (e.params.data) {
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json;charset=UTF-8',
+                    url: '/s/abilitytree/queryDataabilitylevelSelectld',
+                    data: JSON.stringify({
+                        abilityID: e.params.data.id
+                    }),
+                    async: false, // false代表只有在等待ajax执行完毕后才执行后续代码
+                    success: function (data) {
+                        if (data.result == 'success') {
+                            $("#FAbilityLevelID").empty();
+                            selectabilityLevel = $("#FAbilityLevelID").select2({
+                                data: data.list,
+                                placeholder: '请选择能力水平',
+                                language: "zh-CN"
+                            });
+                        }
+                        if (data.result == 'error') {
+                            toastr.error(data.error)
+                        }
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+            }
+        });*/
+        selectedcondition = $("#FConditionID").select2({
+            placeholder: '请选择能力条件',
+            ajax: {
+                type: 'POST',
+                url: "/s/abilitylevelcondition/queryDataabilitylevelconditionSelect",
+                dataType: 'json',
+                data: function (params) {
+                    return {
+                        search: params.term,
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.list
+                    };
+                },
+                delay: 800,
+                cache: true
+            },
+            language: "zh-CN"
+        });
+        selectedcondition.on('change', function () {
+            // 获取下拉列表当前选中的值
+            var selectedValue = $(this).val();
+            // 修改输入框的值为下拉列表选中的值
+            fconditionID = selectedValue;
+        });
+        // 获取表单元素
+        var form = document.getElementById('zhijierendingForm');
+        // 获取所有单选框
+        var radios = form.elements['fstate'];
+        $("#studentID").prop("disabled", false);
+        radios[1].disabled = true;
+        var rulesstr = {
+            studentID: {
+                required: true
+            },
+            // FAbilityID: {
+            //     required: true
+            // },
+            // FAbilityLevelID: {
+            //     required: true
+            // },
+            FConditionID: {
+                required: true
+            },
+
+            fstate: {
+                required: true
+            },
+            FDate: {
+                required: true
+            },
+            'uploadfile-1': {
+                required: true
+            },
+
+        };
+        var messagesstr = {
+            studentID: {
+                required: '*请选择学生'
+            },
+            // FAbilityID: {
+            //     required: '*请选择能力'
+            // },
+            // FAbilityLevelID: {
+            //     required: '*请选择能力水平'
+            // },
+            FConditionID: {
+                required: '*请选择能力条件'
+            },
+            fstate: {
+                required: '*请选择能力状态'
+            },
+            FDate: {
+                required: '*请选择填写时间'
+            },
+            'uploadfile-1': {
+                required: '*请选择附件'
+            },
+
+        }
+        // 检验数据
+        var userValidate = $('#zhijierendingForm').validate({
+            rules: rulesstr,
+            messages: messagesstr,
+            errorClass: "error-message", // 全局错误类（可选）
+            errorPlacement: function(error, element) {
+                // 针对特定字段添加自定义类
+                if (element.attr("id") === "studentID" || element.attr("id") === "uploadfile-1") {
+                    error.addClass("custom-error");
+                }
+                error.insertAfter(element);
+            },
+            onfocusout: false, // 是否在获取焦点时验证
+            onkeyup: false, // 是否在敲击键盘时验证
+            focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+            focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+            success: 'valid',
+            submitHandler: function () {
+                // 获取参数
+                // var data = form2Json('zhijierendingForm');
+                // 获取参数
+                var form = new FormData(document.getElementById('zhijierendingForm'));
+                // form.append("studentID2",selectedIds);
+                // form.append("FAbilityID",$("#FAbilityID").val());
+                // form.append("FAbilityLevelID",$("#FAbilityLevelID").val());
+                form.append("FConditionID",$("#FConditionID").val());
+                form.append("FDate",$("#FDate").val());
+                form.append("FAbilityInf",$("#FAbilityInf").val());
+                $.ajax({
+                    // type: 'POST',
+                    // contentType: 'application/json',
+                    // url: '/s/studentability/addstudentAbility', // 调用地址
+                    // data: JSON.stringify(data),
+                    // async: false,
+                    url: '/s/studentability/upfilestudentability',
+                    type: 'POST',
+                    data: form,
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        if (data.result == 'success') {
+                            parent.$('#mainTable').DataTable().ajax.reload(null, false);
+                            parent.toastr.success('添加成功！');
+                            layer_close();
+                        } else if (data.result == 'fail') {
+                            toastr.warning('学生能力重复，请重新输入');
+                        } else if (data.result == 'error') {
+                            toastr.error(data.error);
+                        }
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+            }
+        });
+    });
+
+    function openStudent(){
+
+        // var FAbilityID = $("#FAbilityID").val();
+        // var FAbilityLevelID = $("#FAbilityLevelID").val();
+        var FAbilityID ="0";
+        var FAbilityLevelID ="0";
+
+        // if(FAbilityID==null || FAbilityLevelID == null){
+        //     toastr.error("请选择能力后在选择学生信息！");
+        //     return false;
+        // }
+        var FConditionID = $("#FConditionID").val();
+        if(FConditionID == null){
+            toastr.error("请选择能力条件后在选择学生信息！");
+            return false;
+        }
+        if(selectedIds)
+            top.layer_show('学生信息查询页面', '/module/capability/studentability/studentabilityopen2.html?FAbilityID='+FAbilityID +'&FAbilityLevelID='+FAbilityLevelID+'&selectedIds=' + selectedIds + '&selectedNames='+selectedNames +'&FConditionID='+FConditionID, '1400', '600');
+        else{
+            top.layer_show('学生信息查询页面', '/module/capability/studentability/studentabilityopen2.html?classID='+id+'&FConditionID='+FConditionID, '1400', '600');
+        }
+    }
+
+    function getStudentlistID(selectedId,selectedName){
+        selectedIds = selectedId;
+        selectedNames = selectedName;
+        $("#studentID").val(selectedNames);
+        $("#studentID2").val(selectedIds);
+        if(selectedIds){
+            $("#tishirenshudiv").show();
+            $("#yxstudentnum").text(selectedIds.length);
+        }else{
+            $("#tishirenshudiv").hide();
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+        <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+        <!--_only 独立样式 -->
+        <!--/_only 独立样式 -->
+    </head>
+    <style type="text/css">
+        legend {
+            width: 5%;
+            margin-bottom: 5px;
+            font-size: 12px;
+            line-height: 40px;
+            border: 0;
+            border-bottom: 0px solid #e5e5e5
+        }
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* 防止滚动条 */
+        }
+
+        #tab_demo {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        iframe {
+            width: 100%;
+            height: 80vh;
+            border: none; /* 去掉 iframe 的边框 */
+        }
+        #tab_demo #jbxx{
+            width: 100%;
+            height: 70vh;
+            border: none; /* 去掉 iframe 的边框 */
+        }
+    </style>
+    <body>
+        <div class="page-container" style="padding: 2px;">
+            <div class="f-l" style="width: 100%; margin-top: 3px;">
+                <div class="panel panel-default">
+                    <div class="panel-header">课程名称：<strong class="xmname"></strong></div>
+                    <div class="panel-body">
+                        <div id="tab_demo" class="HuiTab">
+                            <div class="tabBar clearfix">
+                                <span onclick="getValue(0);">课程信息</span>
+                                <span onclick="getValue(1);">课程目标</span>
+                                <span onclick="getValue(5);">毕业要求指标点</span>
+                                <span onclick="getValue(2);">课程教材</span>
+                                <span onclick="getValue(3);">课程参考资料</span>
+                                <span onclick="getValue(7);">课程资源</span>
+                                <span onclick="getValue(4);">评价与考核方式</span>
+<!--                                <div id="nenglibiaozhunspan"><span  onclick="getValue(6);">能力标准设置</span></div>-->
+                            </div>
+                            <div class="tabCon">
+                                <fieldset  >
+                                    <legend>基本信息</legend>
+                                    <iframe width="100%;" height="100%;" frameborder="0" id="jbxx"></iframe>
+                                </fieldset>
+                            </div>
+<!--                            style="height: 500px;"-->
+                            <div class="tabCon" id="teamdiv">
+                                <iframe width="100%;" height="100%;" frameborder="0" id="mubiao"></iframe>
+                            </div>
+                            <div class="tabCon">
+                                <iframe width="100%;" height="100%;" frameborder="0" id="zhibiaodian"></iframe>
+                            </div>
+                            <div class="tabCon">
+                                <iframe width="100%;" height="100%;" frameborder="0" id="jiaocai"></iframe>
+                            </div>
+                            <div class="tabCon">
+                                <iframe width="100%;" height="100%;" frameborder="0" id="cankaozhiliao"></iframe>
+                            </div>
+                            <div class="tabCon">
+                                <iframe width="100%;" height="100%;" frameborder="0" id="kechengziyuan"></iframe>
+                            </div>
+                            <div class="tabCon">
+                                <iframe width="100%;" height="100%;" frameborder="0" id="fangshi"></iframe>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <script type="text/javascript">
+            var id = getQueryStringByName('id');
+            var xmname = parent.xmname;
+            var showtype = getQueryStringByName('showtype'); //显示类型
+            // 业务代码
+            $
+            (function () {
+                // if(showtype == 1){
+                //     $("#nenglibiaozhunspan").show();
+                // }else{
+                //     $("#nenglibiaozhunspan").hide();
+                // }
+
+                if(getQueryStringByName("name")){
+                    $(".xmname").text(getQueryStringByName("name"));
+                }else{
+                    $(".xmname").text(xmname);
+                }
+
+                var tab = $("#tab_demo").Huitab({
+                    index: 0
+                });
+                $('#jbxx').attr('src', 'coursexx.html?id=' + id+'&ftype=1&showtype='+showtype);
+
+            });
+            function getValue(obj) {
+                var value = obj;
+                if (value == 0) {
+                    $('#jbxx').attr('src', 'coursexx.html?id=' + id+"&ftype=1"+'&showtype='+showtype);
+                } else if (value == 1) {
+                    $('#mubiao').attr('src', '/module/capability/course/target/coursetargetlist.html?id=' + id+'&showtype='+showtype);
+                } else if (value == 2) {
+                    $('#jiaocai').attr('src', '/module/capability/course/textbookl/textbooklist.html?id=' + id+'&showtype='+showtype+'&FType=1');
+                } else if (value == 3) {
+                    $('#cankaozhiliao').attr('src', '/module/capability/course/textbookl/textbooklist.html?id=' + id+'&showtype='+showtype+'&FType=2');
+                } else if (value == 4) {
+                    $('#fangshi').attr('src', '/module/capability/course/method/nethodlist.html?id=' + id+'&showtype='+showtype);
+                }else if (value == 5) {
+                    $('#zhibiaodian').attr('src', '/module/capability/course/graduation/coursegraduationlist.html?id=' + id+'&showtype='+showtype);
+                }
+                else if (value == 6) {
+
+                    $('#nenglibiaozhun').attr('src', '/module/capability/coursestudent/settings/coursestudentabilitylist.html?id=' + id+'&showtype='+showtype);
+                }
+                else if (value == 7) {
+
+                    $('#kechengziyuan').attr('src', '/module/capability/course/resourcefile/file_up.html?FCourseID=' + id+'&showtype='+showtype);
+                }
+
+
+            }
+        </script>
+    </body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<!--_global 公共配置文件 -->
+<script language="javascript">var golbal_type="admin";</script>
+<script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+<!--_only 独立样式 -->
+<link rel="stylesheet" href="/plugins/select2/css/select2.min.css" />
+<link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css" />
+<!--/_only 独立样式 -->
+</head>
+<body>
+<div class="page-container" style="padding: 0 2px 2px 2px;">
+  <div class="f-l text-l">
+    <button type="button" class="btn btn-default size-S my-btn sys-message-btn-read-ok-fun">全部已读</button>
+  </div>
+  <div class="f-r text-r">
+    <select class="sys-message-form-select-type" style="width:150px">
+      <option value="-1">全部</option>
+      <option value="1">系统消息</option>
+      <option value="2">用户消息</option>
+      <option value="3">流程图消息</option>
+<!--      <option value="4">评价模块消息</option>-->
+      <option value="5">项目消息</option>
+      <option value="6">模具任务消息</option>
+    </select>
+    <input type="text" class="input-text size-S sys-message-form-text-title" style="width:200px" placeholder="输入标题" />
+    <button type="button" class="btn btn-default size-S my-btn sys-message-btn-search-fun"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+  </div>
+	<div class="f-l" style="width: 100%; margin-top: 1px;">
+    <table id="mainMessageTable" class="display compact" style="width: 99.8%;"></table>
+	</div>
+</div>
+
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+// 业务代码
+$(function(){
+  // 封装下拉列表
+  var sysMessageSelectType = $(".sys-message-form-select-type").select2({
+    placeholder: '请选择信息类型',
+    language: "zh-CN"
+  });
+  sysMessageSelectType.val(getQueryStringByName('type')).trigger('change');
+  // 消息-表格
+  $('#mainMessageTable').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: {
+      type: 'POST',
+      contentType: 'application/json',
+      url: '/s/message/queryMessage', // 调用地址
+      data: function ( d ) {
+        return JSON.stringify( $.extend( {}, d, {
+          page: d.start/d.length+1, // 当前页
+          results: d.length, // 每页显示条数
+          type: $('.sys-message-form-select-type').val(),
+          title: $('.sys-message-form-text-title').val()
+        } ) );
+      },
+      dataSrc: function (json) {
+        json.recordsFiltered = json.total;  // 总行数
+        json.recordsTotal = json.page; // 当前页数
+        return json.list;
+      },
+      error: function (xhr, status, error) {
+        toastr.error(xhr);
+      }
+    },
+    columns: [
+    {
+        title: '类型',
+        data: 'f_type',
+        width: 80,
+        orderable: false,
+        render: function (data, type, row) {
+          switch (data) {
+            case 1: return '系统'; break;
+            case 2: return '用户'; break;
+            case 3: return '流程图'; break;
+            case 4: return '评价模块'; break;
+            case 5: return '项目'; break;
+            case 6: return '模具任务'; break;
+            default: return '无'; break;
+          }
+        }
+      },
+      { title: '标题', data: 'f_title', orderable: false },
+      { title: '发件人', data: 'from_user_name', width: 80, orderable: false },
+      { title: '时间', data: 'f_c_date', width: 150 },
+      {
+        title: '状态',
+        data: 'f_is_read',
+        width: 50,
+        orderable: false,
+        render: function (data, type, row) {
+          if (data == 1) {
+            return '已读';
+          } else {
+            return '<span class="label label-warning">未读</span>';
+          }
+        }
+      },
+      {
+        title: '查看',
+        data: 'key',
+        width: 60,
+        orderable: false,
+        render: function (data, type, row) {
+          return '<button type="button" class="btn btn-secondary size-MINI" onclick="MainMessageInfoView(\''+data+'\',\''+row.f_is_read+'\',\''+row.f_type+'\')"><i class="fas fa-eye mr-2"></i> 查看</button>';
+        }
+      }
+    ],
+    scrollY: '423px',
+    scrollX: true,
+    paging: true, // 是否开启本地分页
+    pageLength: 18, // 改变初始化页长度（每页多少条数据）
+    pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+    lengthChange: false, // 是否允许用户改变表格每页显示的记录数
+    searching: false, // 是否允许Datatables开启本地搜索
+    ordering: true, // 是否允许Datatables开启排序
+    info: true, // 控制是否显示表格左下角的信息
+    language: DataTablesLanguage
+  });
+  // 查询按钮点击事件
+  $('.sys-message-btn-search-fun').on('click', function(){
+    $('#mainMessageTable').DataTable().ajax.reload(null, false);
+  });
+  // 全部标记已读
+  $('.sys-message-btn-read-ok-fun').on('click', function(){
+    layer.confirm('确定要将所有信息都变为已读吗？',function(index){
+      $.ajax({
+        type: 'POST',
+        contentType: 'application/json;charset=UTF-8',
+        url: '/s/message/allReadMessage',
+        success: function(data) {
+          if(data.result == 'success'){
+            // 消息栏状态重置
+            parent.$('#UnreadInformation1').html('');
+            parent.$('#UnreadInformation2').html('0 条未读信息');
+            parent.$('#SysInformation').html(0);
+            parent.$('#SysInformationTime').html('');
+            parent.$('#UserInformation').html(0);
+            parent.$('#UserInformationTime').html('');
+            parent.$('#FlowInformation').html(0);
+            parent.$('#FlowInformationTime').html('');
+            parent.$('#EvaluateInformation').html(0);
+            parent.$('#EvaluateInformationTime').html('');
+            $('#mainMessageTable').DataTable().ajax.reload(null, false);
+            toastr.success('操作成功！');
+            layer.close(layer.index);
+          }if(data.result == 'error') {
+            toastr.error(data.error)
+          }
+        },
+        error: function(e){
+          toastr.error(e.status);
+          toastr.error(e.responseText);
+        }
+      });
+    });
+  });
+});
+// 打开消息面板
+function MainMessageInfoView(key, read, type) {
+  if (read != 1) {
+    // 标记已读
+    $.ajax({
+      type: 'POST',
+      contentType: 'application/json',
+      url: '/s/message/isReadMessage', // 调用地址
+      data: JSON.stringify({
+        id: key,
+        isRead: 0
+      }),
+      async: false,
+      success: function(data) {
+        $('#mainMessageTable').DataTable().ajax.reload(null, false);
+        // 更新未读数量
+        var num = parseInt(parent.$('#UnreadInformation1').html()) - 1;
+        parent.$('#UnreadInformation1').html(num);
+        parent.$('#UnreadInformation2').html(num + ' 条未读信息');
+        switch (parseInt(type)) {
+          case 1: // 系统
+            parent.$('#SysInformation').html(parseInt(parent.$('#SysInformation').html())-1);
+            break;
+        
+          case 2: // 用户
+            parent.$('#UserInformation').html(parseInt(parent.$('#UserInformation').html())-1);
+            break;
+        
+          case 3: // 流程图
+            parent.$('#FlowInformation').html(parseInt(parent.$('#FlowInformation').html())-1);
+            break;
+        
+          case 4: // 评价
+            parent.$('#EvaluateInformation').html(parseInt(parent.$('#EvaluateInformation').html())-1);
+            break;
+        
+          default:
+            break;
+        }
+      },
+      error : function(e) {
+        toastr.error(e.status);
+        toastr.error(e.responseText);
+      }
+    });
+  }
+  // 打开面板
+  $.ajax({
+    type: 'POST',
+    contentType: 'application/json',
+    url: '/s/message/queryMessageInfo', // 调用地址
+    data: JSON.stringify({
+      id: key
+    }),
+    async: false,
+    success: function(data) {
+      layer.open({
+        title: data.info.f_title,
+        content: data.info.f_note
+      });
+    },
+    error : function(e) {
+      toastr.error(e.status);
+      toastr.error(e.responseText);
+    }
+  });
+}
+</script> 
+</body>
+</html>

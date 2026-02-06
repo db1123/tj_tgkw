@@ -1,0 +1,958 @@
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=5,IE=9" ><![endif]-->
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css">
+  <link rel="stylesheet" href="/plugins/font-awesome-4.7.0/css/font-awesome.min.css">
+  <!-- Toastr -->
+  <link rel="stylesheet" href="/plugins/toastr/toastr.min.css">
+  <!-- mloading -->
+  <link rel="stylesheet" href="/plugins/mloading/jquery.mloading.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+  <!-- Select2 -->
+  <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+  <style type="text/css">
+    .select2-dropdown {
+      z-index: 10099;
+    }
+    .select2-container .select2-selection--single {
+      height: 25px;
+      line-height: 25px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+      line-height: 25px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+      height: 24px;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+      line-height: 18px;
+    }
+  </style>
+  <!-- CodeMirror -->
+  <link rel="stylesheet" href="/plugins/codemirror/lib/codemirror.css">
+  <link rel="stylesheet" href="/plugins/codemirror/theme/dracula.css">
+  <!-- tooltip -->
+  <link rel="stylesheet" href="/plugins/tooltip/tooltip.css">
+  <!-- 自定义滚动条 -->
+  <link rel="stylesheet" href="/plugins/perfect-scrollbar-main/css/perfect-scrollbar.css">
+  <!-- XNDatepicker -->
+  <style>
+    .date-input{
+      line-height: 30px;
+      height: 30px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      position: relative;
+      padding: 0 6px;
+      font-size: 12px !important;
+    }
+  </style>
+  <!-- GraphEditor -->
+  <link rel="stylesheet" type="text/css" href="styles/grapheditor.css">
+  <!-- 自定义 -->
+  <link rel="stylesheet" type="text/css" href="styles/my.css">
+
+  <!-- 处理嵌入式参数 -->
+	<script type="text/javascript">
+		// 分析URL参数。支持的参数有：
+		// lang=xy: 指定用户界面的语言
+		// touch=1: 启用触摸式用户界面
+		// storage=local: 启用HTML5本地存储
+		// chrome=0: ChromeLess模式[居于Chrome Headless　做了一层封装，通过api调用操作chrome浏览器（点击，输入，打开网站等等）].
+    var urlParams = new Object();
+    urlParams = (function(url)
+		{
+			var result = new Object();
+			var idx = url.lastIndexOf('?');
+			if (idx > 0)
+			{
+				var params = url.substring(idx + 1).split('&');
+				for (var i = 0; i < params.length; i++)
+				{
+					idx = params[i].indexOf('=');
+					if (idx > 0)
+					{
+						result[params[i].substring(0, idx)] = params[i].substring(idx + 1);
+					}
+				}
+			}
+			return result;
+		})(window.location.href);
+		// 默认资源包含在GraphEditor资源中
+    mxLoadResources = false;
+    // ******************************** 全局变量 ********************************
+    // ------ 对象类 ------
+    var mainEditorUi; // 流程图UI组件
+    var nowSelectNode; // 当前选中节点
+    // ------ 组件控制 0关闭 1开启 ------
+    var control_menu_op = 1; // 菜单面板
+    var control_toolbar_op = 1; // 工具栏面板
+    var control_sidebar_op = 1; // 左侧图形面板
+    var control_outline_op = 1; // 缩略图面板
+    var control_format_op = 1; // 右侧样式面板
+    var control_logic_subprocess_op = 1; // 子流程设置组件
+    var control_logic_op = 1; // 右侧业务属性面板
+    var control_adaptive_op = 1; // 右侧自适应设计属性面板
+    // ------ 功能控制 0关闭 1开启 ------
+    var function_open_basic_op = 1; // 打开普通流程图
+    var function_open_adaptive_op = 1; // 打开自适应模型
+    var function_open_course_op = 1; // 打开课程模型
+    var function_all_op = 1; // 所有功能是否可编辑
+    var function_draw_edit_op = 1; // 绘图区是否可编辑
+    var function_param_panel_type = 2; // 1普通流程(基本,团队,时间,交付物) 2仿真(基本,团队,时间,交付物,变量,规则)
+    var function_undo_redo_op = 1; // 撤销 恢复
+    var function_fileUpLoad_op = 1; // 附件编辑功能是否可用
+    // ------ 当前打开流程图参数 ------
+    var nowFlowID = ''; // 当前打开流程图ID
+    var nowFlowName = ''; // 当前打开流程图名称
+    var nowFlowExplain = ''; // 当前打开流程图说明
+    var nowFlowState = 0; // 当前打开流程图状态 0编辑 1提交
+    var nowFlowSaveOp = 0; // 当前流程图是否保存 0未修改 1已改动
+    // ------ 当前打开自适应计算模型参数 ------
+    var nowFlowAdaptiveID = ''; // 当前打开自适应模型ID
+    var nowFlowAdaptiveSaveDataID = ''; // 当前打开的自适应模型计算结果ID
+    var nowFlowAdaptiveSaveDataName = ''; // 当前打开自适应模型计算结果名称
+    var nowFlowAdaptiveSaveDataMemo = ''; // 当前打开自适应模型计算结果说明
+    var nowFlowAdaptiveSaveDataSaveOp = 0; // 当前自适应模型计算结果是否保存 0未修改 1已改动
+    // ------ 当前打开课程导图参数 ------
+    var nowFlowCourseTpID = ''; // 培养ID
+    var nowFlowCourseID = ''; // 当前打开流程图ID
+    var nowFlowCourseName = ''; // 当前打开流程图名称
+    var nowFlowCourseExplain = ''; // 当前打开流程图说明
+    var nowFlowCourseSaveOp = 1; // 当前流程图是否保存 0未修改 1已改动
+    // ------ 普通流程图存储 ------
+    var nowNodeInputParameterData = []; // 递归获取的当前节点的祖先节点变量列表
+    var nowNodeInputParameterCount = {}; // 递归获取的当前节点的祖先节点变量列表时用来解决死循环问题的错误计数器
+    var nowNodeFileUploatSteps = {}; // 节点附件操作步骤记录
+    // ------ 项目-全局变量 ------
+    var saveXMLArray = []; // 顶级-二级-三级...
+    var projectPath = []; // 项目节点路径
+    var SideSimulationArray = []; // 节点数组
+    var projectEditNodeID = ''; // 项目当前编辑节点(操作工作流节点时流程图编辑器组件属性 function_all_op = 0)
+    var projectEditState = 2; // 项目用流程图编辑状态 1检出 2保存(默认) 3编辑中
+    // ------ 自适应模型存储 ------
+    var adaptiveDesignList = []; // 自适应节点数据
+    var adaptiveDesignJSON = {}; // 自适应节点数据
+    var stepCountAdaptiveDesignTableData = []; // 分步计算模型数据
+    // ******************************** /全局变量 *******************************
+    // 初始化系统参数
+    switch (urlParams['tv']) {
+      // *************************************************************************************
+      // *********************************** 直接使用编辑器 ***********************************
+      // *************************************************************************************
+      case 'edit': // 默认
+        break;
+
+      case 'edit-basic': // 普通编辑状态
+        function_open_basic_op = 1; // 打开普通流程图
+        function_open_adaptive_op = 0; // 打开自适应模型
+        function_open_course_op = 0; // 打开课程模型
+        break;
+
+      case 'edit-adaptive': // 自适应编辑状态
+        function_open_basic_op = 0; // 打开普通流程图
+        function_open_adaptive_op = 1; // 打开自适应模型
+        function_open_course_op = 0; // 打开课程模型
+        control_toolbar_op = 0; // 工具栏面板 
+        control_sidebar_op = 0; // 左侧图形面板
+        control_outline_op = 0; // 缩略图面板
+        control_format_op = 0; // 右侧样式面板
+        control_logic_op = 0; // 右侧业务属性面板
+        control_adaptive_op = 1; // 右侧自适应设计属性面板
+        break;
+
+      case 'submit': // 提交状态
+        control_toolbar_op = 0; // 工具栏面板 
+        control_sidebar_op = 0; // 左侧图形面板
+        control_outline_op = 0; // 缩略图面板
+        control_format_op = 0; // 右侧样式面板
+        control_logic_op = 0; // 右侧业务属性面板
+        control_adaptive_op = 0; // 右侧自适应设计属性面板
+        function_all_op = 0; // 所有功能不可编辑
+        function_draw_edit_op = 0; // 绘图区不可编辑
+        function_undo_redo_op = 0; // 撤销 恢复
+        break;
+    
+      case 'submit-run': // 提交状态(带模拟运行)
+        control_toolbar_op = 0; // 工具栏面板 
+        control_sidebar_op = 0; // 左侧图形面板
+        control_outline_op = 0; // 缩略图面板
+        control_format_op = 0; // 右侧样式面板
+        control_logic_op = 0; // 右侧业务属性面板
+        control_adaptive_op = 0; // 右侧自适应设计属性面板
+        function_all_op = 0; // 所有功能不可编辑
+        function_draw_edit_op = 0; // 绘图区不可编辑
+        function_undo_redo_op = 0; // 撤销 恢复
+        break;
+
+      // *************************************************************************************
+      // ******************************** 普通编辑模式的外部调用 *******************************
+      // *************************************************************************************
+      case 'outside-basic-edit': // 外部调用(普通)
+        control_menu_op = 0; // 菜单面板
+        control_logic_subprocess_op = 0; // 子流程设置组件
+        control_adaptive_op = 0; // 右侧自适应设计属性面板
+        function_open_basic_op = 0; // 打开普通流程图
+        function_open_adaptive_op = 0; // 打开自适应模型
+        function_open_course_op = 0; // 打开课程模型
+        //function_param_panel_type = 1; // 普通流程
+        function_param_panel_type = 2; // 临时
+        break;
+
+      case 'outside-basic-edit-attribute': // 外部调用(普通)(流程图不可编辑，节点属性可编辑)
+        control_menu_op = 0; // 菜单面板
+        control_toolbar_op = 0; // 工具栏面板 
+        control_sidebar_op = 0; // 左侧图形面板
+        control_outline_op = 0; // 缩略图面板
+        control_format_op = 0; // 右侧样式面板
+        control_logic_subprocess_op = 0; // 子流程设置组件
+        control_adaptive_op = 0; // 右侧自适应设计属性面板
+        function_draw_edit_op = 0; // 绘图区不可编辑
+        function_undo_redo_op = 0; // 撤销 恢复
+        function_fileUpLoad_op = 0; // 附件编辑不可用
+        //function_param_panel_type = 1; // 普通流程
+        function_param_panel_type = 2; // 临时
+        break;
+
+      case 'outside-basic-targetNode-edit-attribute': // 外部调用(普通)(流程图不可编辑，指定节点属性可编辑)
+        control_menu_op = 0; // 菜单面板
+        control_toolbar_op = 0; // 工具栏面板 
+        control_sidebar_op = 0; // 左侧图形面板
+        control_outline_op = 0; // 缩略图面板
+        control_format_op = 0; // 右侧样式面板
+        control_logic_subprocess_op = 0; // 子流程设置组件
+        control_adaptive_op = 0; // 右侧自适应设计属性面板
+        function_draw_edit_op = 0; // 绘图区不可编辑
+        function_undo_redo_op = 0; // 撤销 恢复
+        function_fileUpLoad_op = 0; // 附件编辑不可用
+        //function_param_panel_type = 1; // 普通流程
+        function_param_panel_type = 2; // 临时
+        break;
+
+      case 'view-basic': // 快速浏览试图(普通)
+        control_menu_op = 0; // 菜单面板
+        control_toolbar_op = 0; // 工具栏面板
+        control_sidebar_op = 0; // 左侧图形面板
+        control_outline_op = 0; // 缩略图面板
+        control_format_op = 0; // 右侧样式面板
+        control_logic_subprocess_op = 0; // 子流程设置组件
+        control_adaptive_op = 0; // 右侧自适应设计属性面板
+        function_open_basic_op = 0; // 打开普通流程图
+        function_open_adaptive_op = 0; // 打开自适应模型
+        function_open_course_op = 0; // 打开课程模型
+        function_all_op = 0; // 所有功能是否可编辑
+        function_draw_edit_op = 0; // 绘图区是否可编辑
+        function_undo_redo_op = 0; // 撤销 恢复
+        //function_param_panel_type = 1; // 1普通流程(基本,团队,时间,交付物) 2仿真(基本,团队,时间,交付物,变量,规则)
+        function_param_panel_type = 2; // 临时
+        break;
+
+      // *************************************************************************************
+      // ******************************** 仿真编辑模式的外部调用 *******************************
+      // *************************************************************************************
+      case 'outside-simulation-edit': // 外部调用(仿真)
+        control_menu_op = 0; // 菜单面板
+        control_adaptive_op = 0; // 右侧自适应设计属性面板
+        function_open_basic_op = 0; // 打开普通流程图
+        function_open_adaptive_op = 0; // 打开自适应模型
+        function_open_course_op = 0; // 打开课程模型
+        function_param_panel_type = 2; // 仿真流程
+        break;
+
+      case 'outside-simulation-edit-attribute': // 外部调用(仿真)(流程图不可编辑，节点属性可编辑)
+        control_menu_op = 0; // 菜单面板
+        control_toolbar_op = 0; // 工具栏面板 
+        control_sidebar_op = 0; // 左侧图形面板
+        control_outline_op = 0; // 缩略图面板
+        control_format_op = 0; // 右侧样式面板
+        control_adaptive_op = 0; // 右侧自适应设计属性面板
+        function_draw_edit_op = 0; // 绘图区不可编辑
+        function_undo_redo_op = 0; // 撤销 恢复
+        function_param_panel_type = 2; // 仿真流程
+        break;
+
+      case 'outside-simulation-targetNode-edit-attribute': // 外部调用(仿真)(流程图不可编辑，指定节点属性可编辑)
+        control_menu_op = 0; // 菜单面板
+        control_toolbar_op = 0; // 工具栏面板 
+        control_sidebar_op = 0; // 左侧图形面板
+        control_outline_op = 0; // 缩略图面板
+        control_format_op = 0; // 右侧样式面板
+        control_adaptive_op = 0; // 右侧自适应设计属性面板
+        function_draw_edit_op = 0; // 绘图区不可编辑
+        function_undo_redo_op = 0; // 撤销 恢复
+        function_param_panel_type = 2; // 仿真流程
+        break;
+
+      case 'view-simulation': // 快速浏览试图(仿真)
+        control_menu_op = 0; // 菜单面板
+        control_toolbar_op = 0; // 工具栏面板
+        control_sidebar_op = 0; // 左侧图形面板
+        control_outline_op = 0; // 缩略图面板
+        control_format_op = 0; // 右侧样式面板
+        control_adaptive_op = 0; // 右侧自适应设计属性面板
+        function_open_basic_op = 0; // 打开普通流程图
+        function_open_adaptive_op = 0; // 打开自适应模型
+        function_open_course_op = 0; // 打开课程模型
+        function_all_op = 0; // 所有功能是否可编辑
+        function_draw_edit_op = 0; // 绘图区是否可编辑
+        function_param_panel_type = 2; // 1普通流程(基本,团队,时间,交付物) 2仿真(基本,团队,时间,交付物,变量,规则)
+        function_undo_redo_op = 0; // 撤销 恢复
+        break;
+
+      // *************************************************************************************
+      // ******************************** 自适应模型的外部调用 *******************************
+      // *************************************************************************************
+      case 'outside-adaptive-design-view': // 外部调用(自适应模型)
+        control_menu_op = 0; // 菜单面板
+        control_toolbar_op = 0; // 工具栏面板 
+        control_sidebar_op = 0; // 左侧图形面板
+        control_outline_op = 0; // 缩略图面板
+        control_format_op = 0; // 右侧样式面板
+        control_logic_op = 0; // 右侧业务属性面板
+        control_adaptive_op = 0; // 右侧自适应设计属性面板
+        function_open_basic_op = 0; // 打开普通流程图
+        function_open_adaptive_op = 1; // 打开自适应模型
+        function_open_course_op = 0; // 打开课程模型
+        function_all_op = 1; // 所有功能是否可编辑
+        function_draw_edit_op = 0; // 绘图区是否可编辑
+        function_undo_redo_op = 0; // 撤销 恢复
+        break;
+
+      // **********************************************************************************
+      // ******************************** 课程模型的外部调用 *******************************
+      // **********************************************************************************
+      case 'outside-training-gramminister-view': // 浏览
+        control_menu_op = 0; // 菜单面板
+        control_toolbar_op = 0; // 工具栏面板 
+        control_sidebar_op = 0; // 左侧图形面板
+        control_outline_op = 0; // 缩略图面板
+        control_format_op = 0; // 右侧样式面板
+        control_logic_op = 0; // 右侧业务属性面板
+        control_adaptive_op = 0; // 右侧自适应设计属性面板
+        function_open_basic_op = 0; // 打开普通流程图
+        function_open_adaptive_op = 0; // 打开自适应模型
+        function_open_course_op = 1; // 打开课程模型
+        function_all_op = 1; // 所有功能是否可编辑
+        function_draw_edit_op = 0; // 绘图区是否可编辑
+        function_undo_redo_op = 0; // 撤销 恢复
+        break;
+
+      case 'outside-training-gramminister-edit': // 编辑
+        control_menu_op = 1; // 菜单面板
+        control_toolbar_op = 1; // 工具栏面板 
+        control_sidebar_op = 1; // 左侧图形面板
+        control_outline_op = 1; // 缩略图面板
+        control_format_op = 1; // 右侧样式面板
+        control_logic_op = 0; // 右侧业务属性面板
+        control_adaptive_op = 0; // 右侧自适应设计属性面板
+        function_open_basic_op = 0; // 打开普通流程图
+        function_open_adaptive_op = 0; // 打开自适应模型
+        function_open_course_op = 1; // 打开课程模型
+        function_all_op = 1; // 所有功能是否可编辑
+        function_draw_edit_op = 1; // 绘图区是否可编辑
+        function_undo_redo_op = 1; // 撤销 恢复
+        break;
+
+      // *************************************************************************************
+      // ********************************** 默认编辑器开放方式 ********************************
+      // *************************************************************************************
+      default:
+        control_menu_op = 0; // 菜单面板
+        control_toolbar_op = 0; // 工具栏面板
+        control_sidebar_op = 0; // 左侧图形面板
+        control_outline_op = 0; // 缩略图面板
+        control_format_op = 0; // 右侧样式面板
+        control_logic_op = 0; // 右侧业务属性面板
+        control_adaptive_op = 0; // 右侧自适应设计属性面板
+        function_open_basic_op = 0; // 打开普通流程图
+        function_open_adaptive_op = 0; // 打开自适应模型
+        function_open_course_op = 0; // 打开课程模型
+        function_all_op = 0; // 所有功能是否可编辑
+        function_draw_edit_op = 0; // 绘图区是否可编辑
+        function_param_panel_type = 2; // 1普通流程(基本,团队,时间,交付物) 2仿真(基本,团队,时间,交付物,变量,规则)
+        function_undo_redo_op = 0; // 撤销 恢复
+        break;
+    }
+  </script>
+
+  <!-- GraphEditor -->
+  <script type="text/javascript" src="/javascript/flow/tools.js"></script>
+	<script type="text/javascript" src="js/Init.js"></script>
+	<script type="text/javascript" src="deflate/pako.min.js"></script>
+	<script type="text/javascript" src="deflate/base64.js"></script>
+  <script type="text/javascript" src="jscolor/jscolor.js"></script>
+	<script type="text/javascript" src="sanitizer/sanitizer.min.js"></script>
+	<script type="text/javascript" src="/plugins/mxgraph/mxClient.min.js"></script>
+	<script type="text/javascript" src="js/EditorUi.js"></script>
+	<script type="text/javascript" src="js/Editor.js"></script>
+  <script type="text/javascript">
+    if (control_sidebar_op == 1) document.write("<script type='text/javascript' src='js/Sidebar.js'><\/script>");
+  </script>
+  <script type="text/javascript">
+    if (control_outline_op == 1) document.write("<script type='text/javascript' src='js/Outline.js'><\/script>");
+  </script>
+	<script type="text/javascript" src="js/Graph.js"></script>
+  <script type="text/javascript">
+    if (control_format_op == 1 || control_logic_op == 1 || control_adaptive_op == 1) document.write("<script type='text/javascript' src='js/Format.js'><\/script>");
+  </script>
+  <script type="text/javascript">
+    if (control_logic_op == 1) document.write("<script type='text/javascript' src='/javascript/flow/basics/logic.js'><\/script>");
+    if (control_adaptive_op == 1) document.write("<script type='text/javascript' src='/javascript/flow/adaptive/adaptiveDesign.js'><\/script>");
+  </script>
+	<script type="text/javascript" src="js/Shapes.js"></script>
+	<script type="text/javascript" src="/javascript/flow/basics/actions.js"></script>
+	<script type="text/javascript" src="/javascript/flow/adaptive/actions.js"></script>
+	<script type="text/javascript" src="/javascript/flow/coursest/actions.js"></script>
+	<script type="text/javascript" src="js/Actions.js"></script>
+  <script type='text/javascript' src='js/Menus.js'></script>
+  <script type="text/javascript">
+    if (control_toolbar_op == 1) document.write("<script type='text/javascript' src='js/Toolbar.js'><\/script>");
+  </script>
+  <script type='text/javascript' src='js/Dialogs.js'></script>
+  <script type='text/javascript' src='/javascript/flow/basics/dialogs.js'></script>
+  <script type='text/javascript' src='/javascript/flow/adaptive/dialogs.js'></script>
+  <script type='text/javascript' src='/javascript/flow/coursest/dialogs.js'></script>
+  
+  <!-- math.js -->
+  <script src="/plugins/math.js"></script>
+  <!-- jQuery -->
+  <script src="/nui-ad/lib/jquery/1.9.1/jquery.min.js"></script>
+  <!-- jquery-validation -->
+  <script src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+  <script src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+  <script src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+  <!-- Toastr -->
+  <script src="/plugins/toastr/toastr.min.js"></script>
+  <!-- mloading -->
+  <script src="/plugins/mloading/jquery.mloading.js"></script>
+  <!-- DataTables -->
+  <script src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+  <script src="/javascript/DataTablesPublicParam.js"></script>
+  <script src="/nui-ad/lib/datatables/1.10.15/plugins/jszip.min.js"></script>
+  <script src="/nui-ad/lib/datatables/1.10.15/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+  <script src="/nui-ad/lib/datatables/1.10.15/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+  <script src="/nui-ad/lib/datatables/1.10.15/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+  <!-- Select2 -->
+  <script src="/plugins/select2/js/select2.full.min.js"></script>
+  <!-- CodeMirror -->
+  <script src="/plugins/codemirror/lib/codemirror.js"></script>
+  <script src="/plugins/codemirror/mode/javascript/javascript.js"></script>
+  <script src="/plugins/codemirror/addon/selection/active-line.js"></script>
+  <script src="/plugins/codemirror/addon/edit/matchbrackets.js"></script>
+  <!-- tooltip -->
+  <script src="/plugins/tooltip/tooltip.js"></script>
+  <!-- xndatepicker -->
+  <script src="/plugins/xndatepicker/moment.js"></script>
+  <script src="/plugins/xndatepicker/xndatepicker.js"></script>
+  <!-- 数字输入框 -->
+  <script src="/plugins/numberInput/numberInput.js"></script>
+  <!-- 自定义滚动条 -->
+  <script src="/plugins/perfect-scrollbar-main/js/perfect-scrollbar.min.js"></script>
+  <!-- 代码展示 -->
+  <script src="/nui-ad/lib/prettify.js"></script>
+  <!-- 功能代码 -->
+  <script src="/javascript/tools.js"></script>
+  <script src="/javascript/flow/basics/examRun.js"></script>
+  <script src="/javascript/flow/basics/flowBusiness.js"></script>
+  <script src="/javascript/flow/adaptive/flowBusiness.js"></script>
+  <script src="/javascript/flow/coursest/flowBusiness.js"></script>
+  <script src="/javascript/flow/flowAction.js"></script>
+  <script src="/javascript/flow/basics/flowAction.js"></script>
+  <script src="/javascript/flow/adaptive/flowAction.js"></script>
+  <script src="/javascript/flow/basics/flowNodeAction.js"></script>
+  <script src="/javascript/flow/basics/projectFlowAction.js"></script>
+  <!-- 权限控制 -->
+  <script type="text/javascript">
+    // if (!getParentUrl()) {
+    //   window.location.href= '/module/login.html';
+    // }
+  </script>
+  <!-- 自定义脚本 -->
+  <script type="text/javascript">
+    /*$.ajax({
+      type: 'POST',
+      contentType: 'application/json',
+      url: '/s/flow/queryScriptFile', // 调用地址
+      data: JSON.stringify({
+        type: 1,
+        state: 1
+      }),
+      async: false,
+      success: function(data) {
+        data.list.forEach((item)=>{
+          var oHead = document.getElementsByTagName('HEAD').item(0);
+          var oScript = document.createElement('script');
+          oScript.type = 'text/javascript';
+          oScript.charset = 'UTF-8';
+          oScript.src = item['f_path'];
+          oHead.appendChild(oScript);
+        });
+      },
+      error : function(e) {
+        toastr.error(e.status);
+        toastr.error(e.responseText);
+      }
+    });*/
+  </script>
+  
+</head>
+<body class="geEditor" onload="prettyPrint()">
+  <!-- 开启遮罩 -->
+  <script type="text/javascript">
+    $('body').mLoading('show');
+  </script>
+  <!-- 其他代码 -->
+  <script type="text/javascript">
+    // 初始化Toastr
+    toastr.options = {  
+      closeButton: false,  // 是否显示关闭按钮（提示框右上角关闭按钮）
+      debug: false,  // 是否为调试；
+      progressBar: true,  // 是否显示进度条（设置关闭的超时时间进度条）
+      positionClass: "toast-top-center",  // 消息框在页面显示的位置
+      onclick: null,  // 点击消息框自定义事件
+      showDuration: "300",  // 显示动作时间
+      hideDuration: "1000",  // 隐藏动作时间
+      timeOut: "2000",  // 自动关闭超时时间
+      extendedTimeOut: "1000", // 设置当你鼠标滑入后的timeout，该timeout会更新关闭所需的timeout.
+      showEasing: "swing",  
+      hideEasing: "linear",  
+      showMethod: "fadeIn",  //显示的方式
+      hideMethod: "fadeOut"  //隐藏的方式
+    };
+    // 初始化tooltip
+    ToolTip.init({
+        delay: 50,
+        fadeDuration: 250,
+        fontSize: '1.0em',
+        theme: 'dark',
+        textColor: '#fff',
+        shadowColor: '#000',
+        fontFamily: "'Roboto-Medium', 'Roboto-Regular', Arial"
+    });
+		// 扩展EditorUi以根据后端的可用性更新I/O操作状态
+		(function()
+		{
+      var editorUiInit = EditorUi.prototype.init;
+      
+			EditorUi.prototype.init = function()
+			{
+				editorUiInit.apply(this, arguments);
+				// this.actions.get('export').setEnabled(false);
+				// 根据存储状态更新操作状态
+				// if (!Editor.useLocalStorage)
+				// {
+				// 	mxUtils.post(OPEN_URL, '', mxUtils.bind(this, function(req)
+				// 	{
+				// 		var enabled = req.getStatus() != 404;
+				// 		this.actions.get('open').setEnabled(enabled || Graph.fileSupport);
+				// 		this.actions.get('import').setEnabled(enabled || Graph.fileSupport);
+				// 		this.actions.get('save').setEnabled(enabled);
+				// 		this.actions.get('saveAs').setEnabled(enabled);
+				// 		this.actions.get('export').setEnabled(enabled);
+				// 	}));
+				// }
+			};
+			
+			// 添加所需的资源（禁用加载回退属性，仅当我们知道所有键都在特定于语言的文件中定义时才能使用）
+			mxResources.loadDefaultBundle = false;
+			var bundle = mxResources.getDefaultBundle(RESOURCE_BASE, mxLanguage) ||
+				mxResources.getSpecialBundle(RESOURCE_BASE, mxLanguage);
+
+			// 修复可能的异步请求
+			mxUtils.getAll([bundle, STYLE_PATH + '/default.xml'], function(xhr)
+			{
+        // 禁用浏览器自带右键菜单  
+        mxEvent.disableContextMenu(document.body);
+
+				// 向资源添加捆绑文本
+				mxResources.parse(xhr[0].getText());
+				
+				// 配置默认图形主题
+				var themes = new Object();
+				themes[Graph.prototype.defaultThemeName] = xhr[1].getDocumentElement(); 
+				
+				// 主框架
+        mainEditorUi = new EditorUi(new Editor(urlParams['chrome'] == '0', themes));
+
+        // 禁止悬挂边
+        mainEditorUi.editor.graph.setAllowDanglingEdges(false);
+
+        // 无需保存提交状态
+        EditorMenuNoSaveNoSubmit();
+        mainEditorUi.actions.get('saveAs').setEnabled(false); // 禁用另存为
+
+        // 判断是否需要屏蔽所有编辑功能
+        var graph = mainEditorUi.editor.graph;
+        if (function_draw_edit_op == 0) {
+          // flowDisableFunctionAll();
+          graph.setEnabled(false);
+          mainEditorUi.refresh();
+          // 鼠标拖拽图层-开启
+				  graph.panningHandler.ignoreCell = true;
+        } else {
+          graph.setEnabled(true);
+          mainEditorUi.refresh();
+          // 鼠标拖拽图层-关闭
+				  graph.panningHandler.ignoreCell = false;
+        }
+
+        // 判断是否需要开启模拟器
+        // if (urlParams['tv'] == 'submit-run') {
+          if (function_open_basic_op === 1) {
+            exam('view');
+          }
+        // }
+
+        // 判断是否需要打开流程图
+        if (urlParams['f']) {
+          openFlowGraph(urlParams['f']);
+        }
+
+        // 判断是否需要打开自适应模型
+        if (urlParams['ad']) {
+          openAdaptiveDesign(urlParams['ad']);
+        }
+
+        // 判断是否需要打开课程表模型
+        if (urlParams['tpc']) {
+          nowFlowCourseTpID = urlParams['tpc'];
+          openTrainingProgramCourse(urlParams['tpc']);
+        }
+        if (urlParams['tpc1']) {
+          openTrainingProgramCourse1(urlParams['tpc1']);
+        }
+        if (urlParams['tpc2']) {
+          openTrainingProgramCourse2(urlParams['tpc2']);
+        }
+
+        // 判断是否调整编辑区域缩放比例
+        if (urlParams['z']) {
+          flowZoom(urlParams['z']);
+        }
+        
+        // 判断是否需要为项目选中节点赋值
+        if (urlParams['pNodeID']) {
+          projectEditNodeID = urlParams['pNodeID'];
+        }
+
+        // 拖拽支持
+        mxEvent.addListener(document.body, 'dragover', function(evt)
+				{
+					if (graph.isEnabled())
+					{
+						evt.stopPropagation();
+						evt.preventDefault();
+					}
+				});
+				mxEvent.addListener(document.body, 'drop', function(evt)
+				{
+					if (graph.isEnabled())
+					{
+						evt.stopPropagation();
+						evt.preventDefault();
+						// 获取顶点的放置位置点
+						var pt = mxUtils.convertPoint(graph.container, mxEvent.getClientX(evt), mxEvent.getClientY(evt));
+						var tr = graph.view.translate;
+						var scale = graph.view.scale;
+						var x = pt.x / scale - tr.x;
+						var y = pt.y / scale - tr.y;
+						// 将本地图像转换为数据URL
+						var filesArray = event.dataTransfer.files;
+            for (var i = 0; i < filesArray.length; i++)
+            {
+              handleDrop(graph, filesArray[i], x + i * 10, y + i * 10);
+            }
+					}
+				});
+
+        /********************
+         *** 特殊功能标注 ***
+         ********************/
+        // 用于计算控件边界的辅助函数
+				var getDeleteControlBounds = function(state, controlName)
+				{
+					if (state.controls[controlName] != null)
+					{
+            var Control = state.controls[controlName]['Control'];
+            var OffsetX = state.controls[controlName]['OffsetX'];
+            var OffsetY = state.controls[controlName]['OffsetY'];
+						var oldScale = Control.scale;
+						var w = Control.bounds.width / oldScale;
+						var h = Control.bounds.height / oldScale;
+						var s = state.view.scale;
+						return (state.view.graph.getModel().isEdge(state.cell)) ? 
+							new mxRectangle(state.x + state.width / 2 - w / 2 * s,
+								state.y + state.height / 2 - h / 2 * s, w * s, h * s)
+							: new mxRectangle(state.x + state.width - w * s + OffsetX,
+								state.y + OffsetY, w * s, h * s);
+					}
+					return null;
+				};
+        // 重写节点渲染的创建组件函数以增加自定义标注
+				var mxCellRendererCreateControl = mxCellRenderer.prototype.createControl;
+				mxCellRenderer.prototype.createControl = function(state)
+				{
+					mxCellRendererCreateControl.apply(this, arguments);
+					if (graph.getModel().isVertex(state.cell))
+					{
+            // 初始化标签集合
+            var CellControls = {
+              Member: {
+                Name: 'MemberControl',
+                Path: '/public/floweditor/images/group_blue.png',
+                OffsetX: 14,
+                OffsetY: -3,
+                Event: function(evt) {
+                  var dlg = new TipsDialog(mainEditorUi, null, '成员数据已添加！');
+                  mainEditorUi.showDialog(dlg.container, 300, 90, true, true);
+                },
+                Check: function(cell) {
+                  if (cell['leaderUserData'] && cell['leaderUserData'].length > 0) {
+                    return true;
+                  }
+                  return false;
+                }
+              },
+              WorkTime: {
+                Name: 'WorkTimeControl',
+                Path: '/public/floweditor/images/calendar_month.png',
+                OffsetX: 14,
+                OffsetY: 8,
+                Event: function(evt) {
+                  var dlg = new TipsDialog(mainEditorUi, null, '时间数据已添加！');
+                  mainEditorUi.showDialog(dlg.container, 300, 90, true, true);
+                },
+                Check: function(cell) {
+                  if (cell['start_date'] && cell['start_date'] != '' && cell['end_date'] && cell['end_date'] != '') {
+                    return true;
+                  }
+                  return false;
+                }
+              },
+              FileSub: {
+                Name: 'FileSubControl',
+                Path: '/public/floweditor/images/record_16x16.gif',
+                OffsetX: 14,
+                OffsetY: 19,
+                Event: function(evt) {
+                  var dlg = new TipsDialog(mainEditorUi, null, '交付物数据已添加！');
+                  mainEditorUi.showDialog(dlg.container, 300, 90, true, true);
+                },
+                Check: function(cell) {
+                  if (cell['fileSubData'] && cell['fileSubData'].length > 0) {
+                    return true;
+                  }
+                  return false;
+                }
+              },
+              FileUpload: {
+                Name: 'FileUploadControl',
+                Path: '/public/floweditor/images/registration1_16x16.gif',
+                OffsetX: 14,
+                OffsetY: 31,
+                Event: function(evt) {
+                  var dlg = new TipsDialog(mainEditorUi, null, '附件数据已添加！');
+                  mainEditorUi.showDialog(dlg.container, 300, 90, true, true);
+                },
+                Check: function(cell) {
+                  if (cell['fileUploadData'] && cell['fileUploadData'].length > 0) {
+                    return true;
+                  }
+                  return false;
+                }
+              },
+              Rule: {
+                Name: 'RuleControl',
+                Path: '/public/floweditor/images/measurement.gif',
+                OffsetX: 14,
+                OffsetY: 44,
+                Event: function(evt) {
+                  var dlg = new TipsDialog(mainEditorUi, null, '规则数据已添加！');
+                  mainEditorUi.showDialog(dlg.container, 300, 90, true, true);
+                },
+                Check: function(cell) {
+                  if ((cell['nodeStartData'] && cell['nodeStartData'].length > 0) || (cell['nodeEndData'] && cell['nodeEndData'].length > 0)) {
+                    return true;
+                  }
+                  return false;
+                }
+              },
+              Variable: {
+                Name: 'VariableControl',
+                Path: '/public/floweditor/images/diamonds_4.png',
+                OffsetX: 13,
+                OffsetY: 56,
+                Event: function(evt) {
+                  var dlg = new TipsDialog(mainEditorUi, null, '变量数据已添加！');
+                  mainEditorUi.showDialog(dlg.container, 300, 90, true, true);
+                },
+                Check: function(cell) {
+                  if (cell['variableData'] && cell['variableData'].length > 0) {
+                    return true;
+                  }
+                  return false;
+                }
+              }
+            };
+            // 初始化节点标签集合
+            if (!state.controls) state.controls = {};
+            // 创建节点内标签集合
+            for (var name in CellControls) {
+              var element = CellControls[name];
+              if (!state.controls[element.Name]) state.controls[element.Name] = {};
+              if (state.controls[element.Name].Control == null)
+              {
+                state.controls[element.Name].Control = new mxImageShape(new mxRectangle(0, 0, 12, 12), element.Path);
+                state.controls[element.Name].Control.dialect = graph.dialect;
+                state.controls[element.Name].Control.preserveImageAspect = false;
+                state.controls[element.Name].OffsetX = element.OffsetX;
+                state.controls[element.Name].OffsetY = element.OffsetY;
+                state.controls[element.Name].Check = element.Check;
+                // 按钮点击事件
+                this.initControl(state, state.controls[element.Name].Control, false, element.Event);
+              }
+            }
+					}
+          else
+					{
+            if (state.controls) {
+              for (var name in state.controls) {
+                var element = state.controls[name];
+                if (element.Control != null)
+                {
+                  element.Control.destroy();
+                  element.Control = null;
+                }
+              }
+            }
+					}
+				};
+				// 重写以更新控件的比例和边界
+				var mxCellRendererRedrawControl = mxCellRenderer.prototype.redrawControl;
+				mxCellRenderer.prototype.redrawControl = function(state)
+				{
+					mxCellRendererRedrawControl.apply(this, arguments);
+          for (var name in state.controls) {
+            var element = state.controls[name];
+            if (element.Control != null && element.Check(state.cell))
+            {
+              var bounds = getDeleteControlBounds(state, name);
+              var s = state.view.scale;
+              if (element.Control.scale != s || !element.Control.bounds.equals(bounds))
+              {
+                element.Control.bounds = bounds;
+                element.Control.scale = s;
+                element.Control.redraw();
+              }
+            }
+          }
+				};
+				// 渲染组件的销毁事件，销毁时同时销毁标注
+				var mxCellRendererDestroy = mxCellRenderer.prototype.destroy;
+				mxCellRenderer.prototype.destroy = function(state)
+				{
+					mxCellRendererDestroy.apply(this, arguments);
+          for (var name in state.controls) {
+            var element = state.controls[name];
+            if (element.Control != null)
+            {
+              element.Control.destroy();
+              element.Control = null;
+              element.OffsetX = null;
+              element.OffsetY = null;
+            }
+          }
+				};
+			}, function()
+			{
+				document.body.innerHTML = '<center style="margin-top:10%;">加载资源文件时出错，请检查浏览器控制台。</center>';
+			});
+		})();
+    // 将每个文件作为单独的插入处理
+		function handleDrop(graph, file, x, y)
+		{
+			if (file.type.substring(0, 5) == 'image')
+			{
+        var reader = new FileReader();
+        reader.onload = function(e)
+        {
+          // 获取顶点的图像大小
+					var data = e.target.result;
+          // SVG需要特殊处理，以便在缺少和
+          //从SVG属性中查找初始大小（仅适用于IE11
+					if (file.type.substring(0, 9) == 'image/svg')
+	    			{
+    					var comma = data.indexOf(',');
+    					var svgText = atob(data.substring(comma + 1));
+    					var root = mxUtils.parseXml(svgText);
+    					// 解析SVG以查找宽度和高度
+    					if (root != null)
+    					{
+    						var svgs = root.getElementsByTagName('svg');
+    						if (svgs.length > 0)
+	    					{
+    							var svgRoot = svgs[0];
+	    						var w = parseFloat(svgRoot.getAttribute('width'));
+	    						var h = parseFloat(svgRoot.getAttribute('height'));
+	    						// 检查viewBox属性是否已存在
+	    						var vb = svgRoot.getAttribute('viewBox');
+	    						if (vb == null || vb.length == 0)
+	    						{
+	    							svgRoot.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+	    						}
+	    						// 使用viewbox中的宽度和高度
+                  // 缺少宽度和高度属性
+	    						else if (isNaN(w) || isNaN(h))
+	    						{
+	    							var tokens = vb.split(' ');
+	    							if (tokens.length > 3)
+	    							{
+	    								w = parseFloat(tokens[2]);
+	    								h = parseFloat(tokens[3]);
+	    							}
+	    						}
+                  w = Math.max(1, Math.round(w));
+                  h = Math.max(1, Math.round(h));
+	    						data = 'data:image/svg+xml,' + btoa(mxUtils.getXml(svgs[0], '\n'));
+	    						var cell = graph.insertVertex(null, null, '', x, y, w, h, 'shape=image;image=' + data + ';');
+                  cell['simulationId'] = 'other';
+	    					}
+    					}
+	    			}
+					else
+					{
+            var img = new Image();
+            img.onload = function()
+            {
+              var w = Math.max(1, img.width);
+              var h = Math.max(1, img.height);
+              // 将数据url的格式转换为“顶点”中使用的单元格样式值
+              var semi = data.indexOf(';');
+              if (semi > 0)
+              {
+                data = data.substring(0, semi) + data.substring(data.indexOf(',', semi + 1));
+              }
+              var cell = graph.insertVertex(null, null, '', x, y, w, h, 'shape=image;image=' + data + ';');
+              cell['simulationId'] = 'other';
+            };
+            img.src = data;
+					}
+        };
+				reader.readAsDataURL(file);
+			}
+		};
+  </script>
+  <!-- 关闭遮罩 -->
+  <script type="text/javascript">
+    setTimeout(function(){
+      $('body').mLoading('hide');
+    }, 500);
+  </script>
+</body>
+</html>

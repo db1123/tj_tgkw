@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 控制台输出器（所有日志共用，不影响级别控制） -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 仅控制 Solr 相关日志：设置为 INFO（屏蔽 DEBUG），不影响其他包 -->
+    <logger name="org.apache.solr" level="INFO" additivity="false">
+        <appender-ref ref="STDOUT" /> <!-- Solr 日志通过控制台输出 -->
+    </logger>
+
+    <!-- 全局默认配置：其他未单独配置的包（如你的业务代码）使用此级别 -->
+    <!-- 保持默认级别（如 INFO），但不强制修改其他包的日志行为 -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT" /> <!-- 其他日志也通过控制台输出 -->
+    </root>
+</configuration>

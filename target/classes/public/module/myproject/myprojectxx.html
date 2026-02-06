@@ -1,0 +1,268 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+        <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+        <!--_only 独立样式 -->
+        <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+        <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+        <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+        <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+        <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+        <!--/_only 独立样式 -->
+    </head>
+    <body>
+        <div class="page-container" style="padding: 2px;">
+            <div class="f-r text-l" style="display:none;" id="editxxdiv">
+                <button type="button" class="btn btn-default size-S my-btn" id="editxx"  ><i
+                        class=" fa fa-edit"></i> 编辑信息
+                </button>
+            </div>
+
+            <div class="f-l" style="width: 100%; margin-top: 3px;">
+                <article class="page-container">
+                    <form action="" method="post" class="form form-horizontal" id="myprojectForm">
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" ><span class="c-red">*</span>项目名称：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FName" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" ><span class="c-red">*</span>项目编号：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FNo" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+<!--                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" ><span class="c-red">*</span>客户：</label>-->
+<!--                            <div class="formControls col-xs-3 col-sm-4">-->
+<!--                                <label class="form-label" id="FCustomerID" style="width: 100%;text-align: left;"></label>-->
+<!--                            </div>-->
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" ><span class="c-red">*</span>内部编码：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FInsideNo" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" ><span class="c-red">*</span>负责人：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FLeadUserID" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" ><span class="c-red">*</span>系统编码：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FSysNo" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" ><span class="c-red">*</span>计划开始：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FSDate" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" ><span class="c-red">*</span>计划完成：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FEDate" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" ><span class="c-red">*</span>项目类型：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FTypeID" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" ><span class="c-red">*</span>项目等级：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FLevelID" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >项目要求：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FAsk" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >合同编号：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FContractNo" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >项目来源：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FFrom" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >项目经费：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FFunds" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >学科：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FDeptID" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >密级：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FSecret" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >课程：</label>
+                            <div class="formControls col-xs-8 col-sm-10">
+                                <label class="form-label" id="FCourseID" style="width: 100%;text-align: left;"></label>
+                            </div>
+
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >项目发布人：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FUserID" style="width: 100%;text-align: left;"></label>
+                            </div>
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >项目发布时间：</label>
+                            <div class="formControls col-xs-3 col-sm-4">
+                                <label class="form-label" id="FDate" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <div class="row cl">
+                            <label class="form-label col-xs-3 col-sm-2" style="font-weight: bold;" >备注：</label>
+                            <div class="formControls col-xs-8 col-sm-10">
+                                <label class="form-label" id="FNote" style="width: 100%;text-align: left;"></label>
+                            </div>
+                        </div>
+                        <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+                    </form>
+                </article>
+            </div>
+        </div>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+        <script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+        <script src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+        <script type="text/javascript">
+            var id = getQueryStringByName('id');
+            var fstate = getQueryStringByName('fstate');
+            var ftype = getQueryStringByName('ftype');
+            var showtype = getQueryStringByName('showtype');
+            var isrole ;//是否是负责人
+            // 业务代码
+            $(function () {
+                console.log("ftype:"+ftype+",showtype:"+showtype);
+                if(ftype ==null || ftype == ''){
+                    $("#editxxdiv").attr("style", "display:none;"); //显示
+                }else{
+
+
+                    if(showtype == 1){
+                        if(ftype ==1) {
+                            $("#editxxdiv").attr("style", "display:block;"); //显示
+                        }else if(ftype ==2 ){
+                            $("#editxxdiv").attr("style", "display:none;");  //隐藏
+                        }
+                    }else{
+                        $("#editxxdiv").attr("style", "display:none;");  //隐藏
+                    }
+
+                }
+                showxx();
+
+                if(isrole==2){
+                    $("#editxx").removeClass('disabled'); //移除多个样式
+                    // 编辑信息点击事件
+                    $('#editxx').on('click', function () {
+                        parent.layer.open({
+                            type: 2,
+                            area: ['1200px', '600px'],
+                            fix: false, //不固定
+                            shade: 0.4,
+                            title: '修改项目信息',
+                            content: 'myprojectedit.html?op=2&id=' + id + '&FState=' + fstate +'&type=2'
+                            ,end : function() {
+                                showxx();
+                            }
+                        });
+                    });
+                }else{
+                    $("#editxx").addClass('btn btn-default size-S my-btn disabled'); //追加多个样式
+                }
+
+            });
+
+            function showxx() {
+                //显示基本信息
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    url: '/s/myproject/querymyprojectInfo', // 调用地址
+                    data: JSON.stringify({
+                        id: id
+                    }),
+                    async: false,
+                    success: function (data) {
+                        $('#FName').text(data.info.FName);
+                        $('#FNo').text(data.info.FNo);
+                        $("#FSDate").text(data.info.FSDate);
+                        $("#FEDate").text(data.info.FEDate);
+                        $('#FContractNo').text(data.info.FContractNo);
+                        $('#FFrom').text(data.info.FFrom);
+                        $('#FFunds').text(data.info.FFunds);
+                        $("#FAsk").text(data.info.FAsk);
+                        $("#FNote").text(data.info.FNote);
+                        $("#FUserID").text(data.info.FUserName);
+                        $("#FDate").text(data.info.FDate);
+                        $("#FSysNo").text(data.info.FSysNo);
+                        $("#FInsideNo").text(data.info.FInsideNo);
+                        //客户
+                        // $("#FCustomerID").text(data.info.FCustomerName);
+                        //项目类型
+                        $("#FTypeID").text(data.info.FTypeName);
+                        //项目等级
+                        $("#FLevelID").text(data.info.FLevelName);
+                        //主管部门
+                        // let TCollegeName = data.info.TCollegeName;
+                        // if(TCollegeName)
+                        //     $("#FDeptID").text(TCollegeName + "/" + data.info.FDeptName);
+                        // else
+                        $("#FDeptID").text(data.info.FDeptName);
+
+                        //密级
+                        $("#FSecret").text(data.info.FSecretName);
+                        //负责人
+                        $("#FLeadUserID").text(data.info.FLeadUserName);
+                        $('#FKeyID').val(data.info.key);
+                        if(data.info.FState==0){
+                            $("#editxx").attr("style", "display:block;"); //显示
+                            // $("#editxx").removeAttr("disabled");
+                        }else{
+                            $("#editxx").attr("style", "display:none;");  //隐藏
+                            // $("#editxx").attr('disabled', 'true');
+                        }
+                        isrole = data.isrole;
+
+
+                        let courselist = '';
+                        if(data.info.courselist){
+                            $.each(data.info.courselist, function(index, item) {
+                                courselist = courselist +  item.name + ",";
+                            });
+                        }
+                        if (courselist.length > 0){
+                            courselist = courselist.substring(0,courselist.length-1);
+                        }
+                        $("#FCourseID").text(courselist);
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+            }
+        </script>
+    </body>
+</html>

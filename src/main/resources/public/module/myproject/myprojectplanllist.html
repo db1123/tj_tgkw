@@ -1,0 +1,376 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+        <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+        <!--_only 独立样式 -->
+        <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+        <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+        <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+        <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+        <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+        <!--/_only 独立样式 -->
+    </head>
+    <body>
+        <div class="page-container" style="padding: 2px;">
+            <div class="f-l text-l" id="newadd">
+                <button type="button" class="btn btn-default size-S my-btn" id="newbtn" onclick="Values(1)"><i
+                        class=" fa fa-user-plus"></i> 新增
+                </button>
+            </div>
+            <div class="f-r text-r">
+
+                <input type="text" class="input-text size-S form-text-FName" style="width:200px" placeholder="计划名称">
+
+                <button type="button" class="btn btn-default size-S my-btn btn-search-fun"><i class="Hui-iconfont">&#xe665;</i>
+                    搜索
+                </button>
+            </div>
+            <div class="f-l" style="width: 100%; margin-top: 3px;">
+                <table id="mainTable" class="display compact" style="width: 99.8%;"></table>
+            </div>
+        </div>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+        <script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+        <script src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+        <script type="text/javascript">
+            var id = getQueryStringByName('id'); // 项目ID
+            var xmname = parent.xmname; //项目名称
+            var planname;
+            var showtype = getQueryStringByName('showtype'); //显示类型 1=项目管理 2=项目执行 3=项目预警
+            var pfstate = -2;//项目状态
+            var FPSDate;
+            var FDQDate;
+            var FplanState;
+            var sum;
+            // 业务代码
+            $(function () {
+                // 封装表格
+                $('#mainTable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/projectPlan/queryprojectPlan', // 调用地址
+                        data: function (d) {
+                            return JSON.stringify($.extend({}, d, {
+                                page: d.start / d.length + 1, // 当前页
+                                results: d.length, // 每页显示条数
+                                name: $('.form-text-FName').val(),//计划名称
+                                id: id
+                            }));
+                        },
+                        dataSrc: function (json) {
+                            json.recordsFiltered = json.total;  // 总行数
+                            sum = json.total;
+                            json.recordsTotal = json.page; // 当前页数
+                            //pfstate = json.pfstate;
+                            return json.list;
+                        },
+                        error: function (xhr, status, error) {
+                            toastr.error(xhr);
+                        }
+                    },
+                    columns: [
+                        {title: '', data: 'no'},
+                        {title: '计划时间', data: 'PSPEDate'},
+                        {title: '计划名称', data: 'FName'},
+                        {title: '是否里程碑', data: 'FISMilepostName'},
+                        {title: '交付物', data: 'FNum'},
+                        {title: '负责人', data: 'FUserName'},
+                        {title: '状态', data: 'FStateName'},
+                        {title: '完成状态', data: 'FEndStateName'},
+                        {
+                            title: '设置',
+                            data: '',
+                            width: 90,
+                            orderable: false,
+                            render: function (data, type, row) {
+                                return '<button type="button" class="btn btn-default size-MINI" onclick="jiaofuwu(\'' + row.key + '\',\'' + row.FName + '\',\'' + row.fstate + '\')">交付物</button>';
+                                // if (row.FISSubData == 1)
+                                //     return '<button type="button" class="btn btn-default size-MINI" onclick="jiaofuwu(\'' + row.key + '\',\'' + row.FName + '\',\'' + row.fstate + '\')">交付物</button>';
+                                // else if (row.FISSubData == 0) {
+                                //     return '<button type="button" class="btn btn-default size-MINI disabled ">交付物</button>';
+                                // }
+                            }
+                        },
+                        {
+                            title: '完成情况',
+                            data: '',
+                            width: 90,
+                            orderable: false,
+                            render: function (data, type, row) {
+                                return '<button type="button" class="btn btn-default size-MINI" onclick="wancheng(\'' + row.key + '\',\'' + row.FName + '\')">完成情况</button>';
+                            }
+                        },
+                        {
+                            title: '操作',
+                            data: 'fstate',
+                            width: 150,
+                            orderable: false,
+                            render: function (data, type, row) {
+                                if (pfstate == 0) {
+                                    if (row.fstate == 0) {
+                                        return '<button type="button" class="btn btn-secondary size-MINI" onclick="Values(2,\'' + row.key + '\')"><i class="fas fa-edit"></i>编辑</button>' +
+                                            '<button type="button" class="btn btn-danger size-MINI" onclick="onClickBtnDel(\'' + row.key + '\',\'' + row.FName + '\')"><i class="fas fa-trash"></i>删除</button>';
+                                    }else{
+                                        return '<button type="button" class="btn btn-secondary size-MINI disabled" ><i class="fas fa-edit"></i>编辑</button>' +
+                                            '<button type="button" class="btn btn-danger size-MINI disabled"><i class="fas fa-trash"></i>删除</button>';
+                                    }
+                                } else {
+                                    if (showtype == 1) {
+                                        // return '<button type="button" class="btn btn-secondary size-MINI disabled " ><i class="fas fa-edit"></i>编辑</button>' +
+                                        //     '<button type="button" class="btn btn-danger size-MINI disabled " ><i class="fas fa-trash"></i>删除</button>';
+                                        if (row.fstate == 0) {
+                                            return '<button type="button" class="btn btn-secondary size-MINI" onclick="Values(2,\'' + row.key + '\')"><i class="fas fa-edit"></i>编辑</button>' +
+                                                '<button type="button" class="btn btn-danger size-MINI" onclick="onClickBtnDel(\'' + row.key + '\',\'' + row.FName + '\')"><i class="fas fa-trash"></i>删除</button>';
+                                        }else{
+                                            return '<button type="button" class="btn btn-secondary size-MINI disabled" ><i class="fas fa-edit"></i>编辑</button>' +
+                                                '<button type="button" class="btn btn-danger size-MINI disabled"><i class="fas fa-trash"></i>删除</button>';
+                                        }
+                                    } else if (showtype == 2 || showtype ==3 ) {
+                                        if (row.fstate == 0) {
+                                            return '<button type="button" class="btn btn-default size-MINI " onclick="kaishiplan(\'' + row.key + '\')" >开始计划</button>&nbsp;'+
+                                                    '<button type="button" class="btn btn-default size-MINI " onclick="biangengdate(\'' + row.key + '\',\'' + row.FPSDate + '\',\'' + row.PSPEDate + '\',\'' + row.fstate + '\')" >变更计划时间</button>&nbsp;';
+                                        } else if (row.fstate == 1) {
+                                            return '<button type="button" class="btn btn-default size-MINI " onclick="wanchengplan(\'' + row.key + '\')" >完成计划</button>&nbsp;' +
+                                                   '<button type="button" class="btn btn-default size-MINI " onclick="biangengdate(\'' + row.key + '\',\'' + row.FPSDate + '\',\'' + row.PSPEDate + '\',\'' + row.fstate + '\')" >变更计划时间</button>&nbsp;';
+                                        } else if (row.fstate == 2) {
+                                            return '<button type="button" class="btn btn-default size-MINI disabled " >已完成</button>';
+                                        }
+                                    }else{
+                                        if (row.fstate == 0) {
+                                            return '<button type="button" class="btn btn-default size-MINI disabled"   >开始计划</button>';
+                                        } else if (row.fstate == 1) {
+                                            return '<button type="button" class="btn btn-default size-MINI disabled"   >完成计划</button>';
+                                        } else if (row.fstate == 2) {
+                                            return '<button type="button" class="btn btn-default size-MINI disabled " >已完成</button>';
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+                    ],
+                    scrollY: (document.body.clientHeight - 100) + 'px',
+                    scrollX: true,
+                    paging: true, // 是否开启本地分页
+                    pageLength: 15, // 改变初始化页长度（每页多少条数据）
+                    pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+                    lengthChange: false, // 是否允许因子改变表格每页显示的记录数
+                    searching: false, // 是否允许Datatables开启本地搜索
+                    ordering: true, // 是否允许Datatables开启排序
+                    info: true, // 控制是否显示表格左下角的信息
+                    language: DataTablesLanguage
+                });
+
+                //获取项目状态
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    url: '/s/myproject/getmyprojectstate', // 调用地址
+                    data: JSON.stringify({
+                        id:id
+                    }),
+                    async: false,
+                    success: function (data) {
+                        pfstate = data.pfstate;
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+
+                if(showtype==1){
+                    $("#newadd").attr("style", "display:block;"); //显示
+                    if(pfstate < 2){
+                        $("#newbtn").removeClass('disabled'); //移除多个样式
+                    }else{
+                        $('#newbtn').addClass('btn btn-default size-S my-btn disabled'); //追加多个样式
+                    }
+                }else if(showtype==2){
+                    $("#newadd").attr("style", "display:none;"); //隐藏
+                }else{
+                    $("#newadd").attr("style", "display:none;"); //隐藏
+                }
+
+                // 查询按钮点击事件
+                $('.btn-search-fun').on('click', function () {
+                    $('#mainTable').DataTable().ajax.reload(null, false);
+                });
+
+            });
+
+
+            // 新增或者修改点击事件
+            function Values(op, fKey) {
+
+                if (op == 1) { // 新增
+                    parent.layer.open({
+                        type: 2,
+                        area: ['800px', '400px'],
+                        fix: false, //不固定
+                        shade: 0.4,
+                        title: '新增计划信息',
+                        content: 'myprojectplanledit.html?op=1&FProjectID=' + id
+                        , end: function () {
+                            innsetend();
+                        }
+                    });
+                    //layer_show('新增计划信息', 'myprojectplanledit.html?op=1', '800', '400');
+                } else { // 修改
+                    parent.layer.open({
+                        type: 2,
+                        area: ['800px', '400px'],
+                        fix: false, //不固定
+                        shade: 0.4,
+                        title: '修改计划信息',
+                        content: 'myprojectplanledit.html?op=2&FProjectID=' + id + '&id=' + fKey
+                        , end: function () {
+                            updateend();
+                        }
+                    });
+                    //layer_show('修改计划信息', 'myprojectplanledit.html?op=2&id=' + fKey+'&', '800', '400');
+                }
+            }
+
+            function innsetend() {
+                $('#mainTable').DataTable().ajax.reload(null, false);
+
+            }
+
+            function updateend() {
+                $('#mainTable').DataTable().ajax.reload(null, false);
+
+            }
+
+            // 删除按钮点击事件
+            function onClickBtnDel(id, name) {
+                layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function (index) {
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json;charset=UTF-8',
+                        url: '/s/projectPlan/delprojectPlan',
+                        data: JSON.stringify({
+                            id: id
+                        }),
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                $('#mainTable').DataTable().ajax.reload(null, false);
+                                toastr.success('删除成功！');
+                                layer.close(layer.index);
+                            }
+                            if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                });
+            }
+
+            function jiaofuwu(fkey, name,planstate) {
+                planname = name;
+                parent.layer.open({
+                    type: 2,
+                    area: ['900px', '500px'],
+                    fix: false, //不固定
+                    shade: 0.4,
+                    title: '设置交付物',
+                    content: 'myprojectplansub.html?id=' + fkey + '&FProjectID=' + id + '&pfstate=' + pfstate+'&planstate='+planstate+'&showtype='+showtype
+                    , end: function () {
+                        updateend();
+                    }
+                });
+                //layer_show('设置交付物', 'myprojectplansub.html?id=' + fkey + '&FProjectID=' + id + '&pfstate=' + pfstate+'&planstate='+planstate+'&showtype='+showtype, '900', '500');
+            }
+
+            function wancheng(fkey, name) {
+                planname = name;
+                layer_show('计划完成情况', 'myprojectplanfinish.html?id=' + fkey + '&FProjectID=' + id, '900', '500');
+            }
+
+            function kaishiplan(fkeyid) {
+                layer.confirm('<b>' + name + '</b><br />确定要开始计划吗?', function (index) {
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json;charset=UTF-8',
+                        url: '/s/projectPlan/kaishiprojectPlan',
+                        data: JSON.stringify({
+                            id: fkeyid,
+                            FProjectID:id
+                        }),
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                $('#mainTable').DataTable().ajax.reload(null, false);
+                                toastr.success('计划开始成功！');
+                                layer.close(layer.index);
+                            }
+                            if (data.result == 'error') {
+                                toastr.error(data.error);
+                                layer.close(layer.index);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                });
+            }
+
+            function wanchengplan(fkeyid) {
+                layer.confirm('<b>' + name + '</b><br />确定要完成计划吗?', function (index) {
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json;charset=UTF-8',
+                        url: '/s/projectPlan/wanchengprojectPlan',
+                        data: JSON.stringify({
+                            id: fkeyid,
+                            FProjectID:id
+                        }),
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                $('#mainTable').DataTable().ajax.reload(null, false);
+                                toastr.success('完成计划成功！');
+                                layer.close(layer.index);
+                            }
+                            if (data.result == 'error') {
+                                toastr.error(data.error);
+                                layer.close(layer.index);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                });
+            }
+
+            function biangengdate(fkeyid,FPSDates,FDQDates,FplanStates) {
+                FPSDate = FPSDates;
+                FDQDate = FDQDates;
+                FplanState = FplanStates;
+                layer_show('变更计划时间', 'myprojectplanbgdate.html?FProjectPlanID=' + fkeyid + '&FProjectID=' + id +'&op=1', '800', '300');
+            }
+        </script>
+    </body>
+</html>

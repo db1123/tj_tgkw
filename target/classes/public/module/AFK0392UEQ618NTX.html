@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<body style="margin: 0; padding: 0;">
+<link rel="stylesheet" type="text/css" href="/plugins/toastr/toastr.min.css" />
+<!-- 功能代码 开始 -->
+<script type="text/javascript" src="/nui-ad/lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="/plugins/toastr/toastr.min.js"></script>
+<script type="text/javascript" src="/javascript/tools.js"></script>
+<script type="text/javascript">
+  // 单点登录
+  $.ajax({
+    type: 'POST',
+    contentType: 'application/json',
+    url: '/s/entry/singleSignOn', // 调用地址
+    data: JSON.stringify({
+      login: getQueryStringByName('l'),
+      pass: getQueryStringByName('p')
+    }),
+    async: false,
+    success : function(data) {
+      if (data.result == "success") {
+        localStorage.setItem('simulation_dmsnid', data.simulation_dmsnid);
+        // 加载功能页
+        window.location.href = getQueryStringByName('url');
+        // if (getQueryStringByName('type') == 1) {
+        //   //$('#mainIframe').attr('src',getQueryStringByName('url'));
+        //   window.location.href = getQueryStringByName('url');
+        // } else {
+        //   switch (parseInt(getQueryStringByName('ut'))) {
+        //     case 1: // 关键数据源与感知方法 参数源管理
+        //       $('#mainIframe').attr('src','/floweditor/index.html?lang=zh&sidebar-entries=large&tv=edit');
+        //       break;
+          
+        //     case 2: // 功能设置 功能类型管理
+        //       $('#mainIframe').attr('src','/module/network/funcunittypelist.html?lang=zh&sidebar-entries=large');
+        //       break;
+          
+        //     case 3: // 功能设置 功能单元维护
+        //       $('#mainIframe').attr('src','/module/network/funcunitlist.html?lang=zh&sidebar-entries=large');
+        //       break;
+              
+        //     case 4: // 功能设置 功能维护
+        //       $('#mainIframe').attr('src','/module/network/functionmlist.html?lang=zh&sidebar-entries=large');
+        //       break;
+
+        //     case 5: // 关系设置 关系设置
+        //       $('#mainIframe').attr('src','/module/network/relationlist.html?lang=zh&sidebar-entries=large');
+        //       break;
+
+        //     case 6: // 关系设置 关系查询
+        //       $('#mainIframe').attr('src','/module/network/relationselectlist.html?lang=zh&sidebar-entries=large');
+        //       break;
+
+        //     case 7: // 执行目标设置 独立管控目标
+        //       $('#mainIframe').attr('src','/module/elemantary/factorlist.html?lang=zh&sidebar-entries=large');
+        //       break;
+
+        //     case 8: // 执行目标设置 合成管控目标
+        //       $('#mainIframe').attr('src','/module/elemantary/dimensionlist.html?lang=zh&sidebar-entries=large');
+        //       break;
+
+        //     case 9: // 执行方案设置 评价方案管理
+        //       $('#mainIframe').attr('src','/module/elemantary/struc_ztreelist.html?lang=zh&sidebar-entries=large');
+        //       break;
+
+        //     case 10: // 执行方案设置 项目方案管理
+        //       $('#mainIframe').attr('src','/module/elemantary/projectstruclist.html?lang=zh&sidebar-entries=large');
+        //       break;
+
+        //     case 11: // 执行方案设置 管控权重计算
+        //       $('#mainIframe').attr('src','/module/elemantary/projectstrucweightlist.html?lang=zh&sidebar-entries=large');
+        //       break;
+
+        //     case 12: // 执行方案设置 管控目标动态实时评价
+        //       $('#mainIframe').attr('src','/module/elemantary/projectstrucgllist.html?lang=zh&sidebar-entries=large');
+        //       break;
+
+        //     case 13: // 执行方案设置 评价结果及可视化
+        //       $('#mainIframe').attr('src','/module/elemantary/projectstrucresultlist.html?lang=zh&sidebar-entries=large');
+        //       break;
+
+        //     default:
+        //       break;
+        //   }
+        // }
+      } else {
+        toastr.error(data.result);
+      }
+    },
+    error : function(e) {
+      toastr.error(e.status);
+      toastr.error(e.responseText);
+    }
+  });
+</script>
+<!-- 功能代码 结束 -->
+</body>
+</html>

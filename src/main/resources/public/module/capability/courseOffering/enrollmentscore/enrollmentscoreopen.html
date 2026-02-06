@@ -1,0 +1,424 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+    <!--/_only 独立样式 -->
+</head>
+<style type="text/css">
+    .open-work-control2 {
+        cursor: pointer;
+    }
+</style>
+<body>
+<div class="page-container" style="padding: 2px;">
+    <div class="f-l " style="width: 98.8%; padding-top: 1px;">
+        <div class="row cl">
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-header">查询条件</div>
+                    <div class="panel-body">
+                        <form action="" method="post" class="form form-horizontal" id="selectForm"
+                              style="height: 79vh;">
+                            <div class="row cl">
+                                <div class="formControls col-xs-12 col-sm-12">
+                                    <button type="button" class="btn btn-default size-S my-btn btn-search-fun">
+                                        <i class="fa fa-search"></i> 查询
+                                    </button>
+                                    <button type="button" class="btn btn-default size-S my-btn btn-search-fz"><i
+                                            class="fa fa-reply"></i> 重置
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row cl">
+                                <label class="form-label col-xs-4 col-sm-4">课程编号：</label>
+                                <div class="formControls col-xs-8 col-sm-8">
+                                    <input type="text" class="input-text size-S form-text-FNo" style="width:10vw" placeholder="课程编号">
+                                </div>
+                            </div>
+                            <div class="row cl">
+                                <label class="form-label col-xs-4 col-sm-4">课程名称：</label>
+                                <div class="formControls col-xs-8 col-sm-8">
+                                    <input type="text" class="input-text size-S form-text-FName" style="width:10vw" placeholder="课程名称">
+                                </div>
+                            </div>
+                            <div class="row cl">
+                                <label class="form-label col-xs-4 col-sm-4">课程类别：</label>
+                                <div class="formControls col-xs-8 col-sm-8">
+                                    <select class="course-form-select-type" id="course-form-select-type" style="width:10vw"></select>
+                                </div>
+                            </div>
+
+                            <div class="row cl">
+                                <label class="form-label col-xs-4 col-sm-4">课程性质：</label>
+                                <div class="formControls col-xs-8 col-sm-8">
+                                    <select class="course-form-select-nature" id="course-form-select-nature" style="width:10vw"></select>
+                                </div>
+                            </div>
+
+                            <div class="row cl">
+                                <label class="form-label col-xs-4 col-sm-4">学生学号：</label>
+                                <div class="formControls col-xs-8 col-sm-8">
+                                    <input type="text" class="input-text size-S form-text-xFNo" style="width:10vw" placeholder="学生学号">
+                                </div>
+                            </div>
+
+                            <div class="row cl">
+                                <label class="form-label col-xs-4 col-sm-4">学生姓名：</label>
+                                <div class="formControls col-xs-8 col-sm-8">
+                                    <input type="text" class="input-text size-S form-text-xFName" style="width:10vw" placeholder="学生姓名">
+                                </div>
+                            </div>
+
+                            <div class="row cl">
+                                <label class="form-label col-xs-4 col-sm-4">学生电话：</label>
+                                <div class="formControls col-xs-8 col-sm-8">
+                                    <input type="text" class="input-text size-S form-text-FTel" style="width:10vw" placeholder="学生电话">
+                                </div>
+                            </div>
+
+                            <div class="row cl">
+                                <label class="form-label col-xs-4 col-sm-4">学生性别：</label>
+                                <div class="formControls col-xs-8 col-sm-8">
+                                    <select class="course-form-select-sex" style="width:10vw">
+                                        <option value="-1">全部</option>
+                                        <option value="0">男</option>
+                                        <option value="1">女</option>
+                                    </select>
+                                </div>
+                            </div>
+
+
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="panel panel-default">
+                    <div class="panel-header">查询结果</div>
+                    <div class="panel-body">
+                        <form action="" method="post" class="form form-horizontal">
+                            <div class="row">
+                                <table id="mainTablelist" class="display compact" style="width: 100%;">
+                                    <thead>
+                                    <th></th>
+                                    <th>培养方案</th>
+                                    <th>课程编号</th>
+                                    <th>课程名称</th>
+                                    <th>英文名称</th>
+                                    <th>课程类别</th>
+                                    <th>课程性质</th>
+                                    <th>课程版本</th>
+                                    <th>学生学号</th>
+                                    <th>学生姓名</th>
+                                    <th>性别</th>
+                                    <th>电话</th>
+                                    <th>所在班级</th>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-12" style="border-bottom: 1px solid #cfcfcf;top: 8px; ">
+                            </div>
+                            <div class="row" style="top: 10px;">
+                                <div class="formControls col-xs-8 col-sm-12"
+                                     style="padding-left: 35%; padding-top: 2%;">
+                                    <input class="btn btn-primary radius mr-20" type="button"
+                                           onclick="queding()" value="&nbsp;&nbsp;确定&nbsp;&nbsp;"/>
+                                    <input class="btn btn-default radius ml-20" type="button"
+                                           value="&nbsp;&nbsp;取消&nbsp;&nbsp;" onclick="layer_close()"/>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script type="text/javascript">
+    var funcname;
+    var fmid = 0;
+    var fno = "";
+    var op = getQueryStringByName('op');
+    var ftype = 2;
+
+    var paramlist = [];
+
+    var treetype = -1;
+    let remarkShowLength = 15;
+
+    var selectedIds2 = getQueryStringByName('selectedIds');//已选课程ID
+    var selectedNames2 = getQueryStringByName('selectedNames');//已选课程名称
+    let selectedIds = [];
+    let selectedNames = [];
+    // 业务代码
+    $(function () {
+
+        $(".course-form-select-sex").select2({
+            placeholder: '请选择性别',
+            language: "zh-CN"
+        });
+
+        //课程类别
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/coursecategory/querycourseCategoryALL', // 调用地址
+            async: false,
+            success: function (data) {
+                var newObj2 = Object.assign([], data.zNodes);
+                newObj2.push({id: 1, pId: 0, name: '全部', showname: '全部', open: true});
+                $('.course-form-select-type').select2ztree({
+                    textField: 'showname',
+                    titleField: 'name',
+                    placeholder: '请选择课程类别',
+                    ztree: {
+                        setting: {
+                            view: {
+                                dblClickExpand: false
+                            },
+                            data: {
+                                simpleData: {
+                                    enable: true,
+                                    idKey: "id",
+                                    pIdKey: "pId",
+                                    rootPId: 0
+                                }
+                            }
+                        },
+                        zNodes: newObj2
+                    },
+                    language: "zh-CN"
+                });
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+        //课程性质
+        var natrueselect = $(".course-form-select-nature").select2({
+            placeholder: '请选择课程性质',
+            ajax: {
+                type: 'POST',
+                url: "/s/coursenature/queryDatacoursenatureSelect",
+                dataType: 'json',
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        ftype: 2
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.list
+                    };
+                },
+                delay: 800,
+                cache: true
+            },
+            language: "zh-CN"
+        });
+        var option = new Option("全部", "EBCA805FCF2DB7A2835690143664B03C", true, true);
+        natrueselect.append(option);
+        natrueselect.change();
+
+        if (selectedIds2) {
+            selectedIds = selectedIds2.split(',');
+            // console.log("openselectedIds:" + selectedIds);
+        }
+
+        if (selectedNames2) {
+            selectedNames = selectedNames2.split(',');
+            // console.log("openselectedNames:" + selectedNames);
+        }
+
+
+        var mainTablelist = $('#mainTablelist').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/courseenrollment/querycourseenrollment', // 调用地址
+                data: function (d) {
+                    return JSON.stringify($.extend({}, d, {
+                        page: d.start / d.length + 1, // 当前页
+                        results: d.length, // 每页显示条数
+                        courseno: $('.form-text-FNo').val(),//课程编号
+                        coursename: $('.form-text-FName').val(),//课程名称
+                        studentname: $('.form-text-xFName').val(),//学生名称
+                        studentno: $('.form-text-xFNo').val(),//学生名称
+                        ftel: $('.form-text-FTel').val(),// 联系电话
+                        FLTypeID: $(".course-form-select-type").val(),//课程类别
+                        FNatureID: $(".course-form-select-nature").val(),//课程性质
+                        FSex: $(".course-form-select-sex").val(),//性别
+                        fipass: -1,
+                        dataall: 1
+                    }));
+                },
+                dataSrc: function (json) {
+                    json.recordsFiltered = json.total;  // 总行数
+                    json.recordsTotal = json.page; // 当前页数
+                    return json.list;
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+            },
+            columns: [
+
+                {
+                    data: null, class: 'open-work-control2',
+                    render: function (data, type, row) {
+                        return '<input type="radio" name="studentRadio" class="row-radio open-work-control2" id="r' + row.key + '" value="' + row.key + '">';
+                    },
+                    orderable: false,
+                    searchable: false
+                },
+                {title: '培养方案', data: 'FCOID', class: 'open-work-control2',
+                    render: function (data, type, row) {
+                        return row.FCOName;
+                    }},
+                {title: '课程编号', data: 'FCourseNo', class: 'open-work-control2'},
+                {title: '课程名称', data: 'FCourseName', class: 'open-work-control2'},
+                {title: '英文名称', data: 'FYWName', class: 'open-work-control2'},
+                {
+                    title: '课程类别', data: 'tc.FType', class: 'open-work-control2',
+                    render: function (data, type, row) {
+                        return row.FTypeName;
+                    }
+                },
+                {
+                    title: '课程性质', data: 'FCNature', class: 'open-work-control2',
+                    render: function (data, type, row) {
+                        return row.FCNatureName;
+                    }
+                },
+                {
+                    title: '课程版本', data: 'tc.FEdition', class: 'open-work-control2',
+                    render: function (data, type, row) {
+                        return '<span class="badge badge-secondary  radius">' + row.FEdition + '</span>'
+                    }
+                },
+                {title: '学生学号', data: 'FStudentNo', class: 'open-work-control2'},
+                {title: '学生姓名', data: 'FStudentName', class: 'open-work-control2'},
+                {
+                    title: '性别', data: 'FStudentSex', class: 'open-work-control2',
+                    render: function (data, type, row) {
+                        if (data == 0)
+                            return "男";
+                        else if (data == 1) {
+                            return "女";
+                        } else {
+                            return "未选择";
+                        }
+                    }
+                },
+                {title: '电话', data: 'FTel', class: 'open-work-control2'},
+                {title: '所在班级', data: 'FStudentNo', class: 'open-work-control2',
+                    render: function (data, type, row) {
+                        return row.FClassName;
+                    }}, //FClassName
+            ],
+            // 分页事件处理
+            drawCallback: function () {
+                mainTablelist.rows({page: 'current'}).nodes().each(function (row) {
+                    var data = mainTablelist.row(row).data();
+                    var radio = $(row).find('.row-radio');
+                    radio.prop('checked', selectedIds.includes(data.key));
+                });
+            },
+            scrollY: (document.body.clientHeight - 250) + 'px',
+            scrollX: true,
+            paging: true, // 是否开启本地分页
+            pageLength: 10, // 改变初始化页长度（每页多少条数据）
+            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+            lengthChange: false, // 是否允许维度改变表格每页显示的记录数
+            searching: false, // 是否允许Datatables开启本地搜索
+            ordering: true, // 是否允许Datatables开启排序
+            info: true, // 控制是否显示表格左下角的信息
+            // order: [[1, 'desc'], [3, 'desc']],
+            language: DataTablesLanguage
+        });
+        // mainTablelist.column(1).visible(false);
+        // 单选按钮事件处理
+        $('#mainTablelist tbody').on('click', 'tr td.open-work-control2', function () {
+            var row = $(this).closest('tr');
+            var data = mainTablelist.row(row).data();
+            selectedIds = [data.key];
+            var name = data.FCourseNo+"/" + data.FCourseName +"," + data.FStudentNo +"/" + data.FStudentName;
+            selectedNames = [name];
+            if (!$("#r" + data.key).prop('checked')) {
+                $("#r" + data.key).prop('checked', true);//全选
+            }
+        });
+        // 查询按钮点击事件
+        $('.btn-search-fun').on('click', function () {
+            $('#mainTablelist').DataTable().ajax.reload(null, false);
+        });
+
+        // 重置按钮点击事件
+        $('.btn-search-fz').on('click', function () {
+            reset_data("selectForm");
+
+        });
+
+
+    });
+
+    // 清空表单
+    function reset_data(formId) {
+        // 重置下拉列表
+        $('#' + formId + ' select').val(null).trigger('change');
+        $(':input', '#' + formId)
+            .not(':button', ':reset', ':hidden', ':submit')
+            .val('')
+            .removeAttr('checked')
+            .removeAttr('selected');
+
+        $('#mainTablelist').DataTable().ajax.reload(null, false);
+    }
+
+    //点击确定事件
+    function queding() {
+        if (selectedIds.length > 0) {
+            //回传
+            // console.log(selectedIds);
+            top.classstudentpage.getCourseAbilityID(selectedIds, selectedNames);
+            layer_close();
+        } else {
+            selectedIds = [];
+            selectedNames = [];
+            top.classstudentpage.getCourseAbilityID(selectedIds, selectedNames);
+            layer_close();
+            // toastr.error("请至少选择一位学生进行添加！");
+        }
+
+    }
+</script>
+</body>
+</html>

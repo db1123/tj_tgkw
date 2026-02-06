@@ -1,0 +1,493 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+        <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+        <!--/_only 独立样式 -->
+
+    </head>
+    <body>
+        <div class="page-container" style="padding: 2px;">
+            <div class="f-l text-l" id="btnlist">
+                <!--        <button type="button" class="btn btn-secondary-outline radius" id="liuchengtulist" onclick="liuchengtu()">-->
+                <!--            流程图视图-->
+                <!--        </button>-->
+                <!--                <button type="button" class="btn btn-secondary-outline radius" id="liebiao" onclick="liebiao()">-->
+                <!--                    列表视图-->
+                <!--                </button>-->
+
+                <button type="button" class="btn btn-default size-S my-btn" id="xuanzegz" onclick="xuanze()">选择工作流
+                </button>
+                <button type="button" class="btn btn-default size-S my-btn" id="savegz" onclick="save(1)">保存节点信息
+                </button>
+                <button type="button" class="btn btn-default size-S my-btn" id="qidonggz" onclick="qidong()">启动工作流
+                </button>
+            </div>
+            <div class="f-l text-l" style="margin-left: 5px;">
+                <button type="button" class="btn btn-default size-S my-btn" id="zhongzhilc" onclick="zzlc()">终止流程
+                </button>
+            </div>
+            <div class="f-l text-l">
+                <strong>当前工作流状态：<strong id="fstatename"></strong></strong>
+            </div>
+            <!--    <div class="f-r text-r">-->
+            <!--        <button type="button" class="btn btn-default size-S my-btn" onclick="xuanze()">选择工作流</button>-->
+            <!--    </div>-->
+            <div class="f-l" style="width: 100%; margin-top: 3px;">
+                <div id="iframediv">
+                    <iframe width="100%;" height="100%;" frameborder="0" id="flow"></iframe>
+                </div>
+            </div>
+
+        </div>
+
+        <script type="text/javascript">
+            var id = getQueryStringByName('id'); //项目ID
+            var xmname = parent.xmname;
+            var flowid = '';
+            var showtype = getQueryStringByName('showtype'); //显示类型 1=项目管理 2=项目执行 3=项目预警 4=项目检索
+            var projectflowid = '';//项目工作流ID
+            var FXML;
+            var my_frame2;
+            var frole = 0;
+            var v_text = "";
+
+            var pfstate=-1;
+            // 业务代码
+            $(function () {
+
+                if (document.body.clientHeight > 600) {
+                    $('#iframediv').height(document.body.clientHeight - 50);
+                } else {
+                    $('#iframediv').height(document.body.clientHeight - 80);
+                }
+                //
+                if (showtype == 1) {
+                    // $("#xuanzegz").attr("style", "display:block;"); //显示
+                    // $("#savegz").attr("style", "display:block;"); //显示
+                    // $("#qidonggz").attr("style", "display:block;"); //显示
+                    $("#btnlist").attr("style", "display:block;"); //显示
+                } else {
+                    // $("#xuanzegz").attr("style", "display:none;");  //隐藏
+                    // $("#savegz").attr("style", "display:none;");  //隐藏
+                    // $("#qidonggz").attr("style", "display:none;");  //隐藏
+                    $("#btnlist").attr("style", "display:none;"); //隐藏
+                }
+                liuchengtu();
+
+                //获取项目状态
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    url: '/s/myproject/getmyprojectstate', // 调用地址
+                    data: JSON.stringify({
+                        id:id
+                    }),
+                    async: false,
+                    success: function (data) {
+                        pfstate = data.pfstate;
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+            });
+
+            function getdata() {
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    url: '/s/myprojectflows/querymyprojectflowsidInfo', // 调用地址
+                    data: JSON.stringify({
+                        id: id
+                    }),
+                    async: false,
+                    success: function (data) {
+                        flowid = data.info.FFlowID;
+                        projectflowid = data.info.key;
+                        frole = data.info.frole;
+                        if (data.info.FState == 0) {
+                            v_text = '&tv=outside-basic-edit-attribute';
+                            $('#savegz').removeClass('disabled'); //移除多个样式
+                            $('#xuanzegz').removeClass('disabled'); //移除多个样式
+                            $('#qidonggz').removeClass('disabled'); //移除多个样式　
+                            $('#zhongzhilc').addClass('btn btn-default size-S my-btn disabled'); //追加多个样式
+                        }else if(data.info.FState == 3){
+                            v_text = '&tv=view-basic';
+                            $('#zhongzhilc').addClass('btn btn-default size-S my-btn disabled'); //追加多个样式
+                            $('#xuanzegz').addClass('btn btn-default size-S my-btn disabled'); //追加多个样式
+                            $('#savegz').addClass('btn btn-default size-S my-btn disabled'); //追加多个样式
+                            $('#qidonggz').addClass('btn btn-default size-S my-btn disabled'); //追加多个样式
+                        }
+                        else {
+                            v_text = '&tv=view-basic';
+                            $('#xuanzegz').addClass('btn btn-default size-S my-btn disabled'); //追加多个样式
+                            $('#savegz').addClass('btn btn-default size-S my-btn disabled'); //追加多个样式
+                            $('#qidonggz').addClass('btn btn-default size-S my-btn disabled'); //追加多个样式
+                            $('#zhongzhilc').removeClass('disabled'); //移除多个样式　
+                        }
+                        if (frole == 1) {
+                            $("#zhongzhilc").attr("style", "display:block;"); //显示
+                        } else {
+                            $("#zhongzhilc").attr("style", "display:none;"); //隐藏
+                        }
+                        $("#fstatename").text(data.info.FStateName);
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+            }
+
+
+            function liuchengtu() {
+                // $("#liuchengtulist").css("background", "#3BB4F2");
+                // $("#liuchengtulist").css("color", "#FFFFFF");
+                // $("#liebiao").css("color", "#3BB4F2");
+                // $("#liebiao").css("background", "#FFFFFF");
+                getdata();
+                if (flowid == '') {
+                    $('#flow').attr('src', '/floweditor/index.html?lang=zh&sidebar-entries=large' + v_text);
+                } else {
+                    $('#flow').attr('src', '/floweditor/index.html?lang=zh&sidebar-entries=large' + v_text);
+                    iframeloadevent();
+                }
+            }
+
+            function iframeloadevent() {
+                var my_frame = document.getElementById("flow");
+                my_frame2 = document.getElementById("flow");
+                if (my_frame) {
+                    if (my_frame.attachEvent) {
+                        my_frame.onreadystatechange = function () {
+                            if (this.readyState == "complete") {
+                                console.log("iframe已加载完成1");
+                                $('body').mLoading('show');
+                                setTimeout(function () {
+                                    $('.mloading-text').html('工作流加载中...');
+                                    $.ajax({
+                                        type: 'POST',
+                                        contentType: 'application/json',
+                                        url: '/s/myprojectflows/querymyprojectflowsidInfo', // 调用地址
+                                        data: JSON.stringify({
+                                            id: id
+                                        }),
+                                        async: false,
+                                        success: function (data) {
+                                            setTimeout(function () {
+                                                $('.mloading-text').html('工作流加载完成...');
+                                                setTimeout(function () {
+                                                    my_frame.contentWindow.openFlowXml(data.info.FXml);
+                                                    $('body').mLoading('hide');
+                                                }, 1000);
+                                            }, 1000);
+                                            // $('body').mLoading('hide');
+                                        },
+                                        error: function (e) {
+                                            toastr.error(e.status);
+                                            toastr.error(e.responseText);
+                                        }
+                                    });
+                                }, 1000);
+                            }
+                        }
+                    } else {
+                        my_frame.onload = function () {
+                            console.log("iframe已加载完成2");
+                            $('body').mLoading('show');
+                            setTimeout(function () {
+                                $('.mloading-text').html('工作流加载中...');
+                                $.ajax({
+                                    type: 'POST',
+                                    contentType: 'application/json',
+                                    url: '/s/myprojectflows/querymyprojectflowsidInfo', // 调用地址
+                                    data: JSON.stringify({
+                                        id: id
+                                    }),
+                                    async: false,
+                                    success: function (data) {
+                                        setTimeout(function () {
+                                            $('.mloading-text').html('工作流加载完成...');
+                                            setTimeout(function () {
+                                                my_frame.contentWindow.openFlowXml(data.info.FXml);
+                                                $('body').mLoading('hide');
+                                            }, 1000);
+                                        }, 1000);
+                                        // $('body').mLoading('hide');
+                                    },
+                                    error: function (e) {
+                                        toastr.error(e.status);
+                                        toastr.error(e.responseText);
+                                    }
+                                });
+                            }, 1000);
+                            // $.ajax({
+                            //     type: 'POST',
+                            //     contentType: 'application/json',
+                            //     url: '/s/myprojectflows/querymyprojectflowsidInfo', // 调用地址
+                            //     data: JSON.stringify({
+                            //         id: id
+                            //     }),
+                            //     async: false,
+                            //     success: function (data) {
+                            //         my_frame.contentWindow.openFlowXml(data.info.FXml);
+                            //     },
+                            //     error: function (e) {
+                            //         toastr.error(e.status);
+                            //         toastr.error(e.responseText);
+                            //     }
+                            // });
+                        }
+                    }
+                }
+            }
+
+            function iframeloadevent_s(xml, flowsid, projectflowids) {
+                $('#flow').attr('src', '/floweditor/index.html?lang=zh&sidebar-entries=large&tv=outside-basic-edit-attribute');
+                flowid = flowsid;
+                projectflowid = projectflowids;
+                var my_frame = document.getElementById("flow");
+                my_frame2 = document.getElementById("flow");
+                if (my_frame) {
+                    if (my_frame.attachEvent) {
+                        my_frame.onreadystatechange = function () {
+                            if (this.readyState == "complete") {
+                                console.log("iframe已加载完成1");
+                            }
+                        }
+                    } else {
+                        my_frame.onload = function () {
+                            console.log("iframe已加载完成2");
+                            $('body').mLoading('show');
+                            setTimeout(function () {
+                                $('.mloading-text').html('工作流加载中...');
+                                setTimeout(function () {
+                                    $('.mloading-text').html('工作流加载完成...');
+                                    setTimeout(function () {
+                                        my_frame.contentWindow.openFlowXml(xml);
+                                        $('body').mLoading('hide');
+                                    }, 1000);
+                                }, 1000);
+                            }, 1000);
+
+                        }
+                    }
+                }
+            }
+
+            function liebiao() {
+                // $("#liebiao").css("background", "#3BB4F2");
+                // $("#liebiao").css("color", "#FFFFFF");
+                // $("#liuchengtulist").css("color", "#3BB4F2");
+                // $("#liuchengtulist").css("background", "#FFFFFF");
+                // $('#flow').attr('src', 'myprojectflowliebiao.html?id=' + id);
+            }
+
+            function xuanze() {
+                if (flowid == '') {
+                    layer_show('选择流程', 'myprojectflowedit.html?op=1&FProjectID=' + id, '', '');
+                } else {
+                    layer_show('选择流程', 'myprojectflowedit.html?op=2&FProjectID=' + id, '', '');
+                }
+            }
+
+            function save(type) {
+
+
+                //获取xml 修改当前工作流FXML字段 、
+                var xml;
+                // 逐级保存修改内容
+                $('#flow')[0].contentWindow.savaParent();
+                // 获取顶级流程图xml字符串
+                if ($('#flow')[0].contentWindow.saveXMLArray.length > 0) {
+                    xml = $('#flow')[0].contentWindow.saveXMLArray[0].xml;
+                } else {
+                    xml = $('#flow')[0].contentWindow.getFlowStr().xml;
+                }
+                if (type == 1) {
+                    if (flowid == '') {
+                        toastr.error("请先选择工作流，再进行保存！");
+                        return;
+                    }
+
+                    var checkFLowAllStartEndTime = $('#flow')[0].contentWindow.checkFLowAllStartEndTime();
+
+                    var checkFLowAllLeader = $('#flow')[0].contentWindow.checkFLowAllLeader();
+
+                    if (checkFLowAllStartEndTime == false) {
+                        //toastr.error("请设置节点上的时间");
+                        return;
+                    }
+                    if (checkFLowAllLeader == false) {
+                        //toastr.error("请设置节点上的团队成员");
+                        return;
+                    }
+                }
+                var nowFlowSaveOp = $('#flow')[0].contentWindow.nowFlowSaveOp;
+                if (nowFlowSaveOp == 0) {
+                    if (type == 1) {
+                        toastr.warning("未修改节点信息，无需重复保存！");
+                        return;
+                    }
+                } else if (nowFlowSaveOp == 1) {
+
+                    //传入后台
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/myprojectflows/addInfomyprojectflows', // 调用地址
+                        data: JSON.stringify({
+                            FProjectID: id,
+                            xml: xml
+                        }),
+                        async: false,
+                        success: function (data) {
+                            if (type == 1) {
+                                toastr.success('保存成功！');
+                            }
+
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                }
+
+            }
+
+            function qidong() {
+                if (flowid == '') {
+                    toastr.error("请先选择工作流，再进行启动！");
+                    return;
+                } else {
+                    // var name='<b>' + name + '</b><br />确定要启动工作流吗?';
+                    var name = '请确认已编辑好每个节点信息，再进行启动！'
+                    layer.confirm(name, function (index) {
+                        layer.close(layer.index);
+                        // console.log("projectflowid:"+projectflowid);
+
+                        var checkFLowAllStartEndTime = $('#flow')[0].contentWindow.checkFLowAllStartEndTime();
+
+                        var checkFLowAllLeader = $('#flow')[0].contentWindow.checkFLowAllLeader();
+                        if (checkFLowAllStartEndTime == false) {
+                            //toastr.error("请设置节点上的时间");
+
+                            layer.close(layer.index);
+                            return;
+                        }
+                        if (checkFLowAllLeader == false) {
+                            //toastr.error("请设置节点上的团队成员");
+                            layer.close(layer.index);
+
+                            return;
+                        }
+                        save(2);
+                        $("body").mLoading("show");
+                        $.ajax({
+                            type: 'POST',
+                            contentType: 'application/json',
+                            url: '/s/projectFlowCell/stateFlow', // 调用地址
+                            data: JSON.stringify({
+                                type: 1,
+                                id: id,//projectflowid
+                                state: 1
+                            }),
+                            async: false,
+                            success: function (data) {
+                                if (data.result = "success") {
+                                    toastr.success('启动成功！');
+                                    v_text = '&tv=view-basic';
+                                    $("#fstatename").text("开始");
+                                    $('#xuanzegz').addClass('btn btn-default size-S my-btn disabled'); //追加多个样式
+                                    $('#savegz').addClass('btn btn-default size-S my-btn disabled'); //追加多个样式
+                                    $('#qidonggz').addClass('btn btn-default size-S my-btn disabled'); //追加多个样式
+                                    $('#zhongzhilc').removeClass('disabled'); //移除多个样式　
+                                    // if(pfstate ==0){
+                                    //     //发布项目
+                                    //     $.ajax({
+                                    //         type: 'POST',
+                                    //         contentType: 'application/json;charset=UTF-8',
+                                    //         url: '/s/myproject/fabuemyproject',
+                                    //         data: JSON.stringify({
+                                    //             id: id,
+                                    //             state: 1
+                                    //         }),
+                                    //         success: function (data) {
+                                    //             if (data.result == 'success') {
+                                    //             } else if (data.result == 'error') {
+                                    //                 toastr.error(data.error)
+                                    //             }
+                                    //         },
+                                    //         error: function (e) {
+                                    //             toastr.error(e.status);
+                                    //             toastr.error(e.responseText);
+                                    //         }
+                                    //     });
+                                    // }
+                                    liuchengtu();
+                                    $("body").mLoading("hide");
+                                    layer.close(layer.index);
+                                }
+
+                            },
+                            error: function (e) {
+                                toastr.error(e.status);
+                                toastr.error(e.responseText);
+                                $("body").mLoading("hide");
+                            }
+                        });
+                    });
+                }
+
+
+            }
+            function zzlc() {
+                if(frole==1){
+                    layer.confirm('确定要终止流程吗?', function (index) {
+                        $("body").mLoading("show");
+                        $.ajax({
+                            type: 'POST',
+                            contentType: 'application/json',
+                            url: '/s/projectFlowCell/stateFlow', // 调用地址
+                            data: JSON.stringify({
+                                type: 1,
+                                id: id,//projectflowid
+                                state: 3
+                            }),
+                            async: false,
+                            success: function (data) {
+                                if (data.result = "success") {
+                                    toastr.success('终止流程成功！');
+                                    v_text = '&tv=view-basic';
+                                    $("#fstatename").text("终止");
+                                    liuchengtu();
+                                    $("body").mLoading("hide");
+                                    layer.close(layer.index);
+                                }
+
+                            },
+                            error: function (e) {
+                                toastr.error(e.status);
+                                toastr.error(e.responseText);
+                                $("body").mLoading("hide");
+                            }
+                        });
+                    });
+                }else{
+                    toastr.error("您不是当前项目负责人，不能终止流程！");
+                }
+
+            }
+        </script>
+    </body>
+</html>

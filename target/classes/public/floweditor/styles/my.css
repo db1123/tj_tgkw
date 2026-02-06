@@ -1,0 +1,80 @@
+div .geSidebar .geItem svg g g g g foreignObject div div div {
+  font-size: 18px !important;
+  background-color: transparent !important;
+}
+button {
+  line-height: 25px;
+}
+.geEditor .geToolbarContainer select {
+  height: 20px;
+}
+.geEditor .geFormatSection input {
+  height: 15px;
+}
+.form-control-td .invalid-feedback {
+  display: block;
+  width: 100%;
+  font-size: 90%;
+  color: #dc3545;
+}
+.form-control.is-invalid {
+  border-width: 1px;
+  border-color: #dc3545;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23dc3545' viewBox='-2 -2 7 7'%3e%3cpath stroke='%23dc3545' d='M0 0l3 3m0-3L0 3'/%3e%3ccircle r='.5'/%3e%3ccircle cx='3' r='.5'/%3e%3ccircle cy='3' r='.5'/%3e%3ccircle cx='3' cy='3' r='.5'/%3e%3c/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center right calc(.1em + .1rem);
+  background-size: calc(.75em + .175rem) calc(.75em + .375rem);
+}
+.form-control {
+  display: block;
+}
+.fTable th{ /*数据表格标题文字左对齐*/
+  text-align: left;
+  vertical-align: middle!important;
+}
+.flow-line {
+  stroke-dasharray: 8;
+  animation: dash 0.5s linear;
+  animation-iteration-count: infinite;
+}
+@keyframes dash {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  padding: 2px 7px;
+}
+.geDialog form .geBtn, .mxWindow .geBtn {
+  height: 27px;
+  line-height: 27px;
+  padding: 0px 10px;
+}
+td.details-control {
+  background: url('/images/details_open.png') no-repeat center center;
+  cursor: pointer;
+  height: 20px;
+}
+tr.details td.details-control {
+  background: url('/images/details_close.png') no-repeat center center;
+  height: 20px;
+}
+.ps__rail-y {
+  z-index: 1;
+}
+/* prettify.js */
+pre{display:block;font-family:Monaco,Menlo,Consolas,"Courier New",monospace；padding:9.5px;margin-bottom:10px;font-size:12px;line-height:20px;word-break:break-all;word-wrap:break-word;white-space:pre;white-space:pre-wrap;background-color:#f5f5f5;border:1px solid #ccc;border-radius:4px;color:#333}
+.prettyprint{margin-bottom:20px；padding:8px;background-color:#f7f7f9;border:1px solid #e1e1e8}
+.prettyprint .com { color: #998;font-style:italic }/*注释*/
+.prettyprint .tag{color:#007}/*标签*/
+.prettyprint .lit { color: #195f91}
+.prettyprint .pun,.prettyprint .opn,.prettyprint .clo { color: #93a1a1}/*等于*/
+.prettyprint .fun { color: #dc322f}
+.prettyprint .str,.prettyprint .atv { color: #D14}/*值*/
+.prettyprint .kwd,.prettyprint .prettyprint .tag { color: #1e347b}
+.prettyprint .typ,.prettyprint .atn,.prettyprint .dec,.prettyprint .var { color: teal}/*文档声明，属性*/
+.prettyprint .pln { color: #48484c}
+.prettyprint.linenums{box-shadow:inset 40px 0 0 #fbfbfc,inset 41px 0 0 #ececf0}
+.pre-scrollable{max-height:340px;overflow-y:scroll}
+pre ol.linenums{list-style:decimal outside none;margin:0 0 0 33px}
+pre ol.linenums li{padding-left:12px;color:#bbb;line-height:18px;text-shadow:0 1px 0 #fff}

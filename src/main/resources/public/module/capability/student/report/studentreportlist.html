@@ -1,0 +1,237 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <!--_global 公共配置文件 -->
+    <script language="javascript">
+        var golbal_type = "admin";
+    </script>
+    <script type="text/javascript" src="/javascript/global.js"></script>
+    <!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css" />
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css" />
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css" />
+    <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+    <!--/_only 独立样式 -->
+    <!-- 引入 jszip 和 FileSaver.js -->
+    <script src="js/jszip.min.js"></script>
+    <script src="js/FileSaver.min.js"></script>
+    <!-- 引入 DOMPurify 用于安全处理 HTML -->
+   <!--  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.4.1/purify.min.js"></script> -->
+    <!-- 引入 html-docx.min.js 用于将 HTML 转换为 Word -->
+    <script src="js/html-docx.min.js"></script>
+</head>
+
+<style type="text/css">
+    .open-work-control2 {
+        cursor: pointer;
+    }
+</style>
+
+<body>
+
+    <div class="page-container">
+        <div class="f-l" style="width: 99.8%; margin-top: 3px;">
+            <div class="row cl">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="card-body">
+                        <div class="f-r text-r">
+                            <input type="text" class="input-text size-S form-text-FName" style="width:200px"
+                                placeholder="学生名称">
+                            <button type="button" class="btn btn-default size-S my-btn btn-search-fun"><i
+                                    class="Hui-iconfont">&#xe665;</i>
+                                搜索
+                            </button>
+                            <!-- 修改按钮文本 -->
+                         <!--    <button type="button" class="btn btn-default size-S my-btn btn-download-all"><i
+                                    class="Hui-iconfont">&#xe601;</i>
+                                全部下载
+                            </button> -->
+                        </div>
+                        <table id="mainTable" class="display compact" style="width: 99.8%;"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+    <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+    <script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+    <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+    <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+    <script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+    <script src="/plugins/select2/js/select2.full.min.js"></script>
+    <script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+    <script type="text/javascript">
+        var studentid;
+        var mainTable;
+        var studentName;
+        // 业务代码
+        $(function () {
+            // 封装表格
+            mainTable = $('#mainTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    type: 'POST',
+                    contentType: 'application/json',
+                    url: '/s/tstudent/querytstudent', // 调用地址
+                    data: function (d) {
+                        return JSON.stringify($.extend({}, d, {
+                            page: d.start / d.length + 1, // 当前页
+                            results: d.length, // 每页显示条数
+                            name: $('.form-text-FName').val(), // 学生名称
+                            dataall: 1
+                        }));
+                    },
+                    dataSrc: function (json) {
+                        json.recordsFiltered = json.total; // 总行数
+                        json.recordsTotal = json.page; // 当前页数
+                        return json.list;
+                    },
+                    error: function (xhr, status, error) {
+                        toastr.error(xhr);
+                    }
+                },
+                columns: [
+                    { title: '学生姓名', data: 'FName', class: 'open-work-control2' },
+                    {
+                        title: '学生性别', data: 'FSex', class: 'open-work-control2',
+                        render: function (data, type, row) {
+                            if (data == 0) {
+                                return "男";
+                            } else if (data == 1) {
+                                return "女";
+                            } else {
+                                return "未选择"
+                            }
+                        }
+                    },
+                    { title: '身份证号', data: 'FIDNumber', class: 'open-work-control2' },
+                    { title: '联系电话', data: 'FTel', class: 'open-work-control2' },
+                    { title: '邮箱', data: 'FEmail', class: 'open-work-control2' },
+                    { title: '能力积分', data: 'FPoints', class: 'open-work-control2' },
+                    {
+                        title: '操作',
+                        data: 'FState',
+                        width: 90,
+                        orderable: false,
+                        render: function (data, type, row) {
+                            return '<button type="button" class="btn btn-secondary size-MINI" onclick="report(\'' + row.key + '\')"><i class="fas fa-edit"></i>查看能力报告</button>';
+                        }
+                    }
+                ],
+                scrollY: (document.body.clientHeight - 100) + 'px',
+                scrollX: true,
+                paging: true, // 是否开启本地分页
+                pageLength: 15, // 改变初始化页长度（每页多少条数据）
+                pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+                lengthChange: false, // 是否允许因子改变表格每页显示的记录数
+                searching: false, // 是否允许Datatables开启本地搜索
+                ordering: true, // 是否允许Datatables开启排序
+                info: true, // 控制是否显示表格左下角的信息
+                order: [[0, 'asc'], [1, 'asc']],
+                language: DataTablesLanguage
+            });
+            // 查询按钮点击事件
+            $('.btn-search-fun').on('click', function () {
+                $('#mainTable').DataTable().ajax.reload(null, false);
+            });
+
+            // 全部下载
+            $('.btn-download-all').on('click', async function () {
+                var studentIds = [];
+                mainTable.data().each(function (row) {
+                    studentIds.push(row.key);
+                });
+
+                var completedReports = 0;
+
+                function handleMessage(event) {
+                    if (event.data === 'downloadComplete') {
+                        const iframe = document.querySelector('iframe[src*="report.html"]');
+                        if (iframe) {
+                            const studentId = iframe.src.split('userid=')[1].split('&')[0];
+                            try {
+                                const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                                const a = iframeDocument.querySelector('a[download="student_ability_report.docx"]');
+                                if (a) {
+                                    const docxBlob = a.href.split(',')[1];
+                                    const binaryBlob = atob(docxBlob);
+                                    const arrayBuffer = new ArrayBuffer(binaryBlob.length);
+                                    const uint8Array = new Uint8Array(arrayBuffer);
+                                    for (let i = 0; i < binaryBlob.length; i++) {
+                                        uint8Array[i] = binaryBlob.charCodeAt(i);
+                                    }
+                                    const docxFilename = `student_report_${studentId}.docx`;
+                                    const blob = new Blob([uint8Array], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+                                    saveAs(blob, docxFilename);
+                                }
+                            } catch (error) {
+                                console.error(`处理学生 ${studentId} 的报告时出现错误:`, error);
+                            }
+                            document.body.removeChild(iframe);
+                            completedReports++;
+                        }
+                    }
+                }
+
+                window.addEventListener('message', handleMessage);
+
+                for (let i = 0; i < studentIds.length; i++) {
+                    const iframe = document.createElement('iframe');
+                    // 设置 iframe 为最大化
+                    iframe.style.position = 'fixed';
+                    iframe.style.top = '0';
+                    iframe.style.left = '0';
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+                    iframe.style.zIndex = '9999';
+                    iframe.style.display = 'none';
+                    iframe.src = `report.html?userid=${studentIds[i]}&ftype=2`;
+                    document.body.appendChild(iframe);
+
+                    iframe.onload = function () {
+                        const iframeWindow = iframe.contentWindow;
+                        if (iframeWindow) {
+                            const downloadWordButton = iframeWindow.document.getElementById('downloadWordButton');
+                            if (downloadWordButton) {
+                                downloadWordButton.click();
+                            } else {
+                                console.error(`未找到学生 ${studentIds[i]} 的下载 Word 按钮`);
+                                document.body.removeChild(iframe);
+                                completedReports++;
+                            }
+                        } else {
+                            console.error(`无法获取学生 ${studentIds[i]} 的 iframe 窗口`);
+                            document.body.removeChild(iframe);
+                            completedReports++;
+                        }
+                    };
+
+                    iframe.onerror = function () {
+                        console.error(`加载学生 ${studentIds[i]} 的报告页面时出错`);
+                        document.body.removeChild(iframe);
+                        completedReports++;
+                    };
+                }
+            });
+        });
+
+        function report(fkeyid) {
+            //layer_show('学生能力报告', '/module/capability/student/report/studentabilityhx.html?userid='+fkeyid+'&ftype=2', '', '');
+            layer_show('学生能力报告', '/module/capability/student/report/report.html?userid=' + fkeyid + '&ftype=2', '', '');
+        }
+    </script>
+</body>
+
+</html>
+    

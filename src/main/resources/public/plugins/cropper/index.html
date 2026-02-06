@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" type="text/css" href="css/releases.all.css">
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="css/cropper.css">
+  <link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+<body>
+  <!--[if lt IE 9]>
+  <div class="alert alert-warning alert-dismissible fade show m-0 rounded-0" role="alert">
+    您使用的是<strong>低版本</strong>的浏览器。请<a href="https://browsehappy.com/">升级浏览器</a>以改善您的体验。
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <![endif]-->
+
+  <!-- Content -->
+  <div class="container" style="max-width: 975px; padding-top: 5px;">
+    <div class="row">
+      <div class="col-md-9" style="padding-left: 0;">
+        <div class="docs-demo">
+          <div class="img-container">
+            <img id="mainImg" />
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3" style="padding-right: 0;">
+        <div class="docs-preview clearfix">
+          <div class="img-preview preview-lg"></div>
+          <div class="img-preview preview-md"></div>
+          <div class="img-preview preview-sm"></div>
+          <div class="img-preview preview-xs"></div>
+        </div>
+
+        <div class="docs-data">
+          <div class="input-group input-group-sm">
+            <span class="input-group-prepend">
+              <label class="input-group-text" for="dataX">X</label>
+            </span>
+            <input type="text" class="form-control" id="dataX" placeholder="x" style="background-color: white;" readonly>
+            <span class="input-group-append">
+              <span class="input-group-text">px</span>
+            </span>
+          </div>
+          <div class="input-group input-group-sm">
+            <span class="input-group-prepend">
+              <label class="input-group-text" for="dataY">Y</label>
+            </span>
+            <input type="text" class="form-control" id="dataY" placeholder="y" style="background-color: white;" readonly>
+            <span class="input-group-append">
+              <span class="input-group-text">px</span>
+            </span>
+          </div>
+          <div class="input-group input-group-sm">
+            <span class="input-group-prepend">
+              <label class="input-group-text" for="dataWidth">宽度</label>
+            </span>
+            <input type="text" class="form-control" id="dataWidth" placeholder="宽度" style="background-color: white;" readonly>
+            <span class="input-group-append">
+              <span class="input-group-text">px</span>
+            </span>
+          </div>
+          <div class="input-group input-group-sm">
+            <span class="input-group-prepend">
+              <label class="input-group-text" for="dataHeight">高度</label>
+            </span>
+            <input type="text" class="form-control" id="dataHeight" placeholder="高度" style="background-color: white;" readonly>
+            <span class="input-group-append">
+              <span class="input-group-text">px</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row" id="actions">
+      <div class="col-md-9 docs-buttons" style="padding-left: 0;">
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary btn-sm" data-method="zoom" data-option="0.1" title="放大">
+            <span class="docs-tooltip" data-toggle="tooltip" title="放大">
+              <span class="fa fa-search-plus"></span>
+            </span>
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" data-method="zoom" data-option="-0.1" title="缩小">
+            <span class="docs-tooltip" data-toggle="tooltip" title="缩小">
+              <span class="fa fa-search-minus"></span>
+            </span>
+          </button>
+        </div>
+
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary btn-sm" data-method="move" data-option="-10" data-second-option="0" title="左移">
+            <span class="docs-tooltip" data-toggle="tooltip" title="左移">
+              <span class="fa fa-arrow-left"></span>
+            </span>
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" data-method="move" data-option="10" data-second-option="0" title="右移">
+            <span class="docs-tooltip" data-toggle="tooltip" title="右移">
+              <span class="fa fa-arrow-right"></span>
+            </span>
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" data-method="move" data-option="0" data-second-option="-10" title="上移">
+            <span class="docs-tooltip" data-toggle="tooltip" title="上移">
+              <span class="fa fa-arrow-up"></span>
+            </span>
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" data-method="move" data-option="0" data-second-option="10" title="下移">
+            <span class="docs-tooltip" data-toggle="tooltip" title="下移">
+              <span class="fa fa-arrow-down"></span>
+            </span>
+          </button>
+        </div>
+
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary btn-sm" data-method="reset" title="重置">
+            <span class="docs-tooltip" data-toggle="tooltip" title="重置">
+              <span class="fa fa-sync-alt"></span>&nbsp;重置
+            </span>
+          </button>
+        </div>
+
+        <div class="btn-group" style="float: right;">
+          <label class="btn btn-info btn-upload btn-sm" for="inputImage" title="打开图片">
+            <input type="file" class="sr-only" id="inputImage" name="file" accept="image/*">
+            <span class="docs-tooltip" data-toggle="tooltip" title="打开图片">
+              <span class="fa fa-upload"></span>&nbsp;打开图片
+            </span>
+          </label>
+          <button type="button" class="btn btn-success btn-sm" id="savebtn" title="保存图片">
+            <span class="docs-tooltip" data-toggle="tooltip" title="保存图片">
+              <span class="fa fa-save"></span>&nbsp;保存图片
+            </span>
+          </button>
+        </div>
+
+      </div><!-- /.docs-buttons -->
+
+      <div class="col-md-3 docs-toggles">
+        <div class="btn-group d-flex flex-nowrap" data-toggle="buttons">
+          <label class="btn btn-primary active btn-sm" style="padding-left: 0; padding-right: 0;">
+            <input type="radio" class="sr-only" id="aspectRatio1" name="aspectRatio" value="1.7777777777777777">
+            <span class="docs-tooltip" data-toggle="tooltip" title="比例: 16 / 9">
+              16:9
+            </span>
+          </label>
+          <label class="btn btn-primary btn-sm" style="padding-left: 0; padding-right: 0;">
+            <input type="radio" class="sr-only" id="aspectRatio2" name="aspectRatio" value="1.3333333333333333">
+            <span class="docs-tooltip" data-toggle="tooltip" title="比例: 4 / 3">
+              4:3
+            </span>
+          </label>
+          <label class="btn btn-primary btn-sm" style="padding-left: 0; padding-right: 0;">
+            <input type="radio" class="sr-only" id="aspectRatio3" name="aspectRatio" value="1">
+            <span class="docs-tooltip" data-toggle="tooltip" title="比例: 1 / 1">
+              1:1
+            </span>
+          </label>
+          <label class="btn btn-primary btn-sm" style="padding-left: 5px; padding-right: 5px; font-size: 15px;">
+            <input type="radio" class="sr-only" id="aspectRatio5" name="aspectRatio" value="NaN">
+            <span class="docs-tooltip" data-toggle="tooltip" title="自定义比例">
+              自定义
+            </span>
+          </label>
+        </div>
+
+      </div><!-- /.docs-toggles -->
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="text/javascript" src="js/jquery.slim.min.js"></script>
+  <script type="text/javascript" src="js/bootstrap.bundle.min.js"></script>
+  <script type="text/javascript">
+    if (parent.imgViewCon[0].src.indexOf('images/bg.jpeg') < 0) { // 判断是否需要初始化图片
+      $('#mainImg').attr("src", parent.imgViewCon[0].src);
+    }
+  </script>
+  <script type="text/javascript" src="js/cropper.min.js"></script>
+  <script type="text/javascript" src="js/main.js"></script>
+  <script type="text/javascript" src="/nui-ad/lib/layer/2.4/layer.js"></script>
+  <script type="text/javascript">
+    $('#savebtn').on('click', function(){
+      if (mainCropper && mainCropper.getCroppedCanvas()) {
+        var imgStr = mainCropper.getCroppedCanvas({
+          imageSmoothingQuality: 'high'
+        }).toDataURL('image/*');
+        parent.imgViewCon.attr("src", imgStr);
+        var index = parent.layer.getFrameIndex(window.name);
+        parent.layer.close(index);
+      } else {
+        layer.msg("请选择图片", { icon: 2 });
+      }
+    });
+  </script>
+</body>
+</html>

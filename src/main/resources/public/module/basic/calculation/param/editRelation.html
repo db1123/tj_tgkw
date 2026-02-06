@@ -1,0 +1,161 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<!--_global 公共配置文件 -->
+<script language="javascript">var golbal_type="admin";</script>
+<script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+<!--_only 独立样式 -->
+<link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css" />
+<!--/_only 独立样式 -->
+</head>
+<body>
+<article class="page-container">
+  <button type="button" class="btn btn-default size-S my-btn" onclick="ModelValues(1)" style="margin-bottom: 2px;"><i class=" fa fa-plus"></i> 添加</button>
+  <table id="paramTable" class="display compact" style="width: 99.8%;"></table>
+  <div class="toolbar-bottom-line"></div>
+  <div class="toolbar-bottom-btn">
+    <input class="btn btn-primary radius" type="button" value="&nbsp;&nbsp;提交&nbsp;&nbsp;" onclick="save()" />
+    <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;" onclick="layer_close()" />
+  </div>
+</article>
+
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+// 业务代码
+$(function(){
+  // 封装表格-参数表
+  $('#paramTable').DataTable({
+    data: [],
+    columns: [
+      { title: '类型', data: 'f_type', width: 180, render: function (data, type, row) {return row.type_name} },
+      {
+        title: '分类',
+        data: 'f_classify',
+        width: 60,
+        render: function (data, type, row) {
+          switch (data) {
+            case 1:
+              return '普通节点';
+              break;
+          
+            case 2:
+              return '标准SQL';
+              break;
+
+            case 3:
+              return '自定义SQL';
+              break;
+
+            case 4:
+              return 'JS代码';
+              break;
+
+            case 5:
+              return 'URL引用';
+              break;
+
+            default:
+              return '无';
+              break;
+          }
+        }
+      },
+      { title: '参数名称', data: 'f_title' },
+      {
+        data: 'key',
+        width: 20,
+        orderable: false,
+        render: function (data, type, row) {
+          var temp = '';
+          temp = '<button type="button" class="btn btn-danger size-MINI" onclick="onClickModelBtnDel(\''+row.key+'\',\''+row.f_title+'\')">删</button>';
+          return temp;
+        }
+      }
+    ],
+    paging: false, // 是否开启本地分页
+    lengthChange: false, // 是否允许用户改变表格每页显示的记录数
+    searching: false, // 是否允许Datatables开启本地搜索
+    ordering: false, // 是否允许Datatables开启排序
+    info: false, // 控制是否显示表格左下角的信息
+    language: DataTablesLanguage
+  });
+  // 初始化表格内容
+  var id = getQueryStringByName('id');
+  $.ajax({
+    type: 'POST',
+    contentType: 'application/json',
+    url: '/s/param/queryParamInfo', // 调用地址
+    data: JSON.stringify({
+      id
+    }),
+    async: false,
+    success: function(data) {
+      // 重新构建table
+      var paramTable = $('#paramTable').dataTable();
+      var paramJsonData = data.info.relations;
+      if (paramJsonData.length > 0) {
+        paramTable.fnAddData(paramJsonData, true);
+      }
+    },
+    error : function(e) {
+      toastr.error(e.status);
+      toastr.error(e.responseText);
+    }
+  });
+});
+// 删除按钮点击事件
+function onClickModelBtnDel(id, name) {
+  layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function(index){
+    var index;
+    var data = $('#paramTable').dataTable().fnGetData();
+    for (var i=0; i<data.length; i++) {
+      if (id == data[i]['key']) {
+        index = i;
+      }
+    }
+    $('#paramTable').dataTable().fnDeleteRow(index);
+    layer.close(layer.index);
+	});
+}
+// 参数导入
+function ModelValues(op, fKey) {
+  if (op == 1) { // 新增
+    layer_show('新增参数信息','editRelationModel.html?op=1','900','500');
+  } else { // 修改
+    layer_show('修改参数信息','editRelationModel.html?op=2&id='+fKey,'900','500');
+  }
+}
+// 保存更改
+function save() {
+  var JsonData = {};
+  JsonData['relations'] = JSON.stringify($('#paramTable').dataTable().fnGetData());
+  JsonData['f_key_id'] = getQueryStringByName('id');
+  $.ajax({
+    type: 'POST',
+    contentType: 'application/json',
+    url: '/s/param/updateParamRelation', // 调用地址
+    data: JSON.stringify(JsonData),
+    async: false,
+    success: function(data) {
+      if (data.result == 'success') {
+        parent.toastr.success('修改成功！');
+        layer_close();
+      } else if (data.result == 'error') {
+        toastr.error(data.error);
+      }
+    },
+    error : function(e){
+      toastr.error(e.status);
+      toastr.error(e.responseText);
+    }
+  });
+}
+</script>
+</body>
+</html>

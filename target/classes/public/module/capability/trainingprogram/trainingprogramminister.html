@@ -1,0 +1,148 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <!--/_only 独立样式 -->
+</head>
+<style type="text/css">
+    legend {
+        width: 5%;
+        margin-bottom: 5px;
+        font-size: 12px;
+        line-height: 40px;
+        border: 0;
+        border-bottom: 0px solid #e5e5e5
+    }
+
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden; /* 防止滚动条 */
+    }
+
+    #tab_demo {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    iframe {
+        width: 98vw;
+        height: 80vh;
+        border: none; /* 去掉 iframe 的边框 */
+    }
+</style>
+<body>
+<div class="page-container" style="padding: 2px;">
+    <div class="panel panel-default">
+        <div class="panel-header">方案名称：<strong class="xmname"></strong></div>
+        <div class="panel-body">
+            <div id="tab_demo" class="HuiTab">
+                <div class="tabBar clearfix">
+                    <span onclick="getValue(1);">方案详情</span>
+                    <span onclick="getValue(2);">培养目标</span>
+                    <span onclick="getValue(3);">毕业要求</span>
+                    <span onclick="getValue(4);">主干学科</span>
+                    <span onclick="getValue(5);">学制、学位和毕业学分</span>
+                    <span onclick="getValue(6);">核心课程</span>
+                    <span onclick="getValue(7);">课程安排</span>
+                    <span onclick="getValue(8);">其他</span>
+                    <span onclick="getValue(9);">课程地图</span>
+                    <span onclick="getValue(10);">课程逻辑图</span>
+                </div>
+                <div class="tabCon">
+                    <fieldset  >
+                        <legend>基本信息</legend>
+                        <iframe style=" width: 95vw; height: 70vh;" frameborder="0" id="peiyangfangan"></iframe>
+                    </fieldset>
+                </div>
+<!--                <div class="tabCon">-->
+<!--                    <iframe width="100%;" height="100%;" frameborder="0" id="peiyangfangan"></iframe>-->
+<!--                </div>-->
+                <div class="tabCon">
+                    <iframe width="100%;" height="100%;" frameborder="0" id="peiyangmubiao"></iframe>
+                </div>
+                <div class="tabCon">
+                    <iframe width="100%;" height="100%;" frameborder="0" id="biyeyaoqiu"></iframe>
+                </div>
+                <div class="tabCon">
+                    <iframe width="100%;" height="100%;" frameborder="0" id="zhuganxueke"></iframe>
+                </div>
+                <div class="tabCon">
+                    <iframe width="100%;" height="100%;" frameborder="0" id="xuezhi"></iframe>
+                </div>
+                <div class="tabCon">
+                    <iframe width="100%;" height="100%;" frameborder="0" id="hexinkecheng"></iframe>
+                </div>
+                <div class="tabCon">
+                    <iframe width="100%;" height="100%;" frameborder="0" id="kechenganpai"></iframe>
+                </div>
+                <div class="tabCon">
+                    <iframe width="100%;" height="100%;" frameborder="0" id="qita"></iframe>
+                </div>
+                <div class="tabCon">
+                    <iframe width="100%;" height="100%;" frameborder="0" id="ditu"></iframe>
+                </div>
+                <div class="tabCon">
+                    <iframe width="100%;" height="100%;" frameborder="0" id="luojitu"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript">
+    var id = getQueryStringByName('mid');//专业ID
+    var tpid = getQueryStringByName('tpid');//培养方案ID
+    var xmname = getQueryStringByName('name');
+    var showtype = getQueryStringByName('showtype'); //显示类型
+    // 业务代码
+    $
+    (function () {
+        $(".xmname").text(xmname);
+        var tab = $("#tab_demo").Huitab({
+            index: 0
+        });
+        $('#peiyangfangan').attr('src', '/module/capability/trainingprogram/trainingprogramxx.html?fmajorid=' + id + '&tpid=' + tpid + '&showtype=' + showtype);
+    });
+
+    function getValue(obj) {
+        var value = obj;
+        if (value == 1) {
+            $('#peiyangfangan').attr('src', '/module/capability/trainingprogram/trainingprogramxx.html?fmajorid=' + id + '&tpid=' + tpid + '&showtype=' + showtype);
+        } else if (value == 2) {
+            $('#peiyangmubiao').attr('src', '/module/capability/trainingprogram/mb/trainingprogrammblist.html?fmajorid=' + id + '&tpid=' + tpid + '&showtype=' + showtype);
+        } else if (value == 3) {
+            $('#biyeyaoqiu').attr('src', '/module/capability/trainingprogram/byyq/trainingprogrambyyqlist.html?fmajorid=' + id + '&tpid=' + tpid + '&showtype=' + showtype);
+        } else if (value == 4) {
+            $('#zhuganxueke').attr('src', '/module/capability/trainingprogram/zgxk/trainingprogramzgxklist.html?fmajorid=' + id + '&tpid=' + tpid + '&showtype=' + showtype);
+        } else if (value == 5) {
+            $('#xuezhi').attr('src', '/module/capability/trainingprogram/xzwf/trainingprogramxzwflist.html?fmajorid=' + id + '&tpid=' + tpid + '&showtype=' + showtype);
+        } else if (value == 6) {
+            $('#hexinkecheng').attr('src', '/module/capability/trainingprogram/hxkc/trainingprogramhxkclist.html?fmajorid=' + id + '&tpid=' + tpid + '&showtype=' + showtype);
+        } else if (value == 7) {
+            // $('#kechenganpai').attr('src', '/module/capability/trainingprogram/course/trainingprogramcourselist.html?fmajorid=' + id + '&tpid=' + tpid + '&showtype=' + showtype);
+            $('#kechenganpai').attr('src', '/module/capability/trainingprogram/coursenew/trainingprogramcourselist.html?fmajorid=' + id + '&tpid=' + tpid + '&showtype=' + showtype);
+        } else if (value == 8) {
+            $('#qita').attr('src', '/module/capability/trainingprogram/qt/trainingprogramqtminister.html?fmajorid=' + id + '&tpid=' + tpid + '&showtype=' + showtype);
+        } else if (value == 9) {
+            // $('#luojitu').attr('src', '/module/capability/trainingprogram/image/trainingprogramimagelist.html?fmajorid=' + id + '&tpid=' + tpid + '&showtype=' + showtype);
+            $('#ditu').attr('src', '/module/capability/trainingprogram/image/trainingprogramimagenew.html?fmajorid=' + id + '&tpid=' + tpid + '&showtype=' + showtype);
+        }else if (value == 10) {
+            $('#luojitu').attr('src', '/module/capability/trainingprogram/image/trainingprogramimagenew2.html?fmajorid=' + id + '&tpid=' + tpid + '&showtype=' + showtype);
+        }
+    }
+</script>
+</body>
+</html>

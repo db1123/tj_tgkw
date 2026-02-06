@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fun.server.mapper.TClassStudentMapper">
+  <resultMap id="BaseResultMap" type="fun.server.model.TClassStudent">
+    <!--
+    @mbg.generated
+    -->
+    <constructor>
+      <idArg column="FKeyID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FUID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCDATE" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FUDATE" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FState" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FClassID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FStudentID" javaType="java.lang.Long" jdbcType="BIGINT" />
+    </constructor>
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <!--
+    @mbg.generated
+    -->
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <!--
+    @mbg.generated
+    -->
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    <!--
+    @mbg.generated
+    -->
+    FKeyID, FCID, FUID, FCDATE, FUDATE, FState, FClassID, FStudentID
+  </sql>
+
+  <select id="getCLassStudentlist" parameterType="fun.server.model.customQuery.classStudent.ClassStudentCS"
+          resultType="fun.server.model.customQuery.classStudent.ClassStudentData">
+
+    SELECT s.FKeyID,ifnull(s.FName,'') as FName,ifnull(s.FNo,'') as FNo,ifnull(s.FIDNumber,'') as FIDNumber,ifnull(s.FTel,'') as FTel,s.FSex
+    FROM t_student s
+    LEFT JOIN t_class_student cs
+    ON s.FKeyID = cs.FStudentID
+    <if test="CLassID != null and CLassID!='' and CLassID!='0' ">
+      AND cs.FClassID = #{CLassID}
+    </if>
+    WHERE cs.FStudentID IS NULL
+    <if test="FName != null and FName!=''">
+      and s.FName like concat('%',#{FName},'%')
+    </if>
+    <if test="FTel != null and FTel!=''">
+      and s.FTel like concat('%',#{FTel},'%')
+    </if>
+    <if test="FNo != null and FNo!=''">
+      and s.FNo like concat('%',#{FNo},'%')
+    </if>
+    <if test=" FSex != null and FSex!=''">
+      and s.FSex = #{FSex}
+    </if>
+    <if test="FIDNumber != null and FIDNumber!=''">
+      and s.FIDNumber like concat('%',#{FIDNumber},'%')
+    </if>
+    <if test="orderBy != null and orderBy!=''">
+      order by ${orderBy}
+    </if>
+  </select>
+
+  <select id="getCourseStudentlist" parameterType="fun.server.model.customQuery.classStudent.ClassStudentCS"
+          resultType="fun.server.model.customQuery.classStudent.ClassStudentData">
+
+    SELECT s.FKeyID,ifnull(s.FName,'') as FName,ifnull(s.FNo,'') as FNo,ifnull(s.FIDNumber,'') as FIDNumber,ifnull(s.FTel,'') as FTel,s.FSex
+    FROM t_student s
+    LEFT JOIN t_course_student tcs
+    ON s.FKeyID = tcs.FStudentID
+    <if test="CLassID != null and CLassID!='' and CLassID!='0' ">
+      AND tcs.FCourseID = #{CLassID}
+    </if>
+    WHERE tcs.FStudentID IS NULL
+    <if test="FName != null and FName!=''">
+      and s.FName like concat('%',#{FName},'%')
+    </if>
+    <if test="FTel != null and FTel!=''">
+      and s.FTel like concat('%',#{FTel},'%')
+    </if>
+    <if test="FNo != null and FNo!=''">
+      and s.FNo like concat('%',#{FNo},'%')
+    </if>
+    <if test=" FSex != null and FSex!=''">
+      and s.FSex = #{FSex}
+    </if>
+    <if test="FIDNumber != null and FIDNumber!=''">
+      and s.FIDNumber like concat('%',#{FIDNumber},'%')
+    </if>
+    <if test="orderBy != null and orderBy!=''">
+      order by ${orderBy}
+    </if>
+  </select>
+
+  <select id="getStudentabilitylist" parameterType="fun.server.model.customQuery.classStudent.ClassStudentCS"
+          resultType="fun.server.model.customQuery.classStudent.ClassStudentData">
+
+    SELECT s.FKeyID,ifnull(s.FName,'') as FName,ifnull(s.FNo,'') as FNo,ifnull(s.FIDNumber,'') as FIDNumber,ifnull(s.FTel,'') as FTel,s.FSex
+    FROM t_student s
+    LEFT JOIN t_student_ability tcs
+    ON s.FKeyID = tcs.FStudentID
+    <if test="FAbilityID != null and FAbilityID!='' and FAbilityID!='0' ">
+      AND tcs.FAbilityID = #{FAbilityID}
+    </if>
+    <if test="FAbilityLevelID != null and FAbilityLevelID!='' and FAbilityLevelID!='0' ">
+      AND tcs.FAbilityLevelID = #{FAbilityLevelID}
+    </if>
+     <if test="FConditionID != null and FConditionID!='' and FConditionID!='0' ">
+      AND tcs.FConditionID = #{FConditionID}
+    </if>
+    WHERE tcs.FStudentID IS NULL
+    <if test="FName != null and FName!=''">
+      and s.FName like concat('%',#{FName},'%')
+    </if>
+    <if test="FTel != null and FTel!=''">
+      and s.FTel like concat('%',#{FTel},'%')
+    </if>
+    <if test="FNo != null and FNo!=''">
+      and s.FNo like concat('%',#{FNo},'%')
+    </if>
+    <if test=" FSex != null and FSex!=''">
+      and s.FSex = #{FSex}
+    </if>
+    <if test="FIDNumber != null and FIDNumber!=''">
+      and s.FIDNumber like concat('%',#{FIDNumber},'%')
+    </if>
+    <if test="orderBy != null and orderBy!=''">
+      order by ${orderBy}
+    </if>
+  </select>
+
+  <select id="getStudentenrollmentlist" parameterType="fun.server.model.customQuery.classStudent.ClassStudentCS"
+          resultType="fun.server.model.customQuery.classStudent.ClassStudentData">
+
+    SELECT s.FKeyID,ifnull(s.FName,'') as FName,ifnull(s.FNo,'') as FNo,ifnull(s.FIDNumber,'') as FIDNumber,ifnull(s.FTel,'') as FTel,s.FSex
+    FROM t_student s
+    LEFT JOIN t_course_enrollment tcs
+    ON s.FKeyID = tcs.FStudentID
+    <if test="FAbilityID != null and FAbilityID!='' and FAbilityID!='0' ">
+      AND tcs.FCOID = #{FAbilityID}
+    </if>
+    WHERE tcs.FStudentID IS NULL
+    <if test="FName != null and FName!=''">
+      and s.FName like concat('%',#{FName},'%')
+    </if>
+    <if test="FTel != null and FTel!=''">
+      and s.FTel like concat('%',#{FTel},'%')
+    </if>
+    <if test="FNo != null and FNo!=''">
+      and s.FNo like concat('%',#{FNo},'%')
+    </if>
+    <if test=" FSex != null and FSex!=''">
+      and s.FSex = #{FSex}
+    </if>
+    <if test="FIDNumber != null and FIDNumber!=''">
+      and s.FIDNumber like concat('%',#{FIDNumber},'%')
+    </if>
+    <if test="orderBy != null and orderBy!=''">
+      order by ${orderBy}
+    </if>
+  </select>
+
+
+</mapper>

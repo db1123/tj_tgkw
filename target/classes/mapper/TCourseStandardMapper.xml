@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fun.server.mapper.TCourseStandardMapper">
+  <resultMap id="BaseResultMap" type="fun.server.model.TCourseStandard">
+    <!--
+    @mbg.generated
+    -->
+    <constructor>
+      <idArg column="FKeyID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FUID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCDATE" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FUDATE" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FState" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FCourseID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FAbilityID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FAbilityLevelID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCourseAbilityID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FType" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FcalcType" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FSZState" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FAbilityCAMID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FQZType" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FCAMType" javaType="java.lang.Integer" jdbcType="INTEGER" />
+    </constructor>
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <!--
+    @mbg.generated
+    -->
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <!--
+    @mbg.generated
+    -->
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    <!--
+    @mbg.generated
+    -->
+    FKeyID, FCID, FUID, FCDATE, FUDATE, FState, FCourseID, FAbilityID, FAbilityLevelID, 
+    FCourseAbilityID, FType, FcalcType, FSZState, FAbilityCAMID, FQZType, FCAMType
+  </sql>
+
+<!--  <select id="getCourseStandardDataList" parameterType="fun.server.model.customQuery.coursestandard.CourseStandardCS" resultType="fun.server.model.customQuery.coursestandard.CourseStandardData">-->
+
+<!--    SELECT tcs.FKeyID, tcs.FCourseID,tcs.FAbilityID,tcs.FAbilityLevelID,tcs.FType,tcs.FcalcType,tcs.FSZState,tcs.FAbilityCAMID-->
+<!--    ,IFNULL(tc.FName,'') AS FCourseName,IFNULL(tab.FName,'') AS FAbilityName,IFNULL(tabl.FName,'') AS FAbilityLevelName,-->
+<!--    CASE-->
+<!--    WHEN tcs.FCAMType = 1 THEN IFNULL(tac.FConditionName,'')-->
+<!--    WHEN tcs.FCAMType = 2 THEN IFNULL(tacs.FName,'')-->
+<!--    END AS FAbilityCAMName-->
+<!--    ,tcs.FQZType-->
+<!--    ,CASE-->
+<!--    WHEN tcs.FCAMType = 1 THEN IFNULL(tac.FConditionScore,0)-->
+<!--    WHEN tcs.FCAMType = 2 THEN IFNULL(tacs.FConditionScore,0)-->
+<!--    END AS FConditionScore-->
+<!--    FROM t_course_standard tcs-->
+<!--    INNER JOIN t_course tc-->
+<!--    ON tcs.FCourseID = tc.FKeyID-->
+<!--    INNER JOIN t_ability tab-->
+<!--    ON tcs.FAbilityID = tab.FKeyID-->
+<!--    INNER JOIN t_ability_level tabl-->
+<!--    ON tcs.FAbilityLevelID = tabl.FKeyID-->
+<!--    LEFT JOIN t_ability_condition tac-->
+<!--    ON tac.FKeyID = tcs.FAbilityCAMID AND tcs.FCAMType =1-->
+<!--    LEFT JOIN t_ability_condition_s tacs-->
+<!--    ON tacs.FKeyID = tcs.FAbilityCAMID AND tcs.FCAMType = 2-->
+<!--    WHERE 1=1-->
+<!--    <choose>-->
+<!--      <when test="FCourseID != null and FCourseID!=''">-->
+<!--        and tcs.FCourseAbilityID = #{FCourseID}-->
+<!--      </when>-->
+<!--      <otherwise>-->
+<!--        and tcs.FCourseAbilityID = 0-->
+<!--      </otherwise>-->
+<!--    </choose>-->
+<!--    <if test="FTJName != null and FTJName!=''">-->
+<!--      and tac.FConditionName like concat('%',#{FTJName},'%')-->
+<!--    </if>-->
+<!--    <if test="FNLName != null and FNLName!=''">-->
+<!--      and tab.FName like concat('%',#{FNLName},'%')-->
+<!--    </if>-->
+<!--    <if test="FNLDJName != null and FNLDJName!=''">-->
+<!--      and tabl.FName like concat('%',#{FNLDJName},'%')-->
+<!--    </if>-->
+<!--    <if test=" FSZState != null and FSZState!='' and FSZState!=-2 ">-->
+<!--      and tcs.FSZState = #{FSZState}-->
+<!--    </if>-->
+<!--    <if test=" FType != null and FType!='' and FType != -1 ">-->
+<!--      and tcs.FType = #{FType}-->
+<!--    </if>-->
+<!--    <if test="orderBy != null and orderBy!=''">-->
+<!--      order by ${orderBy}-->
+<!--    </if>-->
+<!--  </select>-->
+
+
+  <select id="getCourseStandardDataList" parameterType="fun.server.model.customQuery.coursestandard.CourseStandardCS" resultType="fun.server.model.customQuery.coursestandard.CourseStandardData">
+
+    SELECT tcs.FKeyID, tcs.FCourseID,tcs.FAbilityID,tcs.FAbilityLevelID,tcs.FType,tcs.FcalcType,tcs.FSZState,tcs.FAbilityCAMID
+    ,IFNULL(tc.FName,'') AS FCourseName,IFNULL(tab.FName,'') AS FAbilityName,IFNULL(tabl.FName,'') AS FAbilityLevelName,
+    IFNULL(tac.FName,'') AS FAbilityCAMName
+    ,tcs.FQZType
+    , IFNULL(tac.FConditionScore,0) AS FConditionScore
+    FROM t_course_standard tcs
+    INNER JOIN t_course tc
+    ON tcs.FCourseID = tc.FKeyID
+    INNER JOIN t_ability_tree tab
+    ON tcs.FAbilityID = tab.FKeyID
+    INNER JOIN t_ability_tree tabl
+    ON tcs.FAbilityLevelID = tabl.FKeyID
+    LEFT JOIN t_ability_tree tac
+    ON tac.FKeyID = tcs.FAbilityCAMID AND tac.FNodeType =3
+    WHERE 1=1
+    <choose>
+      <when test="FCourseID != null and FCourseID!=''">
+        and tcs.FCourseAbilityID = #{FCourseID}
+      </when>
+      <otherwise>
+        and tcs.FCourseAbilityID = 0
+      </otherwise>
+    </choose>
+    <if test="FTJName != null and FTJName!=''">
+      and tac.FName like concat('%',#{FTJName},'%')
+    </if>
+    <if test="FNLName != null and FNLName!=''">
+      and tab.FName like concat('%',#{FNLName},'%')
+    </if>
+    <if test="FNLDJName != null and FNLDJName!=''">
+      and tabl.FName like concat('%',#{FNLDJName},'%')
+    </if>
+    <if test=" FSZState != null and FSZState!='' and FSZState!=-2 ">
+      and tcs.FSZState = #{FSZState}
+    </if>
+    <if test=" FType != null and FType!='' and FType != -1 ">
+      and tcs.FType = #{FType}
+    </if>
+    <if test="orderBy != null and orderBy!=''">
+      order by ${orderBy}
+    </if>
+  </select>
+<!--  <select id="getCourseStandardDatainsert" parameterType="fun.server.model.customQuery.coursestandard.CourseStandardCS" resultType="fun.server.model.customQuery.coursestandard.CourseStandardData">-->
+
+
+<!--    SELECT ConditionFKeyID AS FKeyID, FName as FTJName,FType FROM (-->
+<!--    SELECT-->
+<!--        CASE-->
+<!--          WHEN a.FType = 1 THEN c.FConditionName-->
+<!--          WHEN a.FType = 2 THEN s.FName-->
+<!--        END AS FName-->
+<!--      ,CASE-->
+<!--        WHEN a.FType = 1 THEN c.FKeyID-->
+<!--        WHEN a.FType = 2 THEN s.FKeyID-->
+<!--      END AS ConditionFKeyID-->
+<!--    ,a.FType-->
+<!--    FROM t_ability_condition_assessment_method a-->
+<!--    LEFT JOIN t_ability_condition c-->
+<!--    ON a.FConditionID = c.FKeyID AND a.FType = 1 AND c.FState =1-->
+<!--    LEFT JOIN t_ability_condition_s s-->
+<!--    ON a.FConditionID = s.FKeyID AND a.FType = 2 AND s.FState =1-->
+
+<!--    LEFT JOIN `t_ability_assessment_method` taam-->
+
+<!--    ON taam.`FKeyID` = a.`FMethodID`-->
+
+<!--    WHERE 1 =1-->
+
+<!--    <choose>-->
+<!--      <when test="FCourseID != null and FCourseID!=''">-->
+<!--        and a.FALID = #{FCourseID}      &#45;&#45;       此处是能力等级ID-->
+<!--      </when>-->
+<!--      <otherwise>-->
+<!--        and a.FALID = 0-->
+<!--      </otherwise>-->
+<!--    </choose>-->
+<!--    ) AS a-->
+<!--    GROUP BY a.ConditionFKeyID,a.FName,a.FType-->
+<!--  </select>-->
+
+  <select id="getCourseStandardDatainsert" parameterType="fun.server.model.customQuery.coursestandard.CourseStandardCS" resultType="fun.server.model.customQuery.coursestandard.CourseStandardData">
+
+
+    SELECT c.FName AS FTJName,c.FKeyID FROM t_ability_tree fs
+    LEFT JOIN t_ability_tree c
+    ON fs.FPID = c.FKeyID AND fs.FNodeType =4 AND c.FNodeType = 3
+    LEFT JOIN t_ability_assessment_method taam
+    ON fs.FMethodID = taam.FKeyID
+    WHERE   c.FDel = 1 AND fs.FDel = 1
+
+    <choose>
+      <when test="FCourseID != null and FCourseID!=''">
+        AND fs.FPath like concat('|_1_||_',#{FCourseID},'_|%')
+      </when>
+      <otherwise>
+        and fs.FPID = 0
+      </otherwise>
+    </choose>
+  </select>
+
+  <select id="getTAbilityConditionSDatainsert" parameterType="fun.server.model.customQuery.coursestandard.CourseStandardCS" resultType="fun.server.model.customQuery.coursestandard.CourseStandardData">
+
+    SELECT tac.FKeyID AS FKeyID,tal.FKeyID AS FAbilityLevelID,ta.FKeyID AS FAbilityID FROM t_ability_condition_s tac
+    INNER  JOIN t_ability_condition_assessment_method taca
+    ON tac.FKeyID = taca.FConditionID AND taca.FType =2
+    INNER JOIN t_ability_level tal
+    ON tac.FALID = tal.FKeyID
+    INNER JOIN t_ability ta
+    ON tal.FAbilityID = ta.FKeyID
+    WHERE 1=1
+    <choose>
+      <when test="FCourseID != null and FCourseID!=''">
+        AND tac.FALID = #{FCourseID}      --       此处是等级表ID
+      </when>
+      <otherwise>
+        AND tac.FALID = 0
+      </otherwise>
+    </choose>
+  </select>
+  <select id="getCourseabiltyCount" parameterType="fun.server.model.customQuery.courseAbility.CourseabilityCS" resultType="int">
+
+    SELECT COUNT(*) AS FNum FROM t_course_ability tca
+    INNER JOIN t_ability_tree tal
+    ON tca.FAbilityLevelID = tal.FKeyID
+    INNER JOIN t_ability_tree tab
+    ON tca.FAbilityID = tab.FKeyID
+    WHERE   tal.FNodeType =2 AND tab.FNodeType =1 AND tal.FDel = 1 AND tab.FDel = 1
+    <choose>
+      <when test="FCourseID != null and FCourseID!=''">
+        AND tca.FCourseID = #{FCourseID}
+      </when>
+      <otherwise>
+        AND tca.FCourseID = 0
+      </otherwise>
+    </choose>
+  </select>
+
+</mapper>

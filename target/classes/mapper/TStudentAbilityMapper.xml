@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fun.server.mapper.TStudentAbilityMapper">
+  <resultMap id="BaseResultMap" type="fun.server.model.TStudentAbility">
+    <!--
+    @mbg.generated
+    -->
+    <constructor>
+      <idArg column="FKeyID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FUID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCDATE" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FUDATE" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FState" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FStudentID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FDate" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FMode" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FAbilityID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FAbilityLevelID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FAbilityInf" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FUrl" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FConditionID" javaType="java.lang.Long" jdbcType="BIGINT" />
+    </constructor>
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <!--
+    @mbg.generated
+    -->
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <!--
+    @mbg.generated
+    -->
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    <!--
+    @mbg.generated
+    -->
+    FKeyID, FCID, FUID, FCDATE, FUDATE, FState, FStudentID, FDate, FMode, FAbilityID, 
+    FAbilityLevelID, FAbilityInf, FUrl, FConditionID
+  </sql>
+    <select id="getStudentAbilitylist" parameterType="fun.server.model.customQuery.studentability.StudentabilityCs" resultType="fun.server.model.customQuery.studentability.Studentabilitydata">
+
+        SELECT IFNULL(ts.FName,'') AS FSName,IFNULL(ts.FNo,'') AS FSNo,ts.FSex,IFNULL(ts.FBirthday,'') AS
+        FBirthday,IFNULL(ts.FTel,'') AS FTel,
+        tsa.FKeyID,tsa.FStudentID,IFNULL(tsa.FDate,'') AS
+        FDate,tsa.FMode,tsa.FAbilityID,tsa.FAbilityLevelID,IFNULL(tsa.FAbilityInf,'') AS FAbilityInf,IFNULL(tsa.FUrl,'')
+        AS FUrl,
+        IFNULL(tab.FName,'') AS FTABName,IFNULL(tabl.FName,'') AS FTABLName,IFNULL(tabt.FName,'') AS FTATBTName,tsa.FState AS FSState
+        ,IFNULL(talc.FName,'') AS FConditionName,tsa.FConditionID
+        FROM t_student_ability tsa
+        LEFT JOIN t_student ts
+        ON tsa.FStudentID = ts.FKeyID
+        LEFT JOIN t_ability_level_condition talc
+        ON tsa.FConditionID = talc.FKeyID
+        LEFT JOIN t_ability_tree tab
+        ON tsa.FAbilityID = tab.FKeyID AND tab.FNodeType=1
+        LEFT JOIN t_ability_tree tabl
+        ON tsa.FAbilityLevelID = tabl.FKeyID AND tabl.FNodeType =2
+        LEFT JOIN t_ability_type tabt
+        ON tabt.FKeyID = tab.FTypeID
+        WHERE 1=1
+        <if test="FName != null and FName!=''">
+            and ts.FName like concat('%',#{FName},'%')
+        </if>
+        <if test="FTel != null and FTel!=''">
+            and ts.FTel like concat('%',#{FTel},'%')
+        </if>
+        <if test="FAbilityName != null and FAbilityName!=''">
+            and tab.FName like concat('%',#{FAbilityName},'%')
+        </if>
+        <if test=" FState != null and FState!= -1 ">
+            and tsa.FState = #{FState}
+        </if>
+        <if test="orderBy != null and orderBy!=''">
+            order by ${orderBy}
+        </if>
+    </select>
+
+<!--    &lt;select id="getStudentFPoints"-->
+<!--            resultType="java.lang.Integer"&gt;-->
+
+<!--        SELECT ifnull(SUM(tal.FPoints),0)  AS sumFPoints  FROM t_student_ability tsa-->
+<!--        LEFT JOIN t_ability_level tal-->
+<!--        ON tsa.FAbilityLevelID = tal.FKeyID-->
+<!--        WHERE 1=1-->
+<!--        &lt;choose&gt;-->
+<!--            &lt;when test="FStudentID != null and FStudentID!=''"&gt;-->
+<!--                and tsa.FStudentID = #{FStudentID}-->
+<!--            &lt;/when&gt;-->
+<!--            &lt;otherwise&gt;-->
+<!--                and tsa.FStudentID = 0-->
+<!--            &lt;/otherwise&gt;-->
+<!--        &lt;/choose&gt;-->
+<!--    &lt;/select&gt;-->
+
+<!--    <select id="getStudentFPoints" resultType="java.lang.Integer">-->
+
+<!--        SELECT ifnull(SUM(tal.FPoints),0)  AS sumFPoints  FROM t_student_ability tsa-->
+<!--        LEFT JOIN t_ability_tree tal-->
+<!--        ON tsa.FAbilityLevelID = tal.FKeyID-->
+<!--        WHERE 1=1-->
+<!--        <choose>-->
+<!--            <when test="FStudentID != null and FStudentID!=''">-->
+<!--                and tsa.FStudentID = #{FStudentID}-->
+<!--            </when>-->
+<!--            <otherwise>-->
+<!--                and tsa.FStudentID = 0-->
+<!--            </otherwise>-->
+<!--        </choose>-->
+<!--    </select>-->
+
+    <select id="getStudentFPoints" resultType="java.lang.Integer">
+        WITH RECURSIVE condition_path AS (
+        -- 基础查询：找出学生满足的所有条件节点
+        SELECT
+        tt.FKeyID,
+        tt.FName,
+        tt.FPID,
+        tt.FNodeType,
+        tt.FPoints,
+        tt.FALCID,
+        sa.FStudentID
+        FROM
+        `t_ability_tree` tt
+        JOIN
+        t_student_ability sa ON tt.FALCID = sa.FConditionID
+        WHERE
+        tt.FNodeType = 3
+        <choose>
+            <when test="FStudentID != null and FStudentID!=''">
+                AND sa.FStudentID = #{FStudentID}
+            </when>
+            <otherwise>
+                AND sa.FStudentID = 0
+            </otherwise>
+        </choose>
+        UNION ALL
+
+        -- 递归查询：向上查找父节点
+        SELECT
+        p.FKeyID,
+        p.FName,
+        p.FPID,
+        p.FNodeType,
+        p.FPoints,
+        p.FALCID,
+        cp.FStudentID
+        FROM
+        `t_ability_tree` p
+        JOIN
+        condition_path cp ON p.FKeyID = cp.FPID
+        ),
+
+        -- 新增：找出所有不重复的FNodeType=2节点
+        distinct_parents AS (
+        SELECT DISTINCT
+        FKeyID,
+        FName,
+        FPoints,
+        FStudentID
+        FROM
+        condition_path
+        WHERE
+        FNodeType = 2
+        )
+
+        -- 计算去重后的积分总和
+        SELECT
+        ifnull(SUM(FPoints),0)  AS sumFPoints
+        FROM
+        distinct_parents
+        GROUP BY
+        FStudentID;
+    </select>
+
+<!--    &lt;select id="getStudentAbilityMB" resultType="fun.server.model.customQuery.studentability.StudentabilityMB"&gt;-->
+
+<!-- -->
+<!--        SELECT-->
+<!--            ta.FName AS FTABName,-->
+<!--            GROUP_CONCAT(tal.FName ORDER BY tal.FPoints SEPARATOR '，') AS FTLevelName-->
+<!--        FROM-->
+<!--            t_ability_level tal-->
+<!--                INNER JOIN-->
+<!--            t_ability ta-->
+<!--            ON-->
+<!--                tal.FAbilityID = ta.FKeyID-->
+<!--        WHERE-->
+<!--            ta.FState = 1-->
+<!--          AND tal.FState = 1-->
+<!--        GROUP BY-->
+<!--            ta.FName-->
+<!--        ORDER BY-->
+<!--            ta.FName;-->
+<!--    &lt;/select&gt;-->
+
+<!--    &lt;select id="getStudentAbilityMB" resultType="fun.server.model.customQuery.studentability.StudentabilityMB"&gt;-->
+
+
+<!--        WITH RECURSIVE TypePath AS (-->
+<!--            SELECT-->
+<!--                FKeyID,-->
+<!--                FName AS FTypeName,-->
+<!--                CAST(FName AS CHAR(255)) AS FTypePath,-->
+<!--                FPID-->
+<!--            FROM-->
+<!--                t_ability_type-->
+<!--            WHERE-->
+<!--                FPID = 1  &amp;#45;&amp;#45; 假设根节点的FPID为NULL-->
+<!--            UNION ALL-->
+<!--            SELECT-->
+<!--                t.FKeyID,-->
+<!--                t.FName,-->
+<!--                CONCAT(tp.FTypePath, '/', t.FName),-->
+<!--                t.FPID-->
+<!--            FROM-->
+<!--                t_ability_type t-->
+<!--                    INNER JOIN-->
+<!--                TypePath tp-->
+<!--                ON-->
+<!--                    t.FPID = tp.FKeyID-->
+<!--        )-->
+<!--        SELECT tal.FKeyID as FTLevelID,CONCAT('【',tp.FTypePath, '】——&gt;【', ta.`FName`, '】——&gt;【', tal.`FName`,'】')   AS FTLevelName    FROM  `t_ability_level` tal-->
+<!--            LEFT JOIN `t_ability` ta-->
+<!--                      ON tal.`FAbilityID` = ta.`FKeyID`-->
+<!--            LEFT JOIN-->
+<!--        TypePath tp-->
+<!--        ON-->
+<!--            ta.FTypeID = tp.FKeyID-->
+<!--        WHERE-->
+<!--            ta.FState = 1-->
+<!--          AND tal.FState = 1-->
+
+<!--        ORDER BY-->
+<!--            tal.FCDATE;-->
+<!--    &lt;/select&gt;-->
+
+    <select id="getStudentAbilityMB" resultType="fun.server.model.customQuery.studentability.StudentabilityMB">
+
+
+        -- 创建递归 CTE TypePath，用于生成类型路径
+        WITH RECURSIVE TypePath AS (
+            -- 初始查询，选择根节点数据
+            SELECT
+                FKeyID,
+                FName AS FTypeName,
+                FName AS FTypePath,
+                FPID
+            FROM
+                t_ability_type
+            WHERE
+                FPID = 1
+            UNION ALL
+            -- 递归查询，连接 TypePath 和 t_ability_type 表
+            SELECT
+                t.FKeyID,
+                t.FName,
+                CONCAT(tp.FTypePath, '/', t.FName),
+                t.FPID
+            FROM
+                t_ability_type t
+                    INNER JOIN TypePath tp ON t.FPID = tp.FKeyID
+        ),
+-- 创建临时表 FilteredAbilityTree，提前过滤 t_ability_tree 表中的数据
+                       FilteredAbilityTree AS (
+                           SELECT
+                               FKeyID,
+                               FPID,
+                               FName,
+                               FTypeID,
+                               FState,
+                               FDel,
+                               FCDATE,
+                               FNodeType
+                           FROM
+                               t_ability_tree
+                           WHERE
+                               FState = 1 AND FDel = 1
+                       )
+-- 最终查询，连接 FilteredAbilityTree 和 TypePath 表
+        SELECT
+            tal.FKeyID AS FTLevelID,
+            CONCAT('【', tp.FTypePath, '】——&gt;【', ta.`FName`, '】——&gt;【', tal.`FName`, '】') AS FTLevelName
+        FROM
+            FilteredAbilityTree tal
+                LEFT JOIN FilteredAbilityTree ta ON tal.FPID = ta.FKeyID
+                LEFT JOIN TypePath tp ON ta.FTypeID = tp.FKeyID
+        WHERE
+            tal.FNodeType = 2 AND ta.FNodeType = 1
+        ORDER BY
+            tal.FCDATE;
+    </select>
+
+<!--    &lt;select id="getStudentAbilityLevelMax" resultType="fun.server.model.customQuery.studentability.StudentabilityLevelMax"&gt;-->
+<!--        SELECT tsa.FKeyID,tsa.FAbilityID, ifnull(tal.FName,'') AS FAbilityLevelName-->
+<!--        FROM t_student_ability tsa-->
+<!--                 LEFT JOIN t_ability ta ON tsa.FAbilityID = ta.FKeyID-->
+<!--                 LEFT JOIN t_ability_level tal ON tsa.FAbilityLevelID = tal.FKeyID-->
+<!--        WHERE  tsa.FState= 1-->
+<!--        &lt;choose&gt;-->
+<!--            &lt;when test="FStudentID != null and FStudentID!=''"&gt;-->
+<!--                and tsa.FStudentID = #{FStudentID}-->
+<!--            &lt;/when&gt;-->
+<!--            &lt;otherwise&gt;-->
+<!--                and tsa.FStudentID = 0-->
+<!--            &lt;/otherwise&gt;-->
+<!--        &lt;/choose&gt;-->
+<!--          AND (tsa.FAbilityID, tal.FPoints) IN (SELECT tsa2.FAbilityID, MAX(tal2.FPoints)-->
+<!--                FROM t_student_ability tsa2-->
+<!--                         LEFT JOIN t_ability_level tal2 ON tsa2.FAbilityLevelID = tal2.FKeyID-->
+<!--                WHERE tsa.FState= 1-->
+<!--                &lt;choose&gt;-->
+<!--                    &lt;when test="FStudentID != null and FStudentID!=''"&gt;-->
+<!--                        and tsa.FStudentID = #{FStudentID}-->
+<!--                    &lt;/when&gt;-->
+<!--                    &lt;otherwise&gt;-->
+<!--                        and tsa.FStudentID = 0-->
+<!--                    &lt;/otherwise&gt;-->
+<!--                &lt;/choose&gt;-->
+<!--                GROUP BY tsa2.FAbilityID)-->
+<!--    &lt;/select&gt;-->
+
+    <select id="getStudentAbilityLevelMax" resultType="fun.server.model.customQuery.studentability.StudentabilityLevelMax">
+        SELECT tsa.FKeyID,tsa.FAbilityID, ifnull(tal.FName,'') AS FAbilityLevelName,ifnull(ta.FName,'') AS FAbilityName,tal.FKeyID as FAbilityLevelID,ta.FTypeID
+        FROM t_student_ability tsa
+        LEFT JOIN t_ability_tree ta ON tsa.FAbilityID = ta.FKeyID and ta.FNodeType =1
+        LEFT JOIN t_ability_tree tal ON tsa.FAbilityLevelID = tal.FKeyID and tal.FNodeType =2
+        WHERE  tsa.FState= 1 and ta.FDel =1 and tal.FDel = 1
+        <choose>
+            <when test="FStudentID != null and FStudentID!=''">
+                and tsa.FStudentID = #{FStudentID}
+            </when>
+            <otherwise>
+                and tsa.FStudentID = 0
+            </otherwise>
+        </choose>
+        AND (tsa.FAbilityID, tal.FPoints) IN (SELECT tsa2.FAbilityID, MAX(tal2.FPoints)
+        FROM t_student_ability tsa2
+        LEFT JOIN t_ability_tree tal2 ON tsa2.FAbilityLevelID = tal2.FKeyID and tal2.FNodeType =2
+        WHERE tsa.FState= 1
+        <choose>
+            <when test="FStudentID != null and FStudentID!=''">
+                and tsa.FStudentID = #{FStudentID}
+            </when>
+            <otherwise>
+                and tsa.FStudentID = 0
+            </otherwise>
+        </choose>
+        GROUP BY tsa2.FAbilityID)
+    </select>
+</mapper>

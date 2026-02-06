@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数据趋势可视化系统</title>
+  <!-- Tailwind CSS v3 -->
+ <!--  <script src="https://cdn.tailwindcss.com"></script> -->
+  <!-- Font Awesome -->
+ <!--  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
+  <script src="js/3.4.16"></script>
+  <link href="fonts/font-awesome.min.css" rel="stylesheet">
+  <!-- ECharts -->
+ <!--  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.3.0/echarts.min.js"></script> -->
+  <script src="js/echarts.min.js"></script>
+  <!-- 统一的 Tailwind 配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1E40AF',
+            secondary: '#3B82F6',
+            accent: '#60A5FA',
+            dark: '#1E293B',
+            light: '#F8FAFC',
+            success: '#10B981',
+            warning: '#F59E0B',
+            danger: '#EF4444',
+            info: '#3B82F6'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          boxShadow: {
+            'card': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+            'card-hover': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          }
+        }
+      },
+      darkMode: 'class'
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .bg-gradient-blue {
+        background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .transition-all-300 {
+        transition: all 300ms ease-in-out;
+      }
+      .scrollbar-thin {
+        scrollbar-width: thin;
+      }
+      .scrollbar-thin::-webkit-scrollbar {
+        width: 6px;
+      }
+      .scrollbar-thin::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      .scrollbar-thin::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 3px;
+      }
+      .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
+  <!-- 顶部导航栏 -->
+  <header class="bg-white dark:bg-gray-800 shadow-md z-10">
+    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <i class="fa fa-line-chart text-primary text-2xl"></i>
+        <h1 class="text-xl font-bold text-primary">数据趋势可视化系统</h1>
+      </div>
+      <div class="flex items-center space-x-4">
+        <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-all-300">
+          <i class="fa fa-moon-o dark:hidden"></i>
+          <i class="fa fa-sun-o hidden dark:block"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主要内容区域 -->
+  <main class="flex-grow container mx-auto px-4 py-6 flex flex-col lg:flex-row gap-6">
+    <!-- 左侧面板 -->
+    <div class="lg:w-1/3 space-y-6">
+      <!-- 文件上传区域 -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-card p-6 transition-all-300 hover:shadow-card-hover">
+        <h2 class="text-lg font-semibold mb-4 flex items-center">
+          <i class="fa fa-upload mr-2 text-primary"></i>文件上传
+        </h2>
+        <div id="dropArea" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center cursor-pointer hover:border-primary dark:hover:border-primary transition-all-300">
+          <i class="fa fa-cloud-upload text-4xl text-gray-400 dark:text-gray-500 mb-3"></i>
+          <p class="mb-2">拖放文件到此处或点击上传</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">支持 .txt, .csv, .json 格式</p>
+          <input type="file" id="fileInput" class="hidden" accept=".txt,.csv,.json">
+        </div>
+        <div class="mt-4 flex flex-wrap gap-2">
+          <button id="loadExampleBtn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition-all-300 flex items-center">
+            <i class="fa fa-magic mr-2"></i>加载示例数据
+          </button>
+          <button id="clearDataBtn" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all-300 flex items-center">
+            <i class="fa fa-trash mr-2"></i>清空数据
+          </button>
+        </div>
+      </div>
+
+      <!-- 数据结构树 -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-card p-6 transition-all-300 hover:shadow-card-hover">
+        <h2 class="text-lg font-semibold mb-4 flex items-center">
+          <i class="fa fa-tree mr-2 text-primary"></i>数据结构树
+        </h2>
+        <div id="dataTree" class="max-h-60 overflow-y-auto scrollbar-thin border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+          <p class="text-gray-500 dark:text-gray-400 text-center italic">暂无数据</p>
+        </div>
+      </div>
+
+      <!-- 大文本框 -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-card p-6 transition-all-300 hover:shadow-card-hover">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-semibold flex items-center">
+            <i class="fa fa-file-text mr-2 text-primary"></i>文本数据
+          </h2>
+          <div class="flex gap-2">
+            <button id="copyTextBtn" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+              <i class="fa fa-copy"></i>
+            </button>
+            <button id="clearTextBtn" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+        </div>
+        <textarea id="textData" class="w-full h-60 p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 resize-none scrollbar-thin" placeholder="数据将显示在这里..." readonly></textarea>
+      </div>
+    </div>
+
+    <!-- 右侧面板 -->
+    <div class="lg:w-2/3 space-y-6">
+      <!-- 图表配置区域 -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-card p-6 transition-all-300 hover:shadow-card-hover">
+        <h2 class="text-lg font-semibold mb-4 flex items-center">
+          <i class="fa fa-sliders mr-2 text-primary"></i>图表配置
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="chartType" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">图表类型</label>
+            <select id="chartType" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary">
+              <option value="line">折线图</option>
+              <option value="bar">柱状图</option>
+              <option value="scatter">散点图</option>
+              <option value="area">面积图</option>
+              <option value="radar">雷达图</option>
+            </select>
+          </div>
+          <div>
+            <label for="timeRange" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">时间范围</label>
+            <select id="timeRange" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary">
+              <option value="all">全部</option>
+              <option value="week">最近一周</option>
+              <option value="month">最近一个月</option>
+              <option value="quarter">最近三个月</option>
+              <option value="year">最近一年</option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-4 flex justify-end">
+          <button id="generateChartBtn" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition-all-300 flex items-center disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            <i class="fa fa-chart-line mr-2"></i>生成图表
+          </button>
+        </div>
+      </div>
+
+      <!-- 图表展示区域 -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-card p-6 transition-all-300 hover:shadow-card-hover">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-semibold flex items-center">
+            <i class="fa fa-chart-area mr-2 text-primary"></i>趋势图表
+          </h2>
+          <div class="flex gap-2">
+            <button id="downloadChartBtn" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+              <i class="fa fa-download"></i>
+            </button>
+            <button id="refreshChartBtn" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+              <i class="fa fa-refresh"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- 图表容器 -->
+        <div id="chartContainer" class="relative h-[400px] w-full">
+          <!-- 图表占位符 -->
+          <div id="chartPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center">
+            <i class="fa fa-bar-chart text-5xl text-gray-300 dark:text-gray-600 mb-3"></i>
+            <p class="text-gray-500 dark:text-gray-400">上传数据并点击"生成图表"按钮查看趋势图</p>
+          </div>
+          
+          <!-- 图表加载状态 -->
+          <div id="chartLoading" class="absolute inset-0 flex flex-col items-center justify-center bg-white bg-opacity-80 dark:bg-gray-800 dark:bg-opacity-80 hidden">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            <p class="mt-3 text-gray-600 dark:text-gray-300">图表生成中...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-white dark:bg-gray-800 shadow-inner py-4">
+    <div class="container mx-auto px-4 text-center text-gray-600 dark:text-gray-400 text-sm">
+      <p>© 2025 数据趋势可视化系统 | 设计与开发</p>
+    </div>
+  </footer>
+
+  <!-- 通知组件 -->
+  <div id="notification" class="fixed top-4 right-4 max-w-sm bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 transform translate-x-full transition-transform duration-300 flex items-start z-50">
+    <div id="notificationIcon" class="text-xl mr-3"></div>
+    <div class="flex-1">
+      <h3 id="notificationTitle" class="font-semibold"></h3>
+      <p id="notificationMessage" class="text-sm text-gray-600 dark:text-gray-400 mt-1"></p>
+    </div>
+    <button id="closeNotification" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+      <i class="fa fa-times"></i>
+    </button>
+  </div>
+
+  <script>
+    // DOM元素
+    const dropArea = document.getElementById('dropArea');
+    const fileInput = document.getElementById('fileInput');
+    const loadExampleBtn = document.getElementById('loadExampleBtn');
+    const clearDataBtn = document.getElementById('clearDataBtn');
+    const dataTree = document.getElementById('dataTree');
+    const textData = document.getElementById('textData');
+    const copyTextBtn = document.getElementById('copyTextBtn');
+    const clearTextBtn = document.getElementById('clearTextBtn');
+    const chartType = document.getElementById('chartType');
+    const timeRange = document.getElementById('timeRange');
+    const generateChartBtn = document.getElementById('generateChartBtn');
+    const chartContainer = document.getElementById('chartContainer');
+    const chartPlaceholder = document.getElementById('chartPlaceholder');
+    const chartLoading = document.getElementById('chartLoading');
+    const downloadChartBtn = document.getElementById('downloadChartBtn');
+    const refreshChartBtn = document.getElementById('refreshChartBtn');
+    const themeToggle = document.getElementById('themeToggle');
+    const notification = document.getElementById('notification');
+    const notificationIcon = document.getElementById('notificationIcon');
+    const notificationTitle = document.getElementById('notificationTitle');
+    const notificationMessage = document.getElementById('notificationMessage');
+    const closeNotification = document.getElementById('closeNotification');
+
+    // 全局变量
+    let processedData = {
+      dates: [],
+      values: [],
+      raw: ''
+    };
+    let myChart = null;
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      // 初始化主题
+      initTheme();
+      
+      // 初始化事件监听
+      initEventListeners();
+      
+      // 初始化ECharts实例
+      myChart = echarts.init(chartContainer);
+      
+      // 监听窗口大小变化，调整图表大小
+      window.addEventListener('resize', () => {
+        if (myChart) {
+          myChart.resize();
+        }
+      });
+    });
+
+    // 初始化主题
+    function initTheme() {
+      if (localStorage.getItem('theme') === 'dark' || 
+          (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+
+    // 初始化事件监听
+    function initEventListeners() {
+      // 主题切换
+      themeToggle.addEventListener('click', toggleTheme);
+      
+      // 文件上传区域事件
+      dropArea.addEventListener('click', () => fileInput.click());
+      dropArea.addEventListener('dragover', handleDragOver);
+      dropArea.addEventListener('drop', handleDrop);
+      fileInput.addEventListener('change', handleFileSelect);
+      
+      // 按钮事件
+      loadExampleBtn.addEventListener('click', loadExampleData);
+      clearDataBtn.addEventListener('click', clearData);
+      copyTextBtn.addEventListener('click', copyTextToClipboard);
+      clearTextBtn.addEventListener('click', clearTextArea);
+      generateChartBtn.addEventListener('click', generateChartFromData);
+      downloadChartBtn.addEventListener('click', downloadChart);
+      refreshChartBtn.addEventListener('click', refreshChart);
+      
+      // 通知关闭按钮
+      closeNotification.addEventListener('click', hideNotification);
+    }
+
+    // 切换主题
+    function toggleTheme() {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+      
+      // 如果图表已初始化，更新图表主题
+      if (myChart) {
+        myChart.dispose();
+        myChart = echarts.init(chartContainer);
+        if (processedData.dates.length > 0 && processedData.values.length > 0) {
+          updateChart();
+        }
+      }
+    }
+
+    // 处理拖拽经过
+    function handleDragOver(e) {
+      e.preventDefault();
+      dropArea.classList.add('border-primary');
+    }
+
+    // 处理拖拽放置
+    function handleDrop(e) {
+      e.preventDefault();
+      dropArea.classList.remove('border-primary');
+      
+      if (e.dataTransfer.files.length) {
+        handleFiles(e.dataTransfer.files);
+      }
+    }
+
+    // 处理文件选择
+    function handleFileSelect(e) {
+      if (e.target.files.length) {
+        handleFiles(e.target.files);
+      }
+    }
+
+    // 处理文件
+    function handleFiles(files) {
+      const file = files[0];
+      
+      // 验证文件类型
+      if (!['text/plain', 'text/csv', 'application/json'].includes(file.type) &&
+          !file.name.endsWith('.txt') && !file.name.endsWith('.csv') && !file.name.endsWith('.json')) {
+        showNotification('错误', '请上传.txt, .csv或.json格式的文件', 'error');
+        return;
+      }
+      
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        try {
+          const content = e.target.result;
+          processedData.raw = content;
+          
+          // 解析文件内容
+          parseFileContent(file, content);
+          
+          // 更新UI
+          updateDataTree();
+          updateTextArea();
+          
+          // 启用按钮
+          generateChartBtn.disabled = false;
+          copyTextBtn.disabled = false;
+          clearTextBtn.disabled = false;
+          
+          showNotification('成功', '文件上传并解析成功', 'success');
+        } catch (error) {
+          showNotification('错误', `文件解析失败: ${error.message}`, 'error');
+        }
+      };
+      
+      reader.onerror = function() {
+        showNotification('错误', '文件读取失败', 'error');
+      };
+      
+      reader.readAsText(file);
+    }
+
+    // 解析文件内容
+    function parseFileContent(file, content) {
+      if (file.name.endsWith('.txt')) {
+        // 解析TXT文件（每行一个数据点，格式：日期,数值）
+        const lines = content.split('\n').filter(line => line.trim() !== '');
+        processedData.dates = [];
+        processedData.values = [];
+        
+        lines.forEach(line => {
+          const parts = line.split(',');
+          if (parts.length === 2) {
+            processedData.dates.push(parts[0].trim());
+            processedData.values.push(parseFloat(parts[1].trim()));
+          }
+        });
+        
+        if (processedData.dates.length === 0) {
+          throw new Error('TXT文件格式不正确，请确保每行格式为：日期,数值');
+        }
+      } else if (file.name.endsWith('.csv')) {
+        // 解析CSV文件（第一行为标题，后续行为数据）
+        const lines = content.split('\n').filter(line => line.trim() !== '');
+        if (lines.length < 2) {
+          throw new Error('CSV文件至少需要包含标题行和一行数据');
+        }
+        
+        // 假设第一列为日期，第二列为数值
+        processedData.dates = [];
+        processedData.values = [];
+        
+        for (let i = 1; i < lines.length; i++) {
+          const parts = lines[i].split(',');
+          if (parts.length >= 2) {
+            processedData.dates.push(parts[0].trim());
+            processedData.values.push(parseFloat(parts[1].trim()));
+          }
+        }
+        
+        if (processedData.dates.length === 0) {
+          throw new Error('CSV文件格式不正确，请确保包含日期和数值列');
+        }
+      } else if (file.name.endsWith('.json')) {
+        // 解析JSON文件（格式：{ "dates": [], "values": [] }）
+        const jsonData = JSON.parse(content);
+        
+        if (!jsonData.dates || !jsonData.values || !Array.isArray(jsonData.dates) || !Array.isArray(jsonData.values)) {
+          throw new Error('JSON文件格式不正确，请确保包含dates和values数组');
+        }
+        
+        if (jsonData.dates.length !== jsonData.values.length) {
+          throw new Error('dates和values数组长度必须一致');
+        }
+        
+        processedData.dates = jsonData.dates;
+        processedData.values = jsonData.values.map(v => parseFloat(v));
+      } else {
+        throw new Error('不支持的文件格式');
+      }
+    }
+
+    // 加载示例数据
+    function loadExampleData() {
+      // 生成过去30天的示例数据
+      const today = new Date();
+      processedData.dates = [];
+      processedData.values = [];
+      
+      for (let i = 29; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        processedData.dates.push(date.toISOString().split('T')[0]);
+        
+        // 生成随机数值，带有一定的趋势性
+        const trend = i * 0.5; // 整体上升趋势
+        const random = Math.random() * 10; // 随机波动
+        processedData.values.push(Math.round((20 + trend + random) * 10) / 10);
+      }
+      
+      // 生成原始数据文本
+      processedData.raw = processedData.dates.map((date, index) => `${date},${processedData.values[index]}`).join('\n');
+      
+      // 更新UI
+      updateDataTree();
+      updateTextArea();
+      
+      // 启用按钮
+      generateChartBtn.disabled = false;
+      copyTextBtn.disabled = false;
+      clearTextBtn.disabled = false;
+      
+      showNotification('示例数据已加载', '点击"生成图表"按钮查看趋势图', 'success');
+    }
+
+    // 清空数据
+    function clearData() {
+      // 清空数据
+      processedData = {
+        dates: [],
+        values: [],
+        raw: ''
+      };
+      
+      // 更新UI
+      updateDataTree();
+      updateTextArea();
+      
+      // 禁用按钮
+      generateChartBtn.disabled = true;
+      downloadChartBtn.disabled = true;
+      refreshChartBtn.disabled = true;
+      copyTextBtn.disabled = true;
+      clearTextBtn.disabled = true;
+      
+      // 清除图表
+      if (!chartPlaceholder.classList.contains('hidden')) {
+        chartPlaceholder.classList.remove('hidden');
+      }
+      
+      // 清除图表实例
+      if (myChart) {
+        myChart.clear();
+      }
+      
+      showNotification('数据已清空', '', 'info');
+    }
+
+    // 更新数据结构树
+    function updateDataTree() {
+      if (processedData.dates.length === 0 || processedData.values.length === 0) {
+        dataTree.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center italic">暂无数据</p>';
+        return;
+      }
+      
+      // 创建数据树
+      let treeHTML = `
+        <div class="tree-item">
+          <div class="flex items-center cursor-pointer tree-toggle">
+            <i class="fa fa-folder-open text-yellow-500 mr-2"></i>
+            <span>数据</span>
+          </div>
+          <div class="ml-6 mt-2">
+      `;
+      
+      // 添加日期节点
+      treeHTML += `
+        <div class="tree-item">
+          <div class="flex items-center cursor-pointer tree-toggle">
+            <i class="fa fa-calendar text-blue-500 mr-2"></i>
+            <span>日期 (${processedData.dates.length})</span>
+          </div>
+          <div class="ml-6 mt-2">
+      `;
+      
+      // 添加前5个日期作为示例
+      const datesToShow = processedData.dates.slice(0, 5);
+      datesToShow.forEach(date => {
+        treeHTML += `
+          <div class="tree-item">
+            <div class="flex items-center">
+              <i class="fa fa-calendar-o text-gray-500 mr-2"></i>
+              <span>${date}</span>
+            </div>
+          </div>
+        `;
+      });
+      
+      // 如果有更多日期，显示省略号
+      if (processedData.dates.length > 5) {
+        treeHTML += `
+          <div class="tree-item">
+            <div class="flex items-center text-gray-500">
+              <i class="fa fa-ellipsis-h mr-2"></i>
+              <span>还有 ${processedData.dates.length - 5} 个日期...</span>
+            </div>
+          </div>
+        `;
+      }
+      
+      treeHTML += `
+          </div>
+        </div>
+      `;
+      
+      // 添加数值节点
+      treeHTML += `
+        <div class="tree-item">
+          <div class="flex items-center cursor-pointer tree-toggle">
+            <i class="fa fa-line-chart text-green-500 mr-2"></i>
+            <span>数值 (${processedData.values.length})</span>
+          </div>
+          <div class="ml-6 mt-2">
+      `;
+      
+      // 添加前5个数值作为示例
+      const valuesToShow = processedData.values.slice(0, 5);
+      valuesToShow.forEach(value => {
+        treeHTML += `
+          <div class="tree-item">
+            <div class="flex items-center">
+              <i class="fa fa-circle text-xs text-gray-500 mr-2"></i>
+              <span>${value}</span>
+            </div>
+          </div>
+        `;
+      });
+      
+      // 如果有更多数值，显示省略号
+      if (processedData.values.length > 5) {
+        treeHTML += `
+          <div class="tree-item">
+            <div class="flex items-center text-gray-500">
+              <i class="fa fa-ellipsis-h mr-2"></i>
+              <span>还有 ${processedData.values.length - 5} 个数值...</span>
+            </div>
+          </div>
+        `;
+      }
+      
+      treeHTML += `
+          </div>
+        </div>
+      `;
+      
+      treeHTML += `
+          </div>
+        </div>
+      `;
+      
+      dataTree.innerHTML = treeHTML;
+      
+      // 添加树节点展开/折叠功能
+      document.querySelectorAll('.tree-toggle').forEach(toggle => {
+        toggle.addEventListener('click', function() {
+          const content = this.nextElementSibling;
+          const icon = this.querySelector('i');
+          
+          if (content.style.display === 'none') {
+            content.style.display = 'block';
+            icon.classList.remove('fa-folder');
+            icon.classList.add('fa-folder-open');
+          } else {
+            content.style.display = 'none';
+            icon.classList.remove('fa-folder-open');
+            icon.classList.add('fa-folder');
+          }
+        });
+      });
+    }
+
+    // 更新文本区域
+    function updateTextArea() {
+      textData.value = processedData.raw || '暂无数据';
+    }
+
+    // 复制文本到剪贴板
+    function copyTextToClipboard() {
+      if (!processedData.raw) {
+        showNotification('提示', '没有可复制的文本', 'info');
+        return;
+      }
+      
+      textData.select();
+      document.execCommand('copy');
+      
+      showNotification('成功', '文本已复制到剪贴板', 'success');
+    }
+
+    // 清空文本区域
+    function clearTextArea() {
+      textData.value = '';
+      showNotification('提示', '文本区域已清空', 'info');
+    }
+
+    // 从数据生成图表
+    function generateChartFromData() {
+      // 显示加载状态
+      chartPlaceholder.classList.add('hidden');
+      chartLoading.classList.remove('hidden');
+      
+      // 模拟数据处理延迟
+      setTimeout(() => {
+        // 更新图表
+        updateChart();
+        
+        // 隐藏加载状态
+        chartLoading.classList.add('hidden');
+        
+        // 启用下载和刷新按钮
+        downloadChartBtn.disabled = false;
+        refreshChartBtn.disabled = false;
+      }, 800);
+    }
+
+    // 更新图表
+    function updateChart() {
+      // 根据时间范围筛选数据
+      let filteredDates = [...processedData.dates];
+      let filteredValues = [...processedData.values];
+      
+      const range = timeRange.value;
+      if (range !== 'all') {
+        const now = new Date();
+        let startDate;
+        
+        switch (range) {
+          case 'week':
+            startDate = new Date(now.setDate(now.getDate() - 7));
+            break;
+          case 'month':
+            startDate = new Date(now.setMonth(now.getMonth() - 1));
+            break;
+          case 'quarter':
+            startDate = new Date(now.setMonth(now.getMonth() - 3));
+            break;
+          case 'year':
+            startDate = new Date(now.setFullYear(now.getFullYear() - 1));
+            break;
+        }
+        
+        const startDateStr = startDate.toISOString().split('T')[0];
+        
+        // 筛选数据
+        const filteredData = processedData.dates.reduce((acc, date, index) => {
+          if (date >= startDateStr) {
+            acc.dates.push(date);
+            acc.values.push(processedData.values[index]);
+          }
+          return acc;
+        }, { dates: [], values: [] });
+        
+        filteredDates = filteredData.dates;
+        filteredValues = filteredData.values;
+      }
+      
+      // 根据图表类型生成配置
+      const type = chartType.value;
+      let seriesConfig = [];
+      
+      // 创建渐变色
+      const colorGradient = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+        { offset: 0, color: '#3B82F6' },
+        { offset: 1, color: '#60A5FA' }
+      ]);
+      
+      switch (type) {
+        case 'line':
+          seriesConfig = [{
+            type: 'line',
+            data: filteredValues,
+            smooth: true,
+            symbol: 'circle',
+            symbolSize: 8,
+            lineStyle: {
+              width: 3,
+              color: colorGradient
+            },
+            itemStyle: {
+              color: '#3B82F6',
+              borderColor: '#fff',
+              borderWidth: 2,
+              shadowBlur: 4,
+              shadowColor: 'rgba(59, 130, 246, 0.5)'
+            },
+            emphasis: {
+              itemStyle: {
+                symbolSize: 12
+              }
+            }
+          }];
+          break;
+        case 'bar':
+          seriesConfig = [{
+            type: 'bar',
+            data: filteredValues,
+            barWidth: '60%',
+            itemStyle: {
+              color: colorGradient,
+              borderRadius: [4, 4, 0, 0]
+            },
+            emphasis: {
+              itemStyle: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                  { offset: 0, color: '#2563EB' },
+                  { offset: 1, color: '#3B82F6' }
+                ])
+              }
+            }
+          }];
+          break;
+        case 'scatter':
+          seriesConfig = [{
+            type: 'scatter',
+            data: filteredValues.map((value, index) => [index, value]),
+            symbolSize: 10,
+            itemStyle: {
+              color: '#3B82F6',
+              shadowBlur: 4,
+              shadowColor: 'rgba(59, 130, 246, 0.5)'
+            },
+            emphasis: {
+              itemStyle: {
+                symbolSize: 14
+              }
+            }
+          }];
+          break;
+        case 'area':
+          seriesConfig = [{
+            type: 'line',
+            data: filteredValues,
+            smooth: true,
+            symbol: 'circle',
+            symbolSize: 8,
+            lineStyle: {
+              width: 3,
+              color: colorGradient
+            },
+            itemStyle: {
+              color: '#3B82F6',
+              borderColor: '#fff',
+              borderWidth: 2
+            },
+            emphasis: {
+              itemStyle: {
+                symbolSize: 12
+              }
+            },
+            areaStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: 'rgba(59, 130, 246, 0.3)' },
+                { offset: 1, color: 'rgba(59, 130, 246, 0.1)' }
+              ])
+            }
+          }];
+          break;
+        case 'radar':
+          // 雷达图需要特殊处理，将数据分成多个维度
+          const radarData = [];
+          const dimensionCount = 8; // 雷达图维度数量
+          
+          // 如果数据点少于维度数量，直接使用所有数据
+          if (filteredValues.length <= dimensionCount) {
+            for (let i = 0; i < filteredValues.length; i++) {
+              radarData.push({
+                value: filteredValues[i],
+                name: filteredDates[i]
+              });
+            }
+          } else {
+            // 否则均匀采样
+            const step = Math.floor(filteredValues.length / dimensionCount);
+            for (let i = 0; i < dimensionCount; i++) {
+              const index = i * step;
+              radarData.push({
+                value: filteredValues[index],
+                name: filteredDates[index]
+              });
+            }
+          }
+          
+          seriesConfig = [{
+            type: 'radar',
+            data: [{
+              value: radarData.map(item => item.value),
+              name: '数据趋势',
+              lineStyle: {
+                width: 3,
+                color: colorGradient
+              },
+              itemStyle: {
+                color: '#3B82F6',
+                borderColor: '#fff',
+                borderWidth: 2
+              },
+              areaStyle: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                  { offset: 0, color: 'rgba(59, 130, 246, 0.3)' },
+                  { offset: 1, color: 'rgba(59, 130, 246, 0.1)' }
+                ])
+              }
+            }]
+          }];
+          break;
+      }
+      
+      // 图表配置
+      const option = {
+        backgroundColor: 'transparent',
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          },
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          borderColor: '#e2e8f0',
+          borderWidth: 1,
+          borderRadius: 8,
+          padding: 12,
+          textStyle: {
+            color: '#1e293b'
+          },
+          extraCssText: 'box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);'
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: type !== 'radar' ? {
+          type: 'category',
+          data: type === 'scatter' ? Array.from({ length: filteredDates.length }, (_, i) => i) : filteredDates,
+          axisLine: {
+            lineStyle: {
+              color: document.documentElement.classList.contains('dark') ? '#475569' : '#cbd5e1'
+            }
+          },
+          axisLabel: {
+            color: document.documentElement.classList.contains('dark') ? '#94a3b8' : '#64748b',
+            rotate: 45,
+            fontSize: 12
+          },
+          splitLine: {
+            show: false
+          }
+        } : undefined,
+        yAxis: type !== 'radar' ? {
+          type: 'value',
+          axisLine: {
+            show: false
+          },
+          axisLabel: {
+            color: document.documentElement.classList.contains('dark') ? '#94a3b8' : '#64748b',
+            fontSize: 12
+          },
+          splitLine: {
+            lineStyle: {
+              color: document.documentElement.classList.contains('dark') ? '#334155' : '#e2e8f0'
+            }
+          }
+        } : undefined,
+        radar: type === 'radar' ? {
+          indicator: radarData.map(item => ({
+            name: item.name,
+            max: Math.max(...radarData.map(d => d.value)) * 1.2
+          })),
+          axisLine: {
+            lineStyle: {
+              color: document.documentElement.classList.contains('dark') ? '#475569' : '#cbd5e1'
+            }
+          },
+          axisLabel: {
+            color: document.documentElement.classList.contains('dark') ? '#94a3b8' : '#64748b',
+            fontSize: 12
+          },
+          splitLine: {
+            lineStyle: {
+              color: document.documentElement.classList.contains('dark') ? '#334155' : '#e2e8f0'
+            }
+          },
+          splitArea: {
+            areaStyle: {
+              color: document.documentElement.classList.contains('dark') ? 'rgba(71, 85, 105, 0.1)' : 'rgba(226, 232, 240, 0.3)'
+            }
+          }
+        } : undefined,
+        series: seriesConfig,
+        animationDuration: 1500,
+        animationEasing: 'cubicOut',
+        animationDelay: function(idx) {
+          return idx * 20;
+        }
+      };
+      
+      // 设置图表
+      myChart.setOption(option);
+    }
+
+    // 下载图表
+    function downloadChart() {
+      if (!myChart) {
+        showNotification('错误', '图表未生成', 'error');
+        return;
+      }
+      
+      // 获取图表的数据URL
+      const dataURL = myChart.getDataURL({
+        pixelRatio: 2,
+        backgroundColor: document.documentElement.classList.contains('dark') ? '#1e293b' : '#ffffff'
+      });
+      
+      // 创建下载链接
+      const link = document.createElement('a');
+      link.download = `数据趋势图_${new Date().toISOString().split('T')[0]}.png`;
+      link.href = dataURL;
+      link.click();
+      
+      showNotification('成功', '图表已下载', 'success');
+    }
+
+    // 刷新图表
+    function refreshChart() {
+      if (!myChart) {
+        showNotification('错误', '图表未生成', 'error');
+        return;
+      }
+      
+      // 显示加载状态
+      chartLoading.classList.remove('hidden');
+      
+      // 模拟数据处理延迟
+      setTimeout(() => {
+        // 更新图表
+        updateChart();
+        
+        // 隐藏加载状态
+        chartLoading.classList.add('hidden');
+        
+        showNotification('成功', '图表已刷新', 'success');
+      }, 500);
+    }
+
+    // 显示通知
+    function showNotification(title, message, type = 'info') {
+      // 设置通知类型
+      let iconClass = 'fa-info-circle text-info';
+      if (type === 'success') {
+        iconClass = 'fa-check-circle text-success';
+      } else if (type === 'error') {
+        iconClass = 'fa-exclamation-circle text-danger';
+      } else if (type === 'warning') {
+        iconClass = 'fa-exclamation-triangle text-warning';
+      }
+      
+      // 设置通知内容
+      notificationIcon.className = iconClass;
+      notificationTitle.textContent = title;
+      notificationMessage.textContent = message;
+      
+      // 显示通知
+      notification.classList.remove('translate-x-full');
+      
+      // 3秒后自动隐藏
+      setTimeout(hideNotification, 3000);
+    }
+
+    // 隐藏通知
+    function hideNotification() {
+      notification.classList.add('translate-x-full');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script>
+    <!--/_global 公共配置文件-->
+</head>
+<body>
+<article class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="userInfoEditForm">
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>姓名：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="f_name"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>手机：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="f_tel"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>邮箱：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" placeholder="@" name="f_email"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">备注：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <textarea name="f_note" class="textarea" id="f_note"></textarea>
+            </div>
+        </div>
+        <div class="toolbar-bottom-line"></div>
+        <div class="toolbar-bottom-btn">
+            <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+            <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                   onclick="layer_close()"/>
+        </div>
+        <input type="hidden" value="" name="f_key_id"/>
+    </form>
+</article>
+
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript">
+    // 业务代码
+    $(function () {
+        // 打开页面时获取用户基本信息
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/entry/showUserInfo',
+            async: false,
+            success: function (data) {
+                $("#userInfoEditForm input[name='f_name']").val(data.user.f_name);
+                $("#userInfoEditForm input[name='f_tel']").val(data.user.f_tel);
+                $("#userInfoEditForm input[name='f_email']").val(data.user.f_email);
+                $("#f_note").val(data.user.f_note);
+                $("#userInfoEditForm input[name='f_key_id']").val(data.user.key);
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+        // 用户基本信息-检验数据
+        $('#userInfoEditForm').validate({
+            rules: {
+                f_name: {
+                    required: true
+                },
+                f_email: {
+                    email: true,
+                },
+                f_tel: {
+                    minlength: 11,
+                    maxlength: 11
+                },
+            },
+            messages: {
+                f_email: {
+                    email: '*请输入有效的电子邮件地址'
+                },
+                f_tel: {
+                    minlength: '*您的电话必须11个字符长度',
+                    maxlength: '*您的电话必须11个字符长度'
+                },
+            },
+            onfocusout: false, // 是否在获取焦点时验证
+            onkeyup: false, // 是否在敲击键盘时验证
+            focusInvalid: false, // 提交表单后，（第一个）未通过验证的表单获得焦点
+            focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+            success: 'valid',
+            submitHandler: function () {
+                // 获取参数
+                var dataJSON = form2Json('userInfoEditForm');
+                // 执行
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    url: '/s/user/updateUserInfo', // 调用地址
+                    data: JSON.stringify(dataJSON),
+                    async: false,
+                    success: function (data) {
+                        if (data.result == 'success') {
+                            parent.$('#sys_login_name').html(dataJSON['f_name']);
+                            parent.SignUserInfo['f_name'] = dataJSON['f_name'];
+                            parent.SignUserInfo['f_tel'] = dataJSON['f_tel'];
+                            parent.SignUserInfo['f_email'] = dataJSON['f_email'];
+                            parent.SignUserInfo['f_note'] = dataJSON['f_note'];
+                            // parent.$('#iframe-welcome')[0].contentWindow.updateUserInfo();
+                            parent.toastr.success('修改成功！');
+                            layer_close();
+                        } else if (data.result == 'tp_user_fail') {
+                            toastr.error('图谱用户修改错误：' + (data.error || '错误'));
+                        } else if (data.result == 'error') {
+                            toastr.error(data.error);
+                        }
+                        
+                        
+                        
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>

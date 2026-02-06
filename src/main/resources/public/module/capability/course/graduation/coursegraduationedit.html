@@ -1,0 +1,487 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <!--/_only 独立样式 -->
+</head>
+<style>
+    .xs{
+        cursor: pointer;
+    }
+
+    /* 特定字段的自定义样式 */
+    label.custom-error {
+        position: absolute;
+        right: 148px;
+        top: 5px;
+        color: #ef392b;
+        font-size: 12px;
+        z-index: 1;
+        padding-right: 15px;
+    }
+
+    label.error-message {
+        position: absolute;
+        right: 48px;
+        top: 5px;
+        color: #ef392b;
+        font-size: 12px;
+        z-index: 1;
+        padding-right: 15px;
+    }
+</style>
+<body>
+<article class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="targetForm">
+<!--        <div class="row cl">-->
+<!--            <label class="form-label col-xs-4 col-sm-3">课程目标类型：</label>-->
+<!--            <div class="formControls col-xs-7 col-sm-8">-->
+<!--                <select name="FType" id="FType" style="width: 100%;"></select>-->
+<!--            </div>-->
+<!--        </div>-->
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>培养方案：</label>
+            <div class="formControls col-xs-7 col-sm-8">
+                <input type="text" class="input-text" name="FTPName" id="FTPName" style="width: 80%;" readonly="readonly" />
+
+                <button type="button" class="btn btn-primary size-S" onclick="openCourse()">培养方案信息</button>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>毕业要求指标点：</label>
+            <div class="formControls col-xs-7 col-sm-8">
+<!--                <input type="text" class="input-text" name="FName" id="FName"/>-->
+                <select id="FTBYYQID" name="FTBYYQID" style="width: 95%;"></select>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>课程目标：</label>
+            <div class="formControls col-xs-7 col-sm-8">
+                <div id="FCourseC">
+                </div>
+            </div>
+        </div>
+        <div class="toolbar-bottom-line"></div>
+        <div class="toolbar-bottom-btn">
+            <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+            <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                   onclick="layer_close()"/>
+        </div>
+        <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+        <input type="hidden" value="" name="FCourseID" id="FCourseID"/>
+        <input type="hidden" value="" name="FTPID" id="FTPID"/>
+
+    </form>
+
+</article>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript">
+    // 编辑框状态 1新建 2修改
+    var op = getQueryStringByName('op');
+    var FCourseID = getQueryStringByName('FCourseID');
+    var FType;
+
+
+    var selectedIds = [];
+    var selectedNames = [];
+    top.classstudentpage = this;
+    var selectedcourseIds;
+    var selectedcourseNames;
+    var courseID;//培养方案ID
+    // 业务代码
+    $(function () {
+        $("#FCourseID").val(FCourseID);
+        selectTBYYQ(selectedcourseIds);
+        // $("#FType").select2({
+        //     placeholder: '请选择类型',
+        //     ajax: {
+        //         type: 'POST',
+        //         url: "/s/coursetargettype/queryDatacoursetargettypeSelect_wu",
+        //         dataType: 'json',
+        //         data: function (params) {
+        //             return {
+        //                 search: params.term,
+        //             };
+        //         },
+        //         processResults: function (data) {
+        //             return {
+        //                 results: data.list
+        //             };
+        //         },
+        //         delay: 800,
+        //         cache: true
+        //     },
+        //     language: "zh-CN"
+        // });
+        // $("#FType").change(function(){
+        //     var value = this.value;
+        //     FType = value;
+        //     dtscinputcheck("FCourseC");
+        // });
+        dtscinputcheck("FCourseC");
+        // 修改操作时读取表单信息
+        if (op == 2) {
+            var id = getQueryStringByName('id');
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/coursegraduation/querycoursegraduationInfo', // 调用地址
+                data: JSON.stringify({
+                    id: id
+                }),
+                async: false,
+                success: function (data) {
+                    // $('#FName').val(data.info.FName);
+                    $('#FTPName').val(data.info.FTPName + data.info.FTPEdition);
+                    selectedcourseIds = data.info.FTPID;
+                    $('#FTPID').val(data.info.FTPID);
+                    selectTBYYQ(selectedcourseIds);
+                    selectedcourseNames =data.info.FTPName ;
+                    var option = new Option(data.info.FTBName, data.info.FTBYYQID, true, true);
+                    $('#FTBYYQID').append(option);
+                    $('#FTBYYQID').change();
+
+
+
+                    $('#FKeyID').val(data.info.key);
+                    if(data.info.FCourseCID){
+                        // 使用 split() 方法将字符串按逗号分隔成数组
+                        var ids = data.info.FCourseCID.split(",");
+                        // 遍历数组，选中对应的复选框
+                        ids.forEach(function(id) {
+                            // 根据 id 获取复选框元素
+                            var checkbox = document.getElementById(id.trim()); // 使用 trim() 去除空格
+                            if (checkbox) {
+                                checkbox.checked = true; // 设置为选中状态
+                            }
+                        });
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        }
+        // 检验数据
+        var targetValidate = $('#targetForm').validate({
+            rules: {
+                FName: {
+                    required: true,
+                    levelLimit: false
+                },
+                FTBYYQID: {
+                    required: true,
+
+                },
+                FTPName: {
+                    required: true,
+
+                },
+            },
+            messages: {
+                FName: {
+                    required: '*请输入毕业要求指标点'
+                },
+                FTBYYQID: {
+                    required: '*请选择毕业要求指标点'
+                },
+                FTPName: {
+                    required: '*请选择培养方案'
+                },
+
+
+            },
+            errorPlacement: function(error, element) {
+                // 针对特定字段添加自定义类
+                if (element.attr("id") === "FTPName") {
+                    error.addClass("custom-error");
+                }else if (element.attr("id") === "FTBYYQID") {
+                    error.addClass("error-message");
+                }
+                error.insertAfter(element);
+            },
+            onfocusout: false, // 是否在获取焦点时验证
+            onkeyup: false, // 是否在敲击键盘时验证
+            focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+            focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+            success: 'valid',
+            submitHandler: function () {
+                if (isAnyCheckboxChecked() == false) {
+                    toastr.error("请选择毕业要求指标点！");
+                    return false;
+                }
+
+                var fcoursecid=[];
+                const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+                checkboxes.forEach(checkbox => {
+                    fcoursecid.push(checkbox.value);
+                });
+                // 获取参数
+                var data = form2Json('targetForm');
+                data['fcoursecid'] = fcoursecid;
+                if (op == 1) { // 添加操作
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/coursegraduation/addcoursegraduation', // 调用地址
+                        data: JSON.stringify(data),
+                        async: false,
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                parent.$('#mainTable').DataTable().ajax.reload(null, false);
+                                parent.toastr.success('添加成功！');
+                                layer_close();
+                            } else if (data.result == 'fail') {
+                                toastr.warning('毕业要求指标点重复，请重新输入');
+                            } else if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                } else {
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/coursegraduation/updatecoursegraduation', // 调用地址
+                        data: JSON.stringify(data),
+                        async: false,
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                parent.$('#mainTable').DataTable().ajax.reload(null, false);
+                                parent.toastr.success('修改成功！');
+                                layer_close();
+                            } else if (data.result == 'fail') {
+                                toastr.warning('毕业要求指标点重复，请重新输入');
+                            } else if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                }
+            }
+        });
+    });
+
+
+    function dtscinputcheck(divs) {
+        var checkdiv = $("#" + divs);
+        checkdiv.empty();
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/coursetarget/queryDatacoursetargetSelect', // 调用地址
+            data: JSON.stringify({
+                FCourseID:FCourseID,
+                FType:FType
+            }),
+            async: false,
+            success: function (data) {
+                // var html = "";
+                // let type;
+                //
+                // for (var i = 0; i < data.list.length; i++) {
+                //     if(i == 0){
+                //         type = data.list[i].ftype;
+                //
+                //     }
+                //     if(i>0 && data.list[i].ftype != type){
+                //         html += `<br/>`;
+                //
+                //         type = data.list[i].ftype;
+                //     }
+                //     html += `<input type="checkbox" class="qxxclass" name="qxx" id="`+data.list[i].id+`" value="` + data.list[i].id + `"/>`;
+                //     html +=`    <label for="`+data.list[i].id+`">`;
+                //     if(data.list[i].ftype != ""){
+                //         html += `        <span class="xs"  data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="`+data.list[i].text+`"><strong>课程目标</strong>` + data.list[i].num + `(<span style="color:#07821F; ">`+data.list[i].ftype+`</span>)</span>&nbsp;`;
+                //     }else{
+                //         html += `        <span class="xs"   data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="`+data.list[i].text+`"><strong>课程目标</strong>` + data.list[i].num + `</span>&nbsp;`;
+                //     }
+                //
+                //         html += `    </label> `;
+                //
+                // }
+                // checkdiv.append(html);
+
+                // 初始化HTML字符串和类型变量
+                let html = '<div class="checkbox-grid">'; // 添加网格容器
+                let type;
+                let currentGroupCount = 0; // 跟踪当前类型组中的项目数量
+
+                for (let i = 0; i < data.list.length; i++) {
+                    // 检查类型是否变化
+                    if (i === 0) {
+                        type = data.list[i].ftype;
+                    } else if (data.list[i].ftype !== type) {
+                        // 类型变化时，补全当前行的空白（如果需要）
+                        const remaining = 3 - (currentGroupCount % 3);
+                        if (remaining < 3) {
+                            html += Array(remaining).fill('<div class="checkbox-spacer"></div>').join('');
+                        }
+
+                        html += `<div class="type-separator"></div>`; // 使用div代替br作为类型分隔符
+                        type = data.list[i].ftype;
+                        currentGroupCount = 0; // 重置计数器
+                    }
+
+                    // 为每个复选框创建容器，便于控制布局
+                    html += `<div class="checkbox-item">`;
+                    html += `<input type="checkbox" class="qxxclass" name="qxx" id="${data.list[i].id}" value="${data.list[i].id}"/>`;
+                    html += `<label for="${data.list[i].id}">`;
+
+                    // 构建标签内容
+                    if (data.list[i].ftype !== "") {
+                        html += `<span class="xs" data-container="body" data-toggle="popover"
+                   data-placement="bottom" data-trigger="hover"
+                   data-content="${data.list[i].text}">
+                   <strong>课程目标</strong>${data.list[i].num}
+                   (<span style="color:#07821F;">${data.list[i].ftype}</span>)
+                 </span>`;
+                    } else {
+                        html += `<span class="xs" data-container="body" data-toggle="popover"
+                   data-placement="bottom" data-trigger="hover"
+                   data-content="${data.list[i].text}">
+                   <strong>课程目标</strong>${data.list[i].num}
+                 </span>`;
+                    }
+
+                    html += `</label>`;
+                    html += `</div>`; // 关闭checkbox-item
+
+                    currentGroupCount++;
+                }
+
+                html += '</div>'; // 关闭网格容器
+
+                // 添加必要的样式
+                const style = document.createElement('style');
+                style.textContent = `
+                    .checkbox-grid {
+                        display: grid;
+                        grid-template-columns: repeat(3, 1fr);
+                        gap: 5px;
+                        padding: 0px;
+                    }
+
+                    .checkbox-item {
+
+                        align-items: center;
+
+                    }
+
+                    .type-separator {
+                        grid-column: 1 / -1; /* 横跨所有列 */
+                        height: 2px;
+                    }
+
+                    .checkbox-spacer {
+                        visibility: hidden;
+                    }
+
+
+                `;
+                document.head.appendChild(style);
+
+                // 将HTML添加到容器
+                checkdiv.append(html);
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+    }
+
+
+    function openCourse(){
+        if($("#FTPID").val() == selectedcourseIds){
+            if(selectedcourseIds)
+                top.layer_show('培养方案信息查询页面', '/module/capability/courseOffering/enrollment2/coursecoursetopen.html?selectedIds=' + selectedcourseIds + '&selectedNames='+selectedcourseNames, '1400', '600');
+            else{
+                top.layer_show('培养方案信息查询页面', '/module/capability/courseOffering/enrollment2/coursecoursetopen.html', '1400', '600');
+            }
+        }else{
+            top.layer_show('培养方案信息查询页面', '/module/capability/courseOffering/enrollment2/coursecoursetopen.html', '1400', '600');
+        }
+    }
+
+    function getCourseID(selectedId,selectedName){
+        selectedIds = selectedId;
+        selectedNames = selectedName;
+        selectedcourseIds = selectedId[0];
+        $("#FTPID").val(selectedId)
+        $("#FTPName").val(selectedNames);
+        selectTBYYQ(selectedcourseIds);
+    }
+
+    //验证是否选择了
+    function isAnyCheckboxChecked() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        for (let checkbox of checkboxes) {
+            if (checkbox.checked) {
+                return true;
+            }
+        }
+        return false;
+    }
+    $(function () { $("[data-toggle='popover']").popover()});
+
+
+    function selectTBYYQ(selectedIds2){
+        $("#FTBYYQID").select2({
+            placeholder: '请选择毕业要求',
+            ajax: {
+                type: 'POST',
+                url: "/s/trainingprogrambyyq/queryDatatrainingprogrambyyqSelect_id",
+                dataType: 'json',
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        FTPID:selectedIds2
+                    };
+            },
+                processResults: function (data) {
+                    return {
+                        results: data.list
+                    };
+                },
+                delay: 800,
+                cache: true
+            },
+            language: "zh-CN"
+        });
+    }
+</script>
+
+</body>
+</html>

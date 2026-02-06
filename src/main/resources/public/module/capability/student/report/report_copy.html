@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <script type="text/javascript" src="/module/capability/ability/huaxiang/js/jQuery.Huifold.js"></script>
+    <title>个人能力报告详细展示</title>
+    <style>
+        body {
+            /*  font-family: Arial, sans-serif; */
+            margin: 20px;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .panel {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 20px;
+        }
+
+        .panel-header {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+        }
+
+        .vertical-line {
+            width: 3px;
+            height: 20px;
+            background-color: #007BFF;
+            margin-right: 10px;
+        }
+
+        .text {
+            font-weight: bold;
+        }
+
+        .panel-body {
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 20px;
+        }
+
+        section {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 15px;
+        }
+
+        h2 {
+            color: #555;
+            font-size: 16px;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .three-column {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between; 
+            box-sizing: border-box; /* 确保内边距和边框不会影响布局 */
+        }
+
+        .three-column section {
+            flex: 0 0 calc(50% - 20px); 
+            min-width: 0; 
+            box-sizing: border-box; /* 确保内边距和边框不会影响布局 */
+        }
+
+        /* 媒体查询，当屏幕宽度小于 768px 时，将两列布局改为一列布局 */
+        @media (max-width: 768px) {
+            .three-column section {
+                flex: 1 1 100%;
+            }
+        }
+
+        /* 优化下拉框样式 */
+        .chart-type-select {
+            padding: 8px 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: white;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .chart-type-select:hover {
+            border-color: #007BFF;
+        }
+
+        /* 图表类型图标样式 */
+        .chart-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        #downloadButton{
+            float: right;
+            margin-top: -1%;
+            margin-right: 1.5%;
+        }
+        #downloadWordButton{
+            float: right;
+            margin-top: -1%;
+            margin-right: 1.5%;
+            margin-left: 10px;
+            display: none;
+        }
+    </style>
+    <!-- 引入 ECharts -->
+    <script src="js/echarts.min.js"></script>
+    <!-- 引入 jspdf 和 html2canvas -->
+    <script src="js/jspdf.umd.min.js"></script>
+    <script src="js/html2canvas.min.js"></script>
+    <!-- 引入 html-docx-js -->
+    <script src="js/html-docx.min.js"></script>
+    <script src="js/FileSaver.min.js"></script>
+</head>
+
+<body>
+    <h1>个人能力报告详细展示</h1>
+    <button id="downloadButton">下载报告（PDF）</button>
+    <button id="downloadWordButton" style="display: none;">下载报告（Word）</button>
+    <div class="panel panel-default">
+        <div class="panel-header">
+            <div class="container">
+                <div class="vertical-line"></div>
+                <div class="text">学生信息</div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <table>
+                <tr>
+                    <th>学生学号</th>
+                    <td id="xmFNo"></td>
+                    <th>学生姓名</th>
+                    <td id="xmFName"></td>
+                    <th>性别</th>
+                    <td id="xmFSex"></td>
+                </tr>
+                <tr>
+                    <th>身份证号</th>
+                    <td id="xmFIDNumber"></td>
+                    <th>联系电话</th>
+                    <td id="xmFTel"></td>
+                    <th>电子邮箱</th>
+                    <td id="xmFEmail"></td>
+                </tr>
+                <tr>
+                    <th>出生日期</th>
+                    <td id="xmFBirthday"></td>
+                    <th>入学时间</th>
+                    <td id="xmFStartSchoolDate"></td>
+                    <th>毕业时间</th>
+                    <td id="xmFEndSchoolDate"></td>
+                </tr>
+                <tr>
+                    <th>专业</th>
+                    <td id="xmFMajor"></td>
+                    <th>学历</th>
+                    <td id="xmFEducation"></td>
+                    <th>政治面目</th>
+                    <td id="xmFPolitical"></td>
+                </tr>
+                <tr>
+                    <th>住址</th>
+                    <td id="xmFAddr"></td>
+                    <th>能力积分</th>
+                    <td id="xmFPoints"></td>
+                    <th>工作状态</th>
+                    <td id="xmFWorkState"></td>
+                </tr>
+                <tr>
+                    <th colspan="6">班级</th>
+                </tr>
+                <tr>
+                    <td colspan="6" id="xmFClassName"></td>
+                </tr>
+                <tr>
+                    <th colspan="6">奖励荣誉</th>
+                </tr>
+                <tr>
+                    <td colspan="6" id="xmFHonor"></td>
+                </tr>
+                <tr>
+                    <th colspan="6">惩罚记录</th>
+                </tr>
+                <tr>
+                    <td colspan="6" id="xmFPunish"></td>
+                </tr>
+                <tr>
+                    <th colspan="6">健康记录</th>
+                </tr>
+                <tr>
+                    <td colspan="6" id="xmFHealth"></td>
+                </tr>
+                <tr>
+                    <th colspan="6">备注</th>
+                </tr>
+                <tr>
+                    <td colspan="6" id="xmFNote"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+     <div class="panel panel-default" style="margin-top: 20px;">
+        <div class="panel-header">
+            <div class="container">
+                <div class="vertical-line"></div>
+                <div class="text">学生课程</div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <table id="course-table">
+                <tr>
+                    <th>课程名称：</th>
+                    <td id="course-names"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+
+    <div class="panel panel-default" style="margin-top: 20px;">
+        <div class="panel-header">
+            <div class="container">
+                <div class="vertical-line"></div>
+                <div class="text">学生能力</div>
+            </div>
+        </div>
+        <div class="three-column" id="ability-container"></div>
+    </div>
+
+    <script>
+        var ftype = getQueryStringByName('ftype');//1=全部 2=个人
+        var userid;
+        var fileurl;
+        var filename;
+        var studentname;
+
+        function getQueryStringByName(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return decodeURIComponent(r[2]); return null;
+        }
+
+        // 业务代码
+        $(function () {
+            if (ftype == 2) {
+                userid = getQueryStringByName('userid');
+            }
+
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/tstudent/querytstudentInfo', // 调用地址
+                data: JSON.stringify({
+                    id: userid
+                }),
+                async: false,
+                success: function (data) {
+                    $("#xmFName").text(data.info.FName);
+                    studentname = data.info.FName;
+                    $("#xmFNo").text(data.info.FNo);
+                    if (data.info.FSex == 0) {
+                        $("#xmFSex").text("男");
+                    } else if (data.info.FSex == 1) {
+                        $("#xmFSex").text("女");
+                    }
+                    $("#xmFBirthday").text(data.info.FBirthday);
+                    $("#xmFIDNumber").text(data.info.FIDNumber);
+                    $("#xmFTel").text(data.info.FTel);
+                    $("#xmFEmail").text(data.info.FEmail);
+                    $("#xmFStartSchoolDate").text(data.info.FStartSchoolDate);
+                    $("#xmFEndSchoolDate").text(data.info.FEndSchoolDate);
+                    $("#xmFMajor").text(data.info.FMajor);
+                    $("#xmFEducation").text(data.info.FEducation);
+                    $("#xmFPolitical").text(data.info.FPolitical);
+                    $("#xmFAddr").text(data.info.FAddr);
+                    $("#xmFHonor").text(data.info.FHonor);
+                    $("#xmFPunish").text(data.info.FPunish);
+                    $("#xmFHealth").text(data.info.FHealth);
+                    $("#xmFNote").text(data.info.FNote);
+                    if (data.info.FWorkState == 0) {
+                        $("#xmFWorkState").text("未工作");
+                    } else if (data.info.FWorkState == 1) {
+                        $("#xmFWorkState").text("已工作");
+                    }
+                    $("#xmFPoints").text(data.info.FPoints);
+                    $("#xmFClassName").text(data.info.FClassName);
+                },
+                error: function (e) {
+                    console.error(e.status);
+                    console.error(e.responseText);
+                }
+            });
+
+
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/tstudent_report/getstudentabilityreport', // 调用地址
+                data: JSON.stringify({
+                    ftype: ftype,
+                    userid: userid
+                }),
+                async: false,
+                success: function (data) {
+                    // 提取能力类型
+                    const abilityTypes = data.abilityTypes.map(item => item.FName);
+
+                    // 提取能力详情，这里将能力详情按能力类型分组
+                    const groupedAbilityDetails = {};
+                    data.abilityDetails.forEach(item => {
+                        const abilityTypeIndex = item.i;
+                        const abilityTypeName = abilityTypes[abilityTypeIndex];
+                        if (!groupedAbilityDetails[abilityTypeName]) {
+                            groupedAbilityDetails[abilityTypeName] = {};
+                        }
+                        groupedAbilityDetails[abilityTypeName][item.FName] = 0; // 先初始化为 0
+                    });
+
+                    // 根据 abilityDetails_value 填充能力值
+                    data.abilityDetails_value.forEach(valueItem => {
+                        const abilityId = valueItem.FAbilityID;
+                        const abilityValue = parseInt(valueItem.value);
+                        data.abilityDetails.forEach(detailItem => {
+                            if (detailItem.key === abilityId) {
+                                const abilityTypeIndex = detailItem.i;
+                                const abilityTypeName = abilityTypes[abilityTypeIndex];
+                                groupedAbilityDetails[abilityTypeName][detailItem.FName] = abilityValue;
+                            }
+                        });
+                    });
+
+                    const container = document.getElementById('ability-container');
+                    for (let i = 0; i < abilityTypes.length; i++) {
+                        const abilityType = abilityTypes[i];
+                        const values = groupedAbilityDetails[abilityType] || {};
+                        const section = document.createElement('section');
+                        section.innerHTML = `
+                            <div class="chart-container" id="${abilityType}-chart"></div>
+                            <select class="chart-type-select">
+                                <option value="bar">
+                                  <svg class="chart-icon" viewBox="0 0 100 100">
+                                    <rect x="10" y="20" width="20" height="60" fill="#007BFF"/>
+                                    <rect x="40" y="30" width="20" height="50" fill="#007BFF"/>
+                                    <rect x="70" y="40" width="20" height="40" fill="#007BFF"/>
+                                  </svg>
+                                  柱状图
+                                </option>
+                                <option value="scatter">
+                                  <svg class="chart-icon" viewBox="0 0 100 100">
+                                    <circle cx="20" cy="20" r="5" fill="#007BFF"/>
+                                    <circle cx="40" cy="60" r="5" fill="#007BFF"/>
+                                    <circle cx="60" cy="30" r="5" fill="#007BFF"/>
+                                    <circle cx="80" cy="80" r="5" fill="#007BFF"/>
+                                  </svg>
+                                  散点图
+                                </option>
+                                <option value="radar">
+                                  <svg class="chart-icon" viewBox="0 0 100 100">
+                                    <polygon points="50,10 80,30 90,70 50,90 10,70 20,30" stroke="#007BFF" fill="none" stroke-width="2"/>
+                                  </svg>
+                                  雷达图
+                                </option>
+                                <option value="pie">
+                                  <svg class="chart-icon" viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="40" fill="#007BFF" />
+                                    <path d="M50,50 L50,10 A40,40 0 0,1 70,30 Z" fill="lightblue" />
+                                  </svg>
+                                  饼图
+                                </option>
+                                <option value="heatmap">
+                                  <svg class="chart-icon" viewBox="0 0 100 100">
+                                    <rect x="10" y="10" width="20" height="20" fill="#ff0000"/>
+                                    <rect x="40" y="10" width="20" height="20" fill="#ff8000"/>
+                                    <rect x="70" y="10" width="20" height="20" fill="#ffff00"/>
+                                    <rect x="10" y="40" width="20" height="20" fill="#80ff00"/>
+                                    <rect x="40" y="40" width="20" height="20" fill="#00ff00"/>
+                                    <rect x="70" y="40" width="20" height="20" fill="#00ff80"/>
+                                  </svg>
+                                  热力图
+                                </option>
+                                <option value="candlestick">
+                                  <svg class="chart-icon" viewBox="0 0 100 100">
+                                    <rect x="20" y="30" width="10" height="40" fill="#007BFF"/>
+                                    <line x1="25" y1="10" x2="25" y2="30" stroke="#007BFF" stroke-width="2"/>
+                                    <line x1="25" y1="70" x2="25" y2="90" stroke="#007BFF" stroke-width="2"/>
+                                    <rect x="50" y="20" width="10" height="60" fill="#007BFF"/>
+                                    <line x1="55" y1="10" x2="55" y2="20" stroke="#007BFF" stroke-width="2"/>
+                                    <line x1="55" y1="80" x2="55" y2="90" stroke="#007BFF" stroke-width="2"/>
+                                  </svg>
+                                  K线图
+                                </option>
+                                <option value="line">
+                                  <svg class="chart-icon" viewBox="0 0 100 100">
+                                    <polyline points="10,80 20,20 30,60 40,40 50,80 60,20 70,60 80,40 90,80" stroke="#007BFF" fill="none" stroke-width="2"/>
+                                  </svg>
+                                  折线图
+                                </option>
+                            </select>
+                        `;
+                        container.appendChild(section);
+
+                        const select = section.querySelector('.chart-type-select');
+                        const chart = echarts.init(document.getElementById(`${abilityType}-chart`));
+
+                        const generateOptions = (type) => {
+                            const hasData = Object.keys(values).length > 0;
+                            if (!hasData) {
+                                return {
+                                    title: {
+                                        text: `${abilityType}能力值`,
+                                        left: 'center',
+                                        top: 'center',
+                                        textStyle: {
+                                            fontSize: 14
+                                        }
+                                    }
+                                };
+                            }
+                            if (type === 'bar') {
+                                const maxValue = Math.max(...Object.values(values));
+                                return {
+                                    title: {
+                                        text: `${abilityType}能力值`,
+                                        textStyle: {
+                                            fontSize: 14
+                                        }
+                                    },
+                                    tooltip: {},
+                                    xAxis: {
+                                        data: Object.keys(values)
+                                    },
+                                    yAxis: {
+                                      
+                                    },
+                                    grid: {
+                                        left: '8%',
+                                        top: '100px' // 增加top值
+                                    },
+                                    series: [{
+                                        name: '能力值',
+                                        type: 'bar',
+                                        data: Object.values(values)
+                                    }]
+                                };
+                            } else if (type === 'scatter') {
+                                const maxValue = Math.max(...Object.values(values));
+                                return {
+                                    title: {
+                                        text: `${abilityType}能力值`,
+                                        textStyle: {
+                                            fontSize: 14
+                                        }
+                                    },
+                                    tooltip: {},
+                                    xAxis: {
+                                        type: 'category',
+                                        data: Object.keys(values)
+                                    },
+                                    yAxis: {
+                                       
+                                    },
+                                    grid: {
+                                        left: '8%',
+                                        top: '100px' // 增加top值
+                                    },
+                                    series: [{
+                                        name: '能力值',
+                                        type: 'scatter',
+                                        data: Object.values(values)
+                                    }]
+                                };
+                            } else if (type === 'radar') {
+                                const indicators = Object.keys(values).map(key => ({ name: key, max: 100 }));
+                                return {
+                                    title: {
+                                        text: `${abilityType}能力值`,
+                                        textStyle: {
+                                            fontSize: 14
+                                        }
+                                    },
+                                    grid: {
+                                        left: '8%',
+                                        top: '100px' // 增加top值
+                                    },
+                                    radar: {
+                                        indicator: indicators
+                                    },
+                                    series: [{
+                                        name: '能力值',
+                                        type: 'radar',
+                                        data: [
+                                            {
+                                                value: Object.values(values),
+                                                name: abilityType
+                                            }
+                                        ]
+                                    }]
+                                };
+                            } else if (type === 'pie') {
+                                const pieData = Object.entries(values).map(([key, value]) => ({ value, name: key }));
+                                return {
+                                    title: {
+                                        text: `${abilityType}能力值`,
+                                        textStyle: {
+                                            fontSize: 14
+                                        }
+                                    },
+                                    tooltip: {
+                                        trigger: 'item'
+                                    },
+                                    grid: {
+                                        left: '8%',
+                                        top: '100px' // 增加top值
+                                    },
+                                    series: [
+                                        {
+                                            name: '能力值',
+                                            type: 'pie',
+                                            radius: '50%',
+                                            data: pieData
+                                        }
+                                    ]
+                                };
+                            } else if (type === 'heatmap') {
+                                const heatmapData = Object.entries(values).map(([key, value], index) => [index, 0, value]);
+                                return {
+                                    title: {
+                                        text: `${abilityType}能力值`,
+                                        textStyle: {
+                                            fontSize: 14
+                                        }
+                                    },
+                                    tooltip: { position: 'top'},
+                                    xAxis: {
+                                        type: 'category',
+                                        data: Object.keys(values),
+                                        splitArea: {
+                                            show: true
+                                          }
+                                    },
+                                    yAxis: {
+                                        type: 'category',
+                                        data: ['能力值'],
+                                        splitArea: {
+                                            show: true
+                                          }
+                                    },
+                              
+           
+                                    grid: {
+                                        left: '8%',
+                                        top: '100px' // 增加top值
+                                    },
+                                    series: [
+                                        {
+                                            name: '能力值',
+                                            type: 'heatmap',
+                                            data: heatmapData,
+                                            label: {
+                                                show: true
+                                              },
+                                              emphasis: {
+                                                itemStyle: {
+                                                  shadowBlur: 10,
+                                                  shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                                }
+                                              }
+                                        }
+                                    ]
+                                };
+                            } else if (type === 'candlestick') {
+                                // 模拟K线数据，这里简单将能力值作为收盘价，其他值简单处理
+                                const candlestickData = Object.values(values).map(value => [value, value, value, value]);
+                                const maxValue = Math.max(...Object.values(values));
+                                return {
+                                    title: {
+                                        text: `${abilityType}能力值`,
+                                        textStyle: {
+                                            fontSize: 14
+                                        }
+                                    },
+                                    tooltip: {},
+                                    xAxis: {
+                                        type: 'category',
+                                        data: Object.keys(values)
+                                    },
+                                    yAxis: {
+                                       
+                                    },
+                                    grid: {
+                                        left: '8%',
+                                        top: '100px' // 增加top值
+                                    },
+                                    series: [
+                                        {
+                                            name: '能力值',
+                                            type: 'candlestick',
+                                            data: candlestickData
+                                        }
+                                    ]
+                                };
+                            } else if (type === 'line') {
+                                const maxValue = Math.max(...Object.values(values));
+                                return {
+                                    title: {
+                                        text: `${abilityType}能力值`,
+                                        textStyle: {
+                                            fontSize: 14
+                                        }
+                                    },
+                                    tooltip: {},
+                         
+                                    xAxis: {
+                                        type: 'category',
+                                        data: Object.keys(values)
+                                    },
+                                    yAxis: {
+                                       
+                                    },
+                                    grid: {
+                                        left: '8%',
+                                        top: '100px' // 增加top值
+                                    },
+                                    series: [{
+                                        name: '能力值',
+                                        type: 'line',
+                                        data: Object.values(values)
+                                    }]
+                                };
+                            } 
+                        };
+
+                        const updateChart = () => {
+                            try {
+                                // 清空原有图表显示效果
+                                chart.clear();
+                                const selectedType = select.value;
+                                const option = generateOptions(selectedType);
+                                chart.setOption(option);
+                            } catch (error) {
+                                console.error(`生成图表时出错: ${error.message}`);
+                            }
+                        };
+
+                        // 随机选择一个图表类型
+                        const randomIndex = Math.floor(Math.random() * select.options.length);
+                        select.selectedIndex = randomIndex;
+
+                        select.addEventListener('change', updateChart);
+                        updateChart();
+                    }
+
+
+                },
+                error: function (e) {
+                    console.error(e.status);
+                    console.error(e.responseText);
+                }
+            });
+
+
+        });
+        //学生已学习课程
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/tstudent_report/querytstudentInfo_kc', // 调用地址
+            data: JSON.stringify({
+                id: userid
+            }),
+            async: false,
+            success: function (data) {
+                //console.log('AJAX 请求成功，返回数据:', data); // 打印返回的数据，用于调试
+                var courseNames = '';
+                var cou_fname = data.info && data.info.Fname;
+
+                if (Array.isArray(cou_fname) && cou_fname.length > 0) {
+                    courseNames = cou_fname.join(', ');
+                } else if (typeof cou_fname === 'string') {
+                    courseNames = cou_fname;
+                } else {
+                    //console.log('数据格式不符合要求:', cou_fname);
+                }
+
+                $('#course-names').text(courseNames);
+            },
+            error: function (e) {
+               // console.error('AJAX 请求失败，状态码:', e.status);
+                //console.error('AJAX 请求失败，响应文本:', e.responseText);
+            }
+        });    
+  
+
+
+
+        // 下载功能（PDF）
+        document.getElementById('downloadButton').addEventListener('click', function () {
+            // 隐藏下载按钮
+            const downloadButton = document.getElementById('downloadButton');
+            const downloadWordButton = document.getElementById('downloadWordButton');
+            downloadButton.style.display = 'none';
+            downloadWordButton.style.display = 'none';
+
+            html2canvas(document.body).then((canvas) => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jspdf.jsPDF();
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+                let position = 0;
+                while (position < imgHeight) {
+                    pdf.addImage(imgData, 'PNG', 0, -position, pdfWidth, imgHeight);
+                    if (position + pdfHeight < imgHeight) {
+                        pdf.addPage();
+                    }
+                    position += pdfHeight;
+                }
+
+                pdf.save('student_ability_report.pdf');
+                // 保存生成的 PDF 文件的 Blob 对象
+                window.pdfBlob = pdf.output('blob');
+                // 显示下载按钮
+                downloadButton.style.display = 'block';
+                downloadWordButton.style.display = 'block';
+            });
+        });    
+
+        // 下载功能（Word）
+        document.getElementById('downloadWordButton').addEventListener('click', async function () {
+            // 隐藏下载按钮
+            const downloadButton = document.getElementById('downloadButton');
+            const downloadWordButton = document.getElementById('downloadWordButton');
+            downloadButton.style.display = 'none';
+            downloadWordButton.style.display = 'none';
+
+            // 将 ECharts 图表转换为图片并替换原图表容器
+            const chartContainers = document.querySelectorAll('.chart-container');
+            for (const container of chartContainers) {
+                const chart = echarts.getInstanceByDom(container);
+                if (chart) {
+                    const imgData = chart.getDataURL({ type: 'png' });
+                    const img = document.createElement('img');
+                    img.src = imgData;
+                    container.parentNode.replaceChild(img, container);
+                }
+            }
+
+            // 获取 HTML 内容
+            let htmlContent = document.body.outerHTML;
+
+            // 优化表格样式
+            htmlContent = htmlContent.replace(/<table>/g, '<table style="border-collapse: collapse; width: 100%;">');
+            htmlContent = htmlContent.replace(/<th>/g, '<th style="border: 1px solid #ccc; padding: 8px; text-align: left; background-color: #f9f9f9;">');
+            htmlContent = htmlContent.replace(/<td>/g, '<td style="border: 1px solid #ccc; padding: 8px; text-align: left;">');
+
+            // 优化标题样式
+            htmlContent = htmlContent.replace(/<h1>/g, '<h1 style="text-align: center; color: #333; font-size: 20px;">');
+            htmlContent = htmlContent.replace(/<h2>/g, '<h2 style="color: #555; font-size: 16px;">');
+
+            // 使用 html-docx-js 转换为 Word 文档
+            const converted = htmlDocx.asBlob(htmlContent);
+
+            // 保存文件
+            saveAs(converted, 'student_ability_report.docx');
+
+            // 恢复原图表容器
+            for (const container of chartContainers) {
+                const img = document.querySelector(`img[src="${container.src}"]`);
+                if (img) {
+                    img.parentNode.replaceChild(container, img);
+                }
+            }
+
+            // 显示下载按钮
+            downloadButton.style.display = 'block';
+            downloadWordButton.style.display = 'block';
+        }); 
+        
+        
+     // 在 report.html 中，当下载完成时发送消息
+        document.getElementById('downloadWordButton').addEventListener('click', function () {
+            // 模拟下载完成后发送消息
+            setTimeout(() => {
+                window.parent.postMessage('downloadComplete', '*');
+            }, 10); // 假设下载需要 2 秒
+        }); 
+    </script>
+</body>
+
+</html>    

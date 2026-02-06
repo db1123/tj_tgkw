@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>基于心智模型调控的知识推理与创新激励</title>
+  <!-- Tailwind CSS v3 -->
+ <!--  <script src="https://cdn.tailwindcss.com"></script> -->
+  <!-- Font Awesome -->
+ <!--  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
+  <script src="js/3.4.16"></script>
+  <link href="fonts/font-awesome.min.css" rel="stylesheet">
+  <!-- ECharts -->
+ <!--  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.3.0/echarts.min.js"></script> -->
+  <script src="js/echarts.min.js"></script>
+  <!-- 统一的 Tailwind 配置 -->
+   <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#0052D9',
+            secondary: '#00A870',
+            accent: '#FF6B00',
+            dark: '#1C2B36',
+            light: '#F0F5FF',
+            'primary-light': '#E6F7FF',
+            'secondary-light': '#E6FFED',
+            'accent-light': '#FFF2E6',
+            'purple-primary': '#7B2CBF',
+            'purple-light': '#F3E8FF',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          boxShadow: {
+            'card': '0 4px 12px rgba(0, 0, 0, 0.05)',
+            'card-hover': '0 8px 16px rgba(0, 0, 0, 0.1)',
+          }
+        }
+      },
+      darkMode: 'class'
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .bg-gradient-purple {
+        background: linear-gradient(135deg, #7B2CBF 0%, #9D4EDD 100%);
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .transition-all-300 {
+        transition: all 300ms ease-in-out;
+      }
+      .scrollbar-thin {
+        scrollbar-width: thin;
+      }
+      .scrollbar-thin::-webkit-scrollbar {
+        width: 6px;
+      }
+      .scrollbar-thin::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      .scrollbar-thin::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 3px;
+      }
+      .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
+  <!-- 顶部导航栏 -->
+  <header class="bg-white dark:bg-gray-800 shadow-md z-10">
+    <div class="container mx-auto px-4 py-3 flex items-items-center justify-between-between">
+      <div class="flex items-center space-x-2">
+        <i class="fa fa-sitemap text-primary text-2xl"></i>
+        <h1 class="text-xl font-bold text-primary">知识关联挖掘与分析系统</h1>
+      </div>
+      <div class="flex items-center space-x-4">
+        <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-all-300">
+          <i class="fa fa-moon-o dark:hidden"></i>
+          <i class="fa fa-sun-o hidden dark:block"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主要内容区域 -->
+  <main class="flex-grow container mx-auto px-4 py-6 flex flex-col lg:flex-row gap-6">
+    <!-- 左侧面板 -->
+    <div class="lg:w-1/4 space-y-6">
+      <!-- 文件上传区域 -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-card p-6 transition-all-300 hover:shadow-card-hover">
+        <h2 class="text-lg font-semibold mb-4 flex items-center">
+          <i class="fa fa-upload mr-2 text-primary"></i>文件上传
+        </h2>
+        <div id="dropArea" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center cursor-pointer-pointer hover:border-primary dark:hover:border-primary transition-all-300">
+          <i class="fa fa-cloud-upload text-4xl text-gray-400 dark:text-gray-500 mb-3"></i>
+          <p class="mb-2">拖放文件到此处或点击上传</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">支持 .txt, .csv, .json 格式</p>
+          <input type="file" id="fileInput" class="hidden" accept=".txt,.csv,.json">
+        </div>
+        <div class="mt-4 flex flex-wrap gap-2">
+          <button id="loadExampleBtn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition-all-300 flex items-center">
+            <i class="fa fa-magic mr-2"></i>加载示例数据
+          </button>
+          <button id="clearDataBtn" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all-300 flex items-center">
+            <i class="fa fa-trash mr-2"></i>清空数据
+          </button>
+        </div>
+      </div>
+
+      <!-- 生成图表按钮 -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-card p-6 transition-all-300 hover:shadow-card-hover">
+        <button id="generateChartBtn" class="w-full px-4 py-3 bg-purple-primary text-white rounded-lg hover:bg-purple-700 transition-all-300 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+          <i class="fa fa-brain mr-2"></i>生成心智模型分析
+        </button>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-3 text-center">点击生成按钮后将在右侧显示心智模型调控分析结果</p>
+      </div>
+
+      <!-- 数据结构树 -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow shadow-card p-6 transition-all-300 hover:shadow-card-hover">
+        <h2 class="text-lg font-semibold mb-4 flex items-center">
+          <i class="fa fa-tree mr-2 text-primary"></i>数据结构树
+        </h2>
+        <div id="dataTree" class="max-h-60 overflow-y-auto scrollbar-thin border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+          <p class="text-gray-500 dark:text-gray-400 text-center italic">暂无数据</p>
+        </div>
+      </div>
+
+      <!-- 大文本框 -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-card p-6 transition-all-300 hover:shadow-card-hover">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-semibold flex items-center">
+            <i class="fa fa-file-text mr-2 text-primary"></i>文本数据
+          </h2>
+          <div class="flex gap-2">
+            <button id="copyTextBtn" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+              <i class="fa fa-copy"></i>
+            </button>
+            <button id="clearTextBtn" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+        </div>
+        <textarea id="textData" class="w-full h-60 p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 resize-none scrollbar-thin" placeholder="数据将显示在这里..." readonly></textarea>
+      </div>
+    </div>
+
+    <!-- 右侧面板 -->
+    <div class="lg:w-3/4 space-y-6">
+      <!-- 标题区域 -->
+      <div class="mb-4 text-center">
+        <div class="inline-block px-4 py-1 bg-purple-light dark:bg-purple-900/30 rounded-full text-purple-primary dark:text-purple-300 text-sm font-medium mb-3">
+          创新点2
+        </div>
+        <h1 class="text-2xl md:text-3xl font-bold mb-2">基于心智模型调控的知识推理与创新激励</h1>
+        <p class="text-gray-600 dark:text-gray-400">突破了传统创新设计中知识获取低效与思维固化的难题</p>
+      </div>
+
+      <!-- 主要内容卡片 -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-card p-6 transition-all-300 hover:shadow-card-hover mb-6">
+        <!-- 技术实现与应用效果标签页 -->
+        <div class="flex border-b border-gray-200 dark:border-gray-700 mb-6">
+          <button id="techTab" class="px-6 py-3 font-medium text-purple-primary border-b-2 border-purple-primary">
+            技术实现
+          </button>
+          <button id="effectTab" class="px-6 py-3 font-medium text-gray-500 dark:text-gray-400 hover:text-purple-primary dark:hover:text-purple-primary">
+            应用效果
+          </button>
+        </div>
+
+        <!-- 内容区域 -->
+        <div id="mainContentArea" class="hidden">
+          <!-- 三栏布局 -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- 左侧 - 认知框架模型 -->
+            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+              <h3 class="text-lg font-semibold mb-3 text-center">认知框架模型</h3>
+              <div id="cognitiveFramework" class="w-full h-[400px]"></div>
+              <div class="mt-4 text-center">
+                <p class="text-sm text-gray-600 dark:text-gray-400">基于认知科学的知识获取与创新思维模型</p>
+              </div>
+            </div>
+
+            <!-- 中间 - 技术实现 -->
+            <div class="flex flex-col gap-6">
+              <!-- 计算模型结构 -->
+              <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 flex-grow">
+                <h3 class="text-lg font-semibold mb-3 text-center">计算模型结构</h3>
+                <div id="computationalModel" class="w-full h-[180px]"></div>
+              </div>
+              
+              <!-- 认知调控过程 -->
+              <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 flex-grow">
+                <h3 class="text-lg font-semibold mb-3 text-center">认知调控过程</h3>
+                <div id="cognitiveRegulation" class="w-full h-[180px]"></div>
+              </div>
+            </div>
+
+            <!-- 右侧 - 应用效果 -->
+            <div class="bg-purple-light dark:bg-purple-900/20 rounded-lg p-6">
+              <h3 class="text-lg font-semibold mb-4 text-purple-primary dark:text-purple-300">应用效果</h3>
+              <div class="space-y-6">
+                <div class="flex items-start">
+                  <div class="bg-purple-primary text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                    <i class="fa fa-lightbulb-o"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-medium">创新方案生成</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">构建设计知识图谱挖掘800余条创新路径，生成效率提升30%</p>
+                  </div>
+                </div>
+                
+                <div class="flex items-start">
+                  <div class="bg-purple-primary text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                    <i class="fa fa-rocket"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-medium">创新能力提升</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">创新能力生成效率平均提升40%</p>
+                  </div>
+                </div>
+                
+                <div class="flex items-start">
+                  <div class="bg-purple-primary text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                    <i class="fa fa-cubes"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-medium">产品多样性</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">产品概念多样性特征值提升25%</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mt-6 pt-6 border-t border-purple-200 dark:border-purple-800">
+                <div class="flex justify-center">
+                  <img src="https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/2dd731cd9cca4f609a2c798c550b2fcc.png~tplv-a9rns2rl98-24:720:720.png?rcl=2025102710402451A579DFDC06D5DF4193&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1762137625&x-signature=P2kD5IaNdyiIogXvdsOdZ1EC%2Fa0%3D" 
+                       alt="应用效果示意图" 
+                       class="rounded-lg shadow-md max-w-full h-auto">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 初始提示区域 -->
+        <div id="initialPromptArea" class="flex flex-col items-center justify-center py-16">
+          <div class="w-24 h-24 rounded-full bg-purple-light dark:bg-purple-900/30 flex items-center justify-center text-purple-primary mb-6">
+            <i class="fa fa-brain text-4xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3 text-center">准备生成心智模型分析</h3>
+          <p class="text-gray-600 dark:text-gray-400 text-center max-w-md">
+            请在左侧面板上传数据文件或加载示例数据，然后点击"生成心智模型分析"按钮以显示分析结果
+          </p>
+        </div>
+      </div>
+
+      <!-- 数据统计卡片 -->
+      <div id="statsCards" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-card p-6 transition-all-300 hover:shadow-card-hover">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold">创新路径数量</h3>
+            <div class="w-10 h-10 rounded-full bg-purple-light dark:bg-purple-900/30 flex items-center justify-center text-purple-primary">
+              <i class="fa fa-sitemap"></i>
+            </div>
+          </div>
+          <div class="flex items-end">
+            <span class="text-3xl font-bold">800+</span>
+            <span class="text-gray-500 dark:text-gray-400 ml-2 mb-1">条</span>
+          </div>
+          <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">较传统方法增加 <span class="text-green-500">50%</span></div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-card p-6 transition-all-300 hover:shadow-card-hover">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold">生成效率提升</h3>
+            <div class="w-10 h-10 rounded-full bg-purple-light dark:bg-purple-900/30 flex items-center justify-center text-purple-primary">
+              <i class="fa fa-rocket"></i>
+            </div>
+          </div>
+          <div class="flex items-end">
+            <span class="text-3xl font-bold">30%</span>
+            <span class="text-gray-500 dark:text-gray-400 ml-2 mb-1">+</span>
+          </div>
+          <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">创新方案生成效率提升 <span class="text-green-500">30%</span></div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-card p-6 transition-all-300 hover:shadow-card-hover">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold">概念多样性</h3>
+            <div class="w-10 h-10 rounded-full bg-purple-light dark:bg-purple-900/30 flex items-center justify-center text-purple-primary">
+              <i class="fa fa-cubes"></i>
+            </div>
+          </div>
+          <div class="flex items-end">
+            <span class="text-3xl font-bold">25%</span>
+            <span class="text-gray-500 dark:text-gray-400 ml-2 mb-1">提升</span>
+          </div>
+          <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">产品概念多样性特征值提升 <span class="text-green-500">25%</span></div>
+        </div>
+      </div>
+
+      <!-- 技术特点卡片 -->
+      <div id="techFeaturesCard" class="hidden bg-white dark:bg-gray-800 rounded-xl shadow-card p-6 transition-all-300 hover:shadow-card-hover">
+        <h2 class="text-xl font-bold mb-6 text-center">核心技术特点</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 text-center">
+            <div class="w-12 h-12 rounded-full bg-purple-light dark:bg-purple-900/30 flex items-center justify-center text-purple-primary mx-auto mb-3">
+              <i class="fa fa-brain text-xl"></i>
+            </div>
+            <h3 class="font-semibold mb-2">认知模型构建</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">基于认知科学理论构建知识获取与创新思维模型</p>
+          </div>
+          
+          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 text-center">
+            <div class="w-12 h-12 rounded-full bg-purple-light dark:bg-purple-900/30 flex items-center justify-center text-purple-primary mx-auto mb-3">
+              <i class="fa fa-sliders text-xl"></i>
+            </div>
+            <h3 class="font-semibold mb-2">动态调控机制</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">实时监测并调控认知过程，突破思维固化限制</p>
+          </div>
+          
+          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 text-center">
+            <div class="w-12 h-12 rounded-full bg-purple-light dark:bg-purple-900/30 flex items-center justify-center text-purple-primary mx-auto mb-3">
+              <i class="fa fa-lightbulb-o text-xl"></i>
+            </div>
+            <h3 class="font-semibold mb-2">创新激励算法</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">基于机器学习的创新灵感生成与激励算法</p>
+          </div>
+          
+          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 text-center">
+            <div class="w-12 h-12 rounded-full bg-purple-light dark:bg-purple-900/30 flex items-center justify-center text-purple-primary mx-auto mb-3">
+              <i class="fa fa-line-chart text-xl"></i>
+            </div>
+            <h3 class="font-semibold mb-2">效果评估体系</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">多维度评估创新能力提升效果的量化指标体系</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-white dark:bg-gray-800 shadow-inner py-4">
+    <div class="container mx-auto px-4 text-center text-gray-600 dark:text-gray-400 text-sm">
+      <p>© 2025 知识关联挖掘与分析系统 | 设计与开发</p>
+    </div>
+  </footer>
+
+  <!-- 通知组件 -->
+  <div id="notification" class="fixed top-4 right-4 max-w-sm bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 transform translate-x-full transition-transform duration-300 flex items-start z-50">
+    <div id="notificationIcon" class="text-xl mr-3"></div>
+    <div class="flex-1">
+      <h3 id="notificationTitle" class="font-semibold"></h3>
+      <p id="notificationMessage" class="text-sm text-gray-600 dark:text-gray-400 mt-1"></p>
+    </div>
+    <button id="closeNotification" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+      <i class="fa fa-times"></i>
+    </button>
+  </div>
+
+  <script>
+    // DOM元素 - 左侧文件上传相关
+    const dropArea = document.getElementById('dropArea');
+    const fileInput = document.getElementById('fileInput');
+    const loadExampleBtn = document.getElementById('loadExampleBtn');
+    const clearDataBtn = document.getElementById('clearDataBtn');
+    const generateChartBtn = document.getElementById('generateChartBtn');
+    const dataTree = document.getElementById('dataTree');
+    const textData = document.getElementById('textData');
+    const copyTextBtn = document.getElementById('copyTextBtn');
+    const clearTextBtn = document.getElementById('clearTextBtn');
+    
+    // DOM元素 - 右侧知识关联相关
+    const themeToggle = document.getElementById('themeToggle');
+    const techTab = document.getElementById('techTab');
+    const effectTab = document.getElementById('effectTab');
+    const mainContentArea = document.getElementById('mainContentArea');
+    const initialPromptArea = document.getElementById('initialPromptArea');
+    const statsCards = document.getElementById('statsCards');
+    const techFeaturesCard = document.getElementById('techFeaturesCard');
+    
+    // DOM元素 - 图表容器
+    const cognitiveFramework = document.getElementById('cognitiveFramework');
+    const computationalModel = document.getElementById('computationalModel');
+    const cognitiveRegulation = document.getElementById('cognitiveRegulation');
+    
+    // DOM元素 - 通知组件
+    const notification = document.getElementById('notification');
+    const notificationIcon = document.getElementById('notificationIcon');
+    const notificationTitle = document.getElementById('notificationTitle');
+    const notificationMessage = document.getElementById('notificationMessage');
+    const closeNotification = document.getElementById('closeNotification');
+
+    // 全局变量
+    let processedData = {
+      dates: [],
+      values: [],
+      raw: ''
+    };
+    let cognitiveFrameworkChart = null;
+    let computationalModelChart = null;
+    let cognitiveRegulationChart = null;
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      // 初始化主题
+      initTheme();
+      
+      // 初始化事件监听
+      initEventListeners();
+    });
+
+    // 初始化主题
+    function initTheme() {
+      if (localStorage.getItem('theme') === 'dark' || 
+          (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+
+    // 初始化事件监听
+    function initEventListeners() {
+      // 主题切换
+      themeToggle.addEventListener('click', toggleTheme);
+      
+      // 标签页切换
+      techTab.addEventListener('click', () => switchTab('tech'));
+      effectTab.addEventListener('click', () => switchTab('effect'));
+      
+      // 文件上传区域事件
+      dropArea.addEventListener('click', () => fileInput.click());
+      dropArea.addEventListener('dragover', handleDragOver);
+      dropArea.addEventListener('drop', handleDrop);
+      fileInput.addEventListener('change', handleFileSelect);
+      
+      // 按钮事件
+      loadExampleBtn.addEventListener('click', loadExampleData);
+      clearDataBtn.addEventListener('click', clearData);
+      generateChartBtn.addEventListener('click', generateCharts);
+      copyTextBtn.addEventListener('click', copyTextToClipboard);
+      clearTextBtn.addEventListener('click', clearTextArea);
+      
+      // 通知关闭按钮
+      closeNotification.addEventListener('click', hideNotification);
+    }
+
+    // 切换主题
+    function toggleTheme() {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+      
+      // 如果图表已生成，重新初始化以适应新主题
+      if (cognitiveFrameworkChart && computationalModelChart && cognitiveRegulationChart) {
+        initCognitiveFrameworkChart();
+        initComputationalModelChart();
+        initCognitiveRegulationChart();
+      }
+    }
+
+    // 切换标签页
+    function switchTab(tab) {
+      if (tab === 'tech') {
+        techTab.classList.add('text-purple-primary', 'border-purple-primary');
+        techTab.classList.remove('text-gray-500', 'dark:text-gray-400');
+        effectTab.classList.remove('text-purple-primary', 'border-purple-primary');
+        effectTab.classList.add('text-gray-500', 'dark:text-gray-400');
+      } else {
+        effectTab.classList.add('text-purple-primary', 'border-purple-primary');
+        effectTab.classList.remove('text-gray-500', 'dark:text-gray-400');
+        techTab.classList.remove('text-purple-primary', 'border-purple-primary');
+        techTab.classList.add('text-gray-500', 'dark:text-gray-400');
+      }
+    }
+
+    // 处理拖拽经过
+    function handleDragOver(e) {
+      e.preventDefault();
+      dropArea.classList.add('border-primary');
+    }
+
+    // 处理拖拽放置
+    function handleDrop(e) {
+      e.preventDefault();
+      dropArea.classList.remove('border-primary');
+      
+      if (e.dataTransfer.files.length) {
+        handleFiles(e.dataTransfer.files);
+      }
+    }
+
+    // 处理文件选择
+    function handleFileSelect(e) {
+      if (e.target.files.length) {
+        handleFiles(e.target.files);
+      }
+    }
+
+    // 处理文件
+    function handleFiles(files) {
+      const file = files[0];
+      
+      // 验证文件类型
+      if (!['text/plain', 'text/csv', 'application/json'].includes(file.type) &&
+          !file.name.endsWith('.txt') && !file.name.endsWith('.csv') && !file.name.endsWith('.json')) {
+        showNotification('错误', '请上传.txt, .csv或.json格式的文件', 'error');
+        return;
+      }
+      
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        try {
+          const content = e.target.result;
+          processedData.raw = content;
+          
+          // 解析文件内容
+          parseFileContent(file, content);
+          
+          // 更新UI
+          updateDataTree();
+          updateTextArea();
+          
+          // 启用按钮
+          copyTextBtn.disabled = false;
+          clearTextBtn.disabled = false;
+          generateChartBtn.disabled = false;
+          
+          showNotification('成功', '文件上传并解析成功', 'success');
+        } catch (error) {
+          showNotification('错误', `文件解析失败: ${error.message}`, 'error');
+        }
+      };
+      
+      reader.onerror = function() {
+        showNotification('错误', '文件读取失败', 'error');
+      };
+      
+      reader.readAsText(file);
+    }
+
+    // 解析文件内容
+    function parseFileContent(file, content) {
+      if (file.name.endsWith('.txt')) {
+        // 解析TXT文件（每行一个数据点，格式：日期,数值）
+        const lines = content.split('\n').filter(line => line.trim() !== '');
+        processedData.dates = [];
+        processedData.values = [];
+        
+        lines.forEach(line => {
+          const parts = line.split(',');
+          if (parts.length === 2) {
+            processedData.dates.push(parts[0].trim());
+            processedData.values.push(parseFloat(parts[1].trim()));
+          }
+        });
+        
+        if (processedData.dates.length === 0) {
+          throw new Error('TXT文件格式不正确，请确保每行格式为：日期,数值');
+        }
+      } else if (file.name.endsWith('.csv')) {
+        // 解析CSV文件（第一行为标题，后续行为数据）
+        const lines = content.split('\n').filter(line => line.trim() !== '');
+        if (lines.length < 2) {
+          throw new Error('CSV文件至少需要包含标题行和一行数据');
+        }
+        
+        // 假设第一列为日期，第二列为数值
+        processedData.dates = [];
+        processedData.values = [];
+        
+        for (let i = 1; i < lines.length; i++) {
+          const parts = lines[i].split(',');
+          if (parts.length >= 2) {
+            processedData.dates.push(parts[0].trim());
+            processedData.values.push(parseFloat(parts[1].trim()));
+          }
+        }
+        
+        if (processedData.dates.length === 0) {
+          throw new Error('CSV文件格式不正确，请确保包含日期和数值列');
+        }
+      } else if (file.name.endsWith('.json')) {
+        // 解析JSON文件（格式：{ "dates": [], "values": [] }）
+        const jsonData = JSON.parse(content);
+        
+        if (!jsonData.dates || !jsonData.values || !Array.isArray(jsonData.dates) || !Array.isArray(jsonData.values)) {
+          throw new Error('JSON文件格式不正确，请确保包含dates和values数组');
+        }
+        
+        if (jsonData.dates.length !== jsonData.values.length) {
+          throw new Error('dates和values数组长度必须一致');
+        }
+        
+        processedData.dates = jsonData.dates;
+        processedData.values = jsonData.values.map(v => parseFloat(v));
+      } else {
+        throw new Error('不支持的文件格式');
+      }
+    }
+
+    // 加载示例数据
+    function loadExampleData() {
+      // 生成过去30天的示例数据
+      const today = new Date();
+      processedData.dates = [];
+      processedData.values = [];
+      
+      for (let i = 29; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        processedData.dates.push(date.toISOString().split('T')[0]);
+        
+        // 生成随机数值，带有一定的趋势性
+        const trend = i * 0.5; // 整体上升趋势
+        const random = Math.random() * 10; // 随机波动
+        processedData.values.push(Math.round((20 + trend + random) * 10) / 10);
+      }
+      
+      // 生成原始数据文本
+      processedData.raw = processedData.dates.map((date, index) => `${date},${processedData.values[index]}`).join('\n');
+      
+      // 更新UI
+      updateDataTree();
+      updateTextArea();
+      
+      // 启用按钮
+      copyTextBtn.disabled = false;
+      clearTextBtn.disabled = false;
+      generateChartBtn.disabled = false;
+      
+      showNotification('示例数据已加载', '数据已显示在文本区域和结构树中', 'success');
+    }
+
+    // 清空数据
+    function clearData() {
+      // 清空数据
+      processedData = {
+        dates: [],
+        values: [],
+        raw: ''
+      };
+      
+      // 更新UI
+      updateDataTree();
+      updateTextArea();
+      
+      // 禁用按钮
+      copyTextBtn.disabled = true;
+      clearTextBtn.disabled = true;
+      generateChartBtn.disabled = true;
+      
+      // 隐藏图表和相关内容
+      if (cognitiveFrameworkChart) {
+        cognitiveFrameworkChart.dispose();
+        cognitiveFrameworkChart = null;
+      }
+      
+      if (computationalModelChart) {
+        computationalModelChart.dispose();
+        computationalModelChart = null;
+      }
+      
+      if (cognitiveRegulationChart) {
+        cognitiveRegulationChart.dispose();
+        cognitiveRegulationChart = null;
+      }
+      
+      mainContentArea.classList.add('hidden');
+      initialPromptArea.classList.remove('hidden');
+      statsCards.classList.add('hidden');
+      techFeaturesCard.classList.add('hidden');
+      
+      showNotification('数据已清空', '', 'info');
+    }
+
+    // 生成图表
+    function generateCharts() {
+      if (processedData.dates.length === 0 || processedData.values.length === 0) {
+        showNotification('错误', '没有可用的数据生成图表', 'error');
+        return;
+      }
+      
+      // 显示图表区域，隐藏初始提示
+      mainContentArea.classList.remove('hidden');
+      initialPromptArea.classList.add('hidden');
+      statsCards.classList.remove('hidden');
+      techFeaturesCard.classList.remove('hidden');
+      
+      // 初始化图表
+      initCognitiveFrameworkChart();
+      initComputationalModelChart();
+      initCognitiveRegulationChart();
+      
+      showNotification('图表生成成功', '心智模型分析已显示在右侧', 'success');
+    }
+
+    // 更新数据结构树
+    function updateDataTree() {
+      if (processedData.dates.length === 0 || processedData.values.length === 0) {
+        dataTree.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center italic">暂无数据</p>';
+        return;
+      }
+      
+      // 创建数据树
+      let treeHTML = `
+        <div class="tree-item">
+          <div class="flex items-center cursor-pointer tree-toggle">
+            <i class="fa fa-folder-open text-yellow-500 mr-2"></i>
+            <span>数据</span>
+          </div>
+          <div class="ml-6 mt-2">
+      `;
+      
+      // 添加日期节点
+      treeHTML += `
+        <div class="tree-item">
+          <div class="flex items-center cursor-pointer tree-toggle">
+            <i class="fa fa-calendar text-blue-500 mr-2"></i>
+            <span>日期 (${processedData.dates.length})</span>
+          </div>
+          <div class="ml-6 mt-2">
+      `;
+      
+      // 添加前5个日期作为示例
+      const datesToShow = processedData.dates.slice(0, 5);
+      datesToShow.forEach(date => {
+        treeHTML += `
+          <div class="tree-item">
+            <div class="flex items-center">
+              <i class="fa fa-calendar-o text-gray-500 mr-2"></i>
+              <span>${date}</span>
+            </div>
+          </div>
+        `;
+      });
+      
+      // 如果有更多日期，显示省略号
+      if (processedData.dates.length > 5) {
+        treeHTML += `
+          <div class="tree-item">
+            <div class="flex items-center text-gray-500">
+              <i class="fa fa-ellipsis-h mr-2"></i>
+              <span>还有 ${processedData.dates.length - 5} 个日期...</span>
+            </div>
+          </div>
+        `;
+      }
+      
+      treeHTML += `
+          </div>
+        </div>
+      `;
+      
+      // 添加数值节点
+      treeHTML += `
+        <div class="tree-item">
+          <div class="flex items-center cursor-pointer tree-toggle">
+            <i class="fa fa-line-chart text-green-500 mr-2"></i>
+            <span>数值 (${processedData.values.length})</span>
+          </div>
+          <div class="ml-6 mt-2">
+      `;
+      
+      // 添加前5个数值作为示例
+      const valuesToShow = processedData.values.slice(0, 5);
+      valuesToShow.forEach(value => {
+        treeHTML += `
+          <div class="tree-item">
+            <div class="flex items-center">
+              <i class="fa fa-circle text-xs text-gray-500 mr-2"></i>
+              <span>${value}</span>
+            </div>
+          </div>
+        `;
+      });
+      
+      // 如果有更多数值，显示省略号
+      if (processedData.values.length > 5) {
+        treeHTML += `
+          <div class="tree-item">
+            <div class="flex items-center text-gray-500">
+              <i class="fa fa-ellipsis-h mr-2"></i>
+              <span>还有 ${processedData.values.length - 5} 个数值...</span>
+            </div>
+          </div>
+        `;
+      }
+      
+      treeHTML += `
+          </div>
+        </div>
+      `;
+      
+      treeHTML += `
+          </div>
+        </div>
+      `;
+      
+      dataTree.innerHTML = treeHTML;
+      
+      // 添加树节点展开/折叠功能
+      document.querySelectorAll('.tree-toggle').forEach(toggle => {
+        toggle.addEventListener('click', function() {
+          const content = this.nextElementSibling;
+          const icon = this.querySelector('i');
+          
+          if (content.style.display === 'none') {
+            content.style.display = 'block';
+            icon.classList.remove('fa-folder');
+            icon.classList.add('fa-folder-open');
+          } else {
+            content.style.display = 'none';
+            icon.classList.remove('fa-folder-open');
+            icon.classList.add('fa-folder');
+          }
+        });
+      });
+    }
+
+    // 更新文本区域
+    function updateTextArea() {
+      textData.value = processedData.raw || '暂无数据';
+    }
+
+    // 复制文本到剪贴板
+    function copyTextToClipboard() {
+      if (!processedData.raw) {
+        showNotification('提示', '没有可复制的文本', 'info');
+        return;
+      }
+      
+      textData.select();
+      document.execCommand('copy');
+      
+      showNotification('成功', '文本已复制到剪贴板', 'success');
+    }
+
+    // 清空文本区域
+    function clearTextArea() {
+      textData.value = '';
+      showNotification('提示', '文本区域已清空', 'info');
+    }
+
+    // 初始化认知框架模型图表
+    function initCognitiveFrameworkChart() {
+      // 初始化ECharts实例
+      cognitiveFrameworkChart = echarts.init(cognitiveFramework);
+      
+      // 监听窗口大小变化，调整图表大小
+      window.addEventListener('resize', () => {
+        cognitiveFrameworkChart.resize();
+      });
+      
+      // 图表配置
+      const option = {
+        backgroundColor: 'transparent',
+        tooltip: {
+          trigger: 'item',
+          formatter: '{b}: {c}'
+        },
+        legend: {
+          orient: 'vertical',
+          right: 10,
+          top: 'center',
+          data: ['知识获取', '知识整合', '创新思维', '方案生成', '评估优化'],
+          textStyle: {
+            color: document.documentElement.classList.contains('dark') ? '#e2e8f0' : '#1a202c'
+          }
+        },
+        series: [
+          {
+            name: '认知框架',
+            type: 'pie',
+            radius: ['40%', '70%'],
+            avoidLabelOverlap: false,
+            itemStyle: {
+              borderRadius: 10,
+              borderColor: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
+              borderWidth: 2
+            },
+            label: {
+              show: false,
+              position: 'center'
+            },
+            emphasis: {
+              label: {
+                show: true,
+                fontSize: '18',
+                fontWeight: 'bold',
+                color: document.documentElement.classList.contains('dark') ? '#e2e8f0' : '#1a202c'
+              }
+            },
+            labelLine: {
+              show: false
+            },
+            data: [
+              { value: 30, name: '知识获取', itemStyle: { color: '#7B2CBF' } },
+              { value: 25, name: '知识整合', itemStyle: { color: '#9D4EDD' } },
+              { value: 20, name: '创新思维', itemStyle: { color: '#C77DFF' } },
+              { value: 15, name: '方案生成', itemStyle: { color: '#E0AAFF' } },
+              { value: 10, name: '评估优化', itemStyle: { color: '#F3E8FF' } }
+            ]
+          }
+        ]
+      };
+      
+      // 设置图表
+      cognitiveFrameworkChart.setOption(option);
+    }
+
+    // 初始化计算模型结构图表
+    function initComputationalModelChart() {
+      // 初始化ECharts实例
+      computationalModelChart = echarts.init(computationalModel);
+      
+      // 监听窗口大小变化，调整图表大小
+      window.addEventListener('resize', () => {
+        computationalModelChart.resize();
+      });
+      
+      // 图表配置
+      const option = {
+        backgroundColor: 'transparent',
+        tooltip: {},
+        legend: {
+          data: ['输入层', '处理层', '输出层'],
+          bottom: 0,
+          textStyle: {
+            color: document.documentElement.classList.contains('dark') ? '#e2e8f0' : '#1a202c'
+          }
+        },
+        series: [
+          {
+            type: 'graph',
+            layout: 'none',
+            symbolSize: 50,
+            roam: false,
+            label: {
+              show: true,
+              color: document.documentElement.classList.contains('dark') ? '#e2e8f0' : '#1a202c'
+            },
+            edgeSymbol: ['none', 'arrow'],
+            edgeSymbolSize: [4, 10],
+            edgeLabel: {
+              fontSize: 12,
+              color: document.documentElement.classList.contains('dark') ? '#e2e8f0' : '#1a202c'
+            },
+            data: [
+              {
+                name: '知识输入',
+                x: 100,
+                y: 80,
+                category: 0,
+                itemStyle: { color: '#7B2CBF' }
+              },
+              {
+                name: '认知模型',
+                x: 300,
+                y: 80,
+                category: 1,
+                itemStyle: { color: '#9D4EDD' }
+              },
+              {
+                name: '创新方案',
+                x: 500,
+                y: 80,
+                category: 2,
+                itemStyle: { color: '#C77DFF' }
+              }
+            ],
+            links: [
+              {
+                source: '知识输入',
+                target: '认知模型',
+                lineStyle: {
+                  width: 5,
+                  curveness: 0.2,
+                  color: '#9D4EDD'
+                }
+              },
+              {
+                source: '认知模型',
+                target: '创新方案',
+                lineStyle: {
+                  width: 5,
+                  curveness: 0.2,
+                  color: '#C77DFF'
+                }
+              }
+            ],
+            categories: [
+              { name: '输入层' },
+              { name: '处理层' },
+              { name: '输出层' }
+            ],
+            lineStyle: {
+              opacity: 0.9,
+              width: 2,
+              curveness: 0
+            }
+          }
+        ]
+      };
+      
+      // 设置图表
+      computationalModelChart.setOption(option);
+    }
+
+    // 初始化认知调控过程图表
+    function initCognitiveRegulationChart() {
+      // 初始化ECharts实例
+      cognitiveRegulationChart = echarts.init(cognitiveRegulation);
+      
+      // 监听窗口大小变化，调整图表大小
+      window.addEventListener('resize', () => {
+        cognitiveRegulationChart.resize();
+      });
+      
+      // 图表配置
+      const option = {
+        backgroundColor: 'transparent',
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          }
+        },
+        legend: {
+          data: ['思维活跃度', '知识关联度', '创新指数'],
+          bottom: 0,
+          textStyle: {
+            color: document.documentElement.classList.contains('dark') ? '#e2e8f0' : '#1a202c'
+          }
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '15%',
+          top: '10%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'category',
+          data: ['阶段1', '阶段2', '阶段3', '阶段4', '阶段5'],
+          axisLine: {
+            lineStyle: {
+              color: document.documentElement.classList.contains('dark') ? '#e2e8f0' : '#1a202c'
+            }
+          },
+          axisLabel: {
+            color: document.documentElement.classList.contains('dark') ? '#e2e8f0' : '#1a202c'
+          }
+        },
+        yAxis: {
+          type: 'value',
+          axisLine: {
+            lineStyle: {
+              color: document.documentElement.classList.contains('dark') ? '#e2e8f0' : '#1a202c'
+            }
+          },
+          axisLabel: {
+            color: document.documentElement.classList.contains('dark') ? '#e2e8f0' : '#1a202c'
+          },
+          splitLine: {
+            lineStyle: {
+              color: document.documentElement.classList.contains('dark') ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+            }
+          }
+        },
+        series: [
+          {
+            name: '思维活跃度',
+            type: 'line',
+            stack: 'Total',
+            data: [15, 23, 35, 50, 75],
+            smooth: true,
+            lineStyle: {
+              width: 4,
+              color: '#7B2CBF'
+            },
+            itemStyle: {
+              color: '#7B2CBF'
+            }
+          },
+          {
+            name: '知识关联度',
+            type: 'line',
+            stack: 'Total',
+            data: [20, 30, 40, 60, 80],
+            smooth: true,
+            lineStyle: {
+              width: 4,
+              color: '#9D4EDD'
+            },
+            itemStyle: {
+              color: '#9D4EDD'
+            }
+          },
+          {
+            name: '创新指数',
+            type: 'line',
+            stack: 'Total',
+            data: [10, 25, 45, 70, 90],
+            smooth: true,
+            lineStyle: {
+              width: 4,
+              color: '#C77DFF'
+            },
+            itemStyle: {
+              color: '#C77DFF'
+            }
+          }
+        ]
+      };
+      
+      // 设置图表
+      cognitiveRegulationChart.setOption(option);
+    }
+
+    // 显示通知
+    function showNotification(title, message, type = 'info') {
+      // 设置通知类型
+      let iconClass = 'fa-info-circle text-info';
+      if (type === 'success') {
+        iconClass = 'fa-check-circle text-success';
+      } else if (type === 'error') {
+        iconClass = 'fa-exclamation-circle text-danger';
+      } else if (type === 'warning') {
+        iconClass = 'fa-exclamation-triangle text-warning';
+      }
+      
+      // 设置通知内容
+      notificationIcon.className = iconClass;
+      notificationTitle.textContent = title;
+      notificationMessage.textContent = message;
+      
+      // 显示通知
+      notification.classList.remove('translate-x-full');
+      
+      // 3秒后自动隐藏
+      setTimeout(hideNotification, 3000);
+    }
+
+    // 隐藏通知
+    function hideNotification() {
+      notification.classList.add('translate-x-full');
+    }
+  </script>
+</body>
+</html>

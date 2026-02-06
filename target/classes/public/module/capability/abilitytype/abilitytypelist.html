@@ -1,0 +1,123 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css" type="text/css"/>
+    <!--/_only 独立样式 -->
+</head>
+<body>
+<div class="page-container" style="padding: 2px;">
+    <div class="f-l text-l">
+        <button type="button" class="btn btn-default size-S my-btn" onclick="abilityTypeValues(1)"><i
+                class=" fa fa-plus"></i> 新增
+        </button>
+        <button type="button" class="btn btn-default size-S my-btn" onclick="abilityTypeValues(2)"><i
+                class=" fa fa-edit"></i> 修改
+        </button>
+        <button type="button" class="btn btn-default size-S my-btn" onclick="onClickabilityTypeBtnDel()"><i
+                class=" fa fa-trash"></i> 删除
+        </button>
+    </div>
+    <div class="f-l table-panel">
+        <ul id="abilityTypeTree" class="ztree"
+            style="height:calc(100vh - 45px); overflow:auto; border: 1px solid #cccccc; background: #f7f7f7;"></ul>
+    </div>
+</div>
+
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript">
+    var abilityTypeTree;
+    var fpname;
+    // 业务代码
+    $(function () {
+        // 初始化权限树
+        var zTreeSetting = {
+            async: {
+                enable: true,
+                type: 'post',
+                contentType: 'application/json',
+                url: '/s/abilitytype/queryabilityType',
+                autoParam: ['id', 'name=n', 'level=lv']
+            },
+            data: {
+                simpleData: {
+                    enable: true,
+                    idKey: 'id',
+                    pIdKey: 'pId',
+                    rootPId: 0
+                }
+            }
+        };
+        abilityTypeTree = $.fn.zTree.init($('#abilityTypeTree'), zTreeSetting);
+    });
+
+    // 新增或者修改点击事件
+    function abilityTypeValues(op) {
+        var nodes = abilityTypeTree.getSelectedNodes();
+        fpname = nodes[0].name;
+        if (op == 1) { // 新增
+            layer_show('新增能力类型信息', 'abilitytypeedit.html?op=1', '800', '400');
+        } else { // 修改
+            layer_show('修改能力类型信息', 'abilitytypeedit.html?op=2&id=' + nodes[0].id, '800', '400');
+        }
+    }
+
+    // 删除按钮点击事件
+    function onClickabilityTypeBtnDel(id, name) {
+        var nodes = abilityTypeTree.getSelectedNodes();
+        if (nodes.length == 0) {
+            toastr.error('请选择需要删除的节点');
+        } else if (nodes[0].id == 1) {
+            toastr.error('根节点不可删除');
+        } else {
+            layer.confirm('<b>' + nodes[0].name + '</b><br />确定要删除吗?', function (index) {
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json;charset=UTF-8',
+                    url: '/s/abilitytype/delabilityType',
+                    data: JSON.stringify({
+                        id: nodes[0].id
+                    }),
+                    success: function (data) {
+                        if (data.result == 'success') {
+                            // 获取选中节点
+                            var nodes = abilityTypeTree.getSelectedNodes();
+                            // 删除选中节点
+                            abilityTypeTree.removeNode(nodes[0]);
+                            // 获取父节点
+                            var parentNode = nodes[0].getParentNode();
+                            // 选中父节点
+                            abilityTypeTree.selectNode(parentNode);
+                            // 判断是否需要更新父节点状态
+                            if (data.PIsLeaf == 1) {
+                                parentNode.isParent = 0;
+                                abilityTypeTree.updateNode(parentNode);
+                            }
+                            // 弹出提示->隐藏弹出框
+                            toastr.success('删除成功！');
+                            layer.close(layer.index);
+                        }
+                        if (data.result == 'error') {
+                            toastr.error(data.error)
+                        }
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+            });
+        }
+    }
+</script>
+</body>
+</html>

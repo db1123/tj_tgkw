@@ -1,0 +1,1086 @@
+package fun.server.model;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class TAbilityConditionExample {
+    protected String orderByClause;
+
+    protected boolean distinct;
+
+    protected List<Criteria> oredCriteria;
+
+    /**
+     * 构造查询条件
+     * student_capability_evaluation..t_ability_condition
+     * @mbg.generated
+     */
+    public TAbilityConditionExample() {
+        oredCriteria = new ArrayList<Criteria>();
+    }
+
+    /**
+     * 设置排序字段
+     * student_capability_evaluation..t_ability_condition
+     * @param orderByClause 排序字段
+     * @mbg.generated
+     */
+    public void setOrderByClause(String orderByClause) {
+        this.orderByClause = orderByClause;
+    }
+
+    /**
+     * 获取排序字段
+     * student_capability_evaluation..t_ability_condition
+     * @mbg.generated
+     */
+    public String getOrderByClause() {
+        return orderByClause;
+    }
+
+    /**
+     * 设置过滤重复数据
+     * student_capability_evaluation..t_ability_condition
+     * @param distinct 是否过滤重复数据
+     * @mbg.generated
+     */
+    public void setDistinct(boolean distinct) {
+        this.distinct = distinct;
+    }
+
+    /**
+     * 是否过滤重复数据
+     * student_capability_evaluation..t_ability_condition
+     * @mbg.generated
+     */
+    public boolean isDistinct() {
+        return distinct;
+    }
+
+    /**
+     * 获取当前的查询条件实例
+     * student_capability_evaluation..t_ability_condition
+     * @mbg.generated
+     */
+    public List<Criteria> getOredCriteria() {
+        return oredCriteria;
+    }
+
+    /**
+     *
+     * student_capability_evaluation..t_ability_condition
+     * 增加或者的查询条件,用于构建或者查询
+     * @param criteria 过滤条件实例
+     * @mbg.generated
+     */
+    public void or(Criteria criteria) {
+        oredCriteria.add(criteria);
+    }
+
+    /**
+     *
+     * student_capability_evaluation..t_ability_condition
+     * 创建一个新的或者查询条件
+     * @mbg.generated
+     */
+    public Criteria or() {
+        Criteria criteria = createCriteriaInternal();
+        oredCriteria.add(criteria);
+        return criteria;
+    }
+
+    /**
+     * 创建一个查询条件
+     * student_capability_evaluation..t_ability_condition
+     * @mbg.generated
+     */
+    public Criteria createCriteria() {
+        Criteria criteria = createCriteriaInternal();
+        if (oredCriteria.size() == 0) {
+            oredCriteria.add(criteria);
+        }
+        return criteria;
+    }
+
+    /**
+     * 内部构建查询条件对象
+     * student_capability_evaluation..t_ability_condition
+     * @mbg.generated
+     */
+    protected Criteria createCriteriaInternal() {
+        Criteria criteria = new Criteria();
+        return criteria;
+    }
+
+    /**
+     * 清除查询条件
+     * student_capability_evaluation..t_ability_condition
+     * @mbg.generated
+     */
+    public void clear() {
+        oredCriteria.clear();
+        orderByClause = null;
+        distinct = false;
+    }
+
+    /**
+     * TAbilityCondition
+     * GeneratedCriteria
+     * 数据库表：student_capability_evaluation..t_ability_condition
+     */
+    protected abstract static class GeneratedCriteria {
+        protected List<Criterion> criteria;
+
+        protected GeneratedCriteria() {
+            super();
+            criteria = new ArrayList<Criterion>();
+        }
+
+        public boolean isValid() {
+            return criteria.size() > 0;
+        }
+
+        public List<Criterion> getAllCriteria() {
+            return criteria;
+        }
+
+        public List<Criterion> getCriteria() {
+            return criteria;
+        }
+
+        protected void addCriterion(String condition) {
+            if (condition == null) {
+                throw new RuntimeException("Value for condition cannot be null");
+            }
+            criteria.add(new Criterion(condition));
+        }
+
+        protected void addCriterion(String condition, Object value, String property) {
+            if (value == null) {
+                throw new RuntimeException("Value for " + property + " cannot be null");
+            }
+            criteria.add(new Criterion(condition, value));
+        }
+
+        protected void addCriterion(String condition, Object value1, Object value2, String property) {
+            if (value1 == null || value2 == null) {
+                throw new RuntimeException("Between values for " + property + " cannot be null");
+            }
+            criteria.add(new Criterion(condition, value1, value2));
+        }
+
+        public Criteria andFkeyidIsNull() {
+            addCriterion("FKeyID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFkeyidIsNotNull() {
+            addCriterion("FKeyID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFkeyidEqualTo(Long value) {
+            addCriterion("FKeyID =", value, "fkeyid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFkeyidNotEqualTo(Long value) {
+            addCriterion("FKeyID <>", value, "fkeyid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFkeyidGreaterThan(Long value) {
+            addCriterion("FKeyID >", value, "fkeyid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFkeyidGreaterThanOrEqualTo(Long value) {
+            addCriterion("FKeyID >=", value, "fkeyid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFkeyidLessThan(Long value) {
+            addCriterion("FKeyID <", value, "fkeyid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFkeyidLessThanOrEqualTo(Long value) {
+            addCriterion("FKeyID <=", value, "fkeyid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFkeyidIn(List<Long> values) {
+            addCriterion("FKeyID in", values, "fkeyid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFkeyidNotIn(List<Long> values) {
+            addCriterion("FKeyID not in", values, "fkeyid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFkeyidBetween(Long value1, Long value2) {
+            addCriterion("FKeyID between", value1, value2, "fkeyid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFkeyidNotBetween(Long value1, Long value2) {
+            addCriterion("FKeyID not between", value1, value2, "fkeyid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcidIsNull() {
+            addCriterion("FCID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcidIsNotNull() {
+            addCriterion("FCID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcidEqualTo(Long value) {
+            addCriterion("FCID =", value, "fcid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcidNotEqualTo(Long value) {
+            addCriterion("FCID <>", value, "fcid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcidGreaterThan(Long value) {
+            addCriterion("FCID >", value, "fcid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcidGreaterThanOrEqualTo(Long value) {
+            addCriterion("FCID >=", value, "fcid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcidLessThan(Long value) {
+            addCriterion("FCID <", value, "fcid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcidLessThanOrEqualTo(Long value) {
+            addCriterion("FCID <=", value, "fcid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcidIn(List<Long> values) {
+            addCriterion("FCID in", values, "fcid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcidNotIn(List<Long> values) {
+            addCriterion("FCID not in", values, "fcid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcidBetween(Long value1, Long value2) {
+            addCriterion("FCID between", value1, value2, "fcid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcidNotBetween(Long value1, Long value2) {
+            addCriterion("FCID not between", value1, value2, "fcid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFuidIsNull() {
+            addCriterion("FUID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFuidIsNotNull() {
+            addCriterion("FUID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFuidEqualTo(Long value) {
+            addCriterion("FUID =", value, "fuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFuidNotEqualTo(Long value) {
+            addCriterion("FUID <>", value, "fuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFuidGreaterThan(Long value) {
+            addCriterion("FUID >", value, "fuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFuidGreaterThanOrEqualTo(Long value) {
+            addCriterion("FUID >=", value, "fuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFuidLessThan(Long value) {
+            addCriterion("FUID <", value, "fuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFuidLessThanOrEqualTo(Long value) {
+            addCriterion("FUID <=", value, "fuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFuidIn(List<Long> values) {
+            addCriterion("FUID in", values, "fuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFuidNotIn(List<Long> values) {
+            addCriterion("FUID not in", values, "fuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFuidBetween(Long value1, Long value2) {
+            addCriterion("FUID between", value1, value2, "fuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFuidNotBetween(Long value1, Long value2) {
+            addCriterion("FUID not between", value1, value2, "fuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcdateIsNull() {
+            addCriterion("FCDATE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcdateIsNotNull() {
+            addCriterion("FCDATE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcdateEqualTo(Date value) {
+            addCriterion("FCDATE =", value, "fcdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcdateNotEqualTo(Date value) {
+            addCriterion("FCDATE <>", value, "fcdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcdateGreaterThan(Date value) {
+            addCriterion("FCDATE >", value, "fcdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcdateGreaterThanOrEqualTo(Date value) {
+            addCriterion("FCDATE >=", value, "fcdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcdateLessThan(Date value) {
+            addCriterion("FCDATE <", value, "fcdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcdateLessThanOrEqualTo(Date value) {
+            addCriterion("FCDATE <=", value, "fcdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcdateIn(List<Date> values) {
+            addCriterion("FCDATE in", values, "fcdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcdateNotIn(List<Date> values) {
+            addCriterion("FCDATE not in", values, "fcdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcdateBetween(Date value1, Date value2) {
+            addCriterion("FCDATE between", value1, value2, "fcdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFcdateNotBetween(Date value1, Date value2) {
+            addCriterion("FCDATE not between", value1, value2, "fcdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFudateIsNull() {
+            addCriterion("FUDATE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFudateIsNotNull() {
+            addCriterion("FUDATE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFudateEqualTo(Date value) {
+            addCriterion("FUDATE =", value, "fudate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFudateNotEqualTo(Date value) {
+            addCriterion("FUDATE <>", value, "fudate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFudateGreaterThan(Date value) {
+            addCriterion("FUDATE >", value, "fudate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFudateGreaterThanOrEqualTo(Date value) {
+            addCriterion("FUDATE >=", value, "fudate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFudateLessThan(Date value) {
+            addCriterion("FUDATE <", value, "fudate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFudateLessThanOrEqualTo(Date value) {
+            addCriterion("FUDATE <=", value, "fudate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFudateIn(List<Date> values) {
+            addCriterion("FUDATE in", values, "fudate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFudateNotIn(List<Date> values) {
+            addCriterion("FUDATE not in", values, "fudate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFudateBetween(Date value1, Date value2) {
+            addCriterion("FUDATE between", value1, value2, "fudate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFudateNotBetween(Date value1, Date value2) {
+            addCriterion("FUDATE not between", value1, value2, "fudate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFstateIsNull() {
+            addCriterion("FState is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFstateIsNotNull() {
+            addCriterion("FState is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFstateEqualTo(Integer value) {
+            addCriterion("FState =", value, "fstate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFstateNotEqualTo(Integer value) {
+            addCriterion("FState <>", value, "fstate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFstateGreaterThan(Integer value) {
+            addCriterion("FState >", value, "fstate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFstateGreaterThanOrEqualTo(Integer value) {
+            addCriterion("FState >=", value, "fstate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFstateLessThan(Integer value) {
+            addCriterion("FState <", value, "fstate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFstateLessThanOrEqualTo(Integer value) {
+            addCriterion("FState <=", value, "fstate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFstateIn(List<Integer> values) {
+            addCriterion("FState in", values, "fstate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFstateNotIn(List<Integer> values) {
+            addCriterion("FState not in", values, "fstate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFstateBetween(Integer value1, Integer value2) {
+            addCriterion("FState between", value1, value2, "fstate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFstateNotBetween(Integer value1, Integer value2) {
+            addCriterion("FState not between", value1, value2, "fstate");
+            return (Criteria) this;
+        }
+
+        public Criteria andFalidIsNull() {
+            addCriterion("FALID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFalidIsNotNull() {
+            addCriterion("FALID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFalidEqualTo(Long value) {
+            addCriterion("FALID =", value, "falid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFalidNotEqualTo(Long value) {
+            addCriterion("FALID <>", value, "falid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFalidGreaterThan(Long value) {
+            addCriterion("FALID >", value, "falid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFalidGreaterThanOrEqualTo(Long value) {
+            addCriterion("FALID >=", value, "falid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFalidLessThan(Long value) {
+            addCriterion("FALID <", value, "falid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFalidLessThanOrEqualTo(Long value) {
+            addCriterion("FALID <=", value, "falid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFalidIn(List<Long> values) {
+            addCriterion("FALID in", values, "falid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFalidNotIn(List<Long> values) {
+            addCriterion("FALID not in", values, "falid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFalidBetween(Long value1, Long value2) {
+            addCriterion("FALID between", value1, value2, "falid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFalidNotBetween(Long value1, Long value2) {
+            addCriterion("FALID not between", value1, value2, "falid");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionnameIsNull() {
+            addCriterion("FConditionName is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionnameIsNotNull() {
+            addCriterion("FConditionName is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionnameEqualTo(String value) {
+            addCriterion("FConditionName =", value, "fconditionname");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionnameNotEqualTo(String value) {
+            addCriterion("FConditionName <>", value, "fconditionname");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionnameGreaterThan(String value) {
+            addCriterion("FConditionName >", value, "fconditionname");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionnameGreaterThanOrEqualTo(String value) {
+            addCriterion("FConditionName >=", value, "fconditionname");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionnameLessThan(String value) {
+            addCriterion("FConditionName <", value, "fconditionname");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionnameLessThanOrEqualTo(String value) {
+            addCriterion("FConditionName <=", value, "fconditionname");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionnameLike(String value) {
+            addCriterion("FConditionName like", value, "fconditionname");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionnameNotLike(String value) {
+            addCriterion("FConditionName not like", value, "fconditionname");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionnameIn(List<String> values) {
+            addCriterion("FConditionName in", values, "fconditionname");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionnameNotIn(List<String> values) {
+            addCriterion("FConditionName not in", values, "fconditionname");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionnameBetween(String value1, String value2) {
+            addCriterion("FConditionName between", value1, value2, "fconditionname");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionnameNotBetween(String value1, String value2) {
+            addCriterion("FConditionName not between", value1, value2, "fconditionname");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditiontypeIsNull() {
+            addCriterion("FConditionType is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditiontypeIsNotNull() {
+            addCriterion("FConditionType is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditiontypeEqualTo(Integer value) {
+            addCriterion("FConditionType =", value, "fconditiontype");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditiontypeNotEqualTo(Integer value) {
+            addCriterion("FConditionType <>", value, "fconditiontype");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditiontypeGreaterThan(Integer value) {
+            addCriterion("FConditionType >", value, "fconditiontype");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditiontypeGreaterThanOrEqualTo(Integer value) {
+            addCriterion("FConditionType >=", value, "fconditiontype");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditiontypeLessThan(Integer value) {
+            addCriterion("FConditionType <", value, "fconditiontype");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditiontypeLessThanOrEqualTo(Integer value) {
+            addCriterion("FConditionType <=", value, "fconditiontype");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditiontypeIn(List<Integer> values) {
+            addCriterion("FConditionType in", values, "fconditiontype");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditiontypeNotIn(List<Integer> values) {
+            addCriterion("FConditionType not in", values, "fconditiontype");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditiontypeBetween(Integer value1, Integer value2) {
+            addCriterion("FConditionType between", value1, value2, "fconditiontype");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditiontypeNotBetween(Integer value1, Integer value2) {
+            addCriterion("FConditionType not between", value1, value2, "fconditiontype");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionvalueIsNull() {
+            addCriterion("FConditionValue is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionvalueIsNotNull() {
+            addCriterion("FConditionValue is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionvalueEqualTo(String value) {
+            addCriterion("FConditionValue =", value, "fconditionvalue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionvalueNotEqualTo(String value) {
+            addCriterion("FConditionValue <>", value, "fconditionvalue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionvalueGreaterThan(String value) {
+            addCriterion("FConditionValue >", value, "fconditionvalue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionvalueGreaterThanOrEqualTo(String value) {
+            addCriterion("FConditionValue >=", value, "fconditionvalue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionvalueLessThan(String value) {
+            addCriterion("FConditionValue <", value, "fconditionvalue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionvalueLessThanOrEqualTo(String value) {
+            addCriterion("FConditionValue <=", value, "fconditionvalue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionvalueLike(String value) {
+            addCriterion("FConditionValue like", value, "fconditionvalue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionvalueNotLike(String value) {
+            addCriterion("FConditionValue not like", value, "fconditionvalue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionvalueIn(List<String> values) {
+            addCriterion("FConditionValue in", values, "fconditionvalue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionvalueNotIn(List<String> values) {
+            addCriterion("FConditionValue not in", values, "fconditionvalue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionvalueBetween(String value1, String value2) {
+            addCriterion("FConditionValue between", value1, value2, "fconditionvalue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionvalueNotBetween(String value1, String value2) {
+            addCriterion("FConditionValue not between", value1, value2, "fconditionvalue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionscoreIsNull() {
+            addCriterion("FConditionScore is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionscoreIsNotNull() {
+            addCriterion("FConditionScore is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionscoreEqualTo(Float value) {
+            addCriterion("FConditionScore =", value, "fconditionscore");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionscoreNotEqualTo(Float value) {
+            addCriterion("FConditionScore <>", value, "fconditionscore");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionscoreGreaterThan(Float value) {
+            addCriterion("FConditionScore >", value, "fconditionscore");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionscoreGreaterThanOrEqualTo(Float value) {
+            addCriterion("FConditionScore >=", value, "fconditionscore");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionscoreLessThan(Float value) {
+            addCriterion("FConditionScore <", value, "fconditionscore");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionscoreLessThanOrEqualTo(Float value) {
+            addCriterion("FConditionScore <=", value, "fconditionscore");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionscoreIn(List<Float> values) {
+            addCriterion("FConditionScore in", values, "fconditionscore");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionscoreNotIn(List<Float> values) {
+            addCriterion("FConditionScore not in", values, "fconditionscore");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionscoreBetween(Float value1, Float value2) {
+            addCriterion("FConditionScore between", value1, value2, "fconditionscore");
+            return (Criteria) this;
+        }
+
+        public Criteria andFconditionscoreNotBetween(Float value1, Float value2) {
+            addCriterion("FConditionScore not between", value1, value2, "fconditionscore");
+            return (Criteria) this;
+        }
+
+        public Criteria andFnoteIsNull() {
+            addCriterion("FNote is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFnoteIsNotNull() {
+            addCriterion("FNote is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFnoteEqualTo(String value) {
+            addCriterion("FNote =", value, "fnote");
+            return (Criteria) this;
+        }
+
+        public Criteria andFnoteNotEqualTo(String value) {
+            addCriterion("FNote <>", value, "fnote");
+            return (Criteria) this;
+        }
+
+        public Criteria andFnoteGreaterThan(String value) {
+            addCriterion("FNote >", value, "fnote");
+            return (Criteria) this;
+        }
+
+        public Criteria andFnoteGreaterThanOrEqualTo(String value) {
+            addCriterion("FNote >=", value, "fnote");
+            return (Criteria) this;
+        }
+
+        public Criteria andFnoteLessThan(String value) {
+            addCriterion("FNote <", value, "fnote");
+            return (Criteria) this;
+        }
+
+        public Criteria andFnoteLessThanOrEqualTo(String value) {
+            addCriterion("FNote <=", value, "fnote");
+            return (Criteria) this;
+        }
+
+        public Criteria andFnoteLike(String value) {
+            addCriterion("FNote like", value, "fnote");
+            return (Criteria) this;
+        }
+
+        public Criteria andFnoteNotLike(String value) {
+            addCriterion("FNote not like", value, "fnote");
+            return (Criteria) this;
+        }
+
+        public Criteria andFnoteIn(List<String> values) {
+            addCriterion("FNote in", values, "fnote");
+            return (Criteria) this;
+        }
+
+        public Criteria andFnoteNotIn(List<String> values) {
+            addCriterion("FNote not in", values, "fnote");
+            return (Criteria) this;
+        }
+
+        public Criteria andFnoteBetween(String value1, String value2) {
+            addCriterion("FNote between", value1, value2, "fnote");
+            return (Criteria) this;
+        }
+
+        public Criteria andFnoteNotBetween(String value1, String value2) {
+            addCriterion("FNote not between", value1, value2, "fnote");
+            return (Criteria) this;
+        }
+
+        public Criteria andFmethodweightIsNull() {
+            addCriterion("FMethodWeight is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFmethodweightIsNotNull() {
+            addCriterion("FMethodWeight is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFmethodweightEqualTo(Float value) {
+            addCriterion("FMethodWeight =", value, "fmethodweight");
+            return (Criteria) this;
+        }
+
+        public Criteria andFmethodweightNotEqualTo(Float value) {
+            addCriterion("FMethodWeight <>", value, "fmethodweight");
+            return (Criteria) this;
+        }
+
+        public Criteria andFmethodweightGreaterThan(Float value) {
+            addCriterion("FMethodWeight >", value, "fmethodweight");
+            return (Criteria) this;
+        }
+
+        public Criteria andFmethodweightGreaterThanOrEqualTo(Float value) {
+            addCriterion("FMethodWeight >=", value, "fmethodweight");
+            return (Criteria) this;
+        }
+
+        public Criteria andFmethodweightLessThan(Float value) {
+            addCriterion("FMethodWeight <", value, "fmethodweight");
+            return (Criteria) this;
+        }
+
+        public Criteria andFmethodweightLessThanOrEqualTo(Float value) {
+            addCriterion("FMethodWeight <=", value, "fmethodweight");
+            return (Criteria) this;
+        }
+
+        public Criteria andFmethodweightIn(List<Float> values) {
+            addCriterion("FMethodWeight in", values, "fmethodweight");
+            return (Criteria) this;
+        }
+
+        public Criteria andFmethodweightNotIn(List<Float> values) {
+            addCriterion("FMethodWeight not in", values, "fmethodweight");
+            return (Criteria) this;
+        }
+
+        public Criteria andFmethodweightBetween(Float value1, Float value2) {
+            addCriterion("FMethodWeight between", value1, value2, "fmethodweight");
+            return (Criteria) this;
+        }
+
+        public Criteria andFmethodweightNotBetween(Float value1, Float value2) {
+            addCriterion("FMethodWeight not between", value1, value2, "fmethodweight");
+            return (Criteria) this;
+        }
+    }
+
+    /**
+     * 类注释
+     * Criteria
+     * 数据库表：student_capability_evaluation..t_ability_condition
+     */
+    public static class Criteria extends GeneratedCriteria {
+
+        protected Criteria() {
+            super();
+        }
+    }
+
+    /**
+     * TAbilityCondition
+     * Criterion
+     * 数据库表：student_capability_evaluation..t_ability_condition
+     */
+    public static class Criterion {
+        private String condition;
+
+        private Object value;
+
+        private Object secondValue;
+
+        private boolean noValue;
+
+        private boolean singleValue;
+
+        private boolean betweenValue;
+
+        private boolean listValue;
+
+        private String typeHandler;
+
+        public String getCondition() {
+            return condition;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public Object getSecondValue() {
+            return secondValue;
+        }
+
+        public boolean isNoValue() {
+            return noValue;
+        }
+
+        public boolean isSingleValue() {
+            return singleValue;
+        }
+
+        public boolean isBetweenValue() {
+            return betweenValue;
+        }
+
+        public boolean isListValue() {
+            return listValue;
+        }
+
+        public String getTypeHandler() {
+            return typeHandler;
+        }
+
+        protected Criterion(String condition) {
+            super();
+            this.condition = condition;
+            this.typeHandler = null;
+            this.noValue = true;
+        }
+
+        protected Criterion(String condition, Object value, String typeHandler) {
+            super();
+            this.condition = condition;
+            this.value = value;
+            this.typeHandler = typeHandler;
+            if (value instanceof List<?>) {
+                this.listValue = true;
+            } else {
+                this.singleValue = true;
+            }
+        }
+
+        protected Criterion(String condition, Object value) {
+            this(condition, value, null);
+        }
+
+        protected Criterion(String condition, Object value, Object secondValue, String typeHandler) {
+            super();
+            this.condition = condition;
+            this.value = value;
+            this.secondValue = secondValue;
+            this.typeHandler = typeHandler;
+            this.betweenValue = true;
+        }
+
+        protected Criterion(String condition, Object value, Object secondValue) {
+            this(condition, value, secondValue, null);
+        }
+    }
+}

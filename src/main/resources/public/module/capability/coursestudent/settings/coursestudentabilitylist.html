@@ -1,0 +1,947 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+    <!--    <link rel="stylesheet" href="/module/capability/coursestudent/settings/css/bootstrap.min.css" />-->
+    <link rel="stylesheet" href="/module/capability/coursestudent/settings/css/jquery.steps.css"/>
+
+    <!--/_only 独立样式 -->
+</head>
+<body>
+<div class="page-container">
+    <div class="row cl">
+        <div class="col-md-5 col-sm-5 col-xs-5">
+            <div class="f-l" style="width: 100%; margin-top: 3px;">
+                <input type="text" class="input-text size-S form-text-FName" style="width:200px" placeholder="考核条件">
+                <select class="" style="width: 100px;" id="FType" placeholder="类型"></select>
+                <select class="" style="width: 100px;" id="FSZState" placeholder="状态"></select>
+
+                <button type="button" class="btn btn-default size-S my-btn btn-search-fun"><i class="Hui-iconfont">&#xe665;</i>
+                    搜索
+                </button>
+            </div>
+            <div class="f-l" style="width: 100%; margin-top: 3px;">
+                <table id="mainTable" class="display compact" style="width: 99.8%;"></table>
+            </div>
+        </div>
+        <div class="col-md-7 col-sm-7 col-xs-7">
+            <div class="x_panel">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- 表格 -->
+                        <input type="hidden" value="0" id="fstrucd"/>
+                        <div class="panel panel-primary">
+                            <div class="panel-header">
+                                <div class="callout">
+                                    <h6 id="mxname"></h6>
+                                    <p class="text-danger"><h6>取值范围1~100之间的整数.</h6></p>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div id="setdiv">
+                                    无数据！
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<script src="/module/capability/coursestudent/settings/js/jquery.steps2.js"></script>
+
+<script type="text/javascript">
+    var courseID = getQueryStringByName('id');//课程ID
+    var selectFcalcType;
+    var istj = true;
+    var fsid = -1;//设置ID
+    var istjqd = 1;
+    var fqztype =-1;
+    var remarkShowLength = 15;//默认现实的字符串长度
+    var TCourstandardsID;//设置子表ID
+    var FStandardID;
+    var shuzhiTable;
+    var strTable;
+    // 业务代码
+    $(function () {
+        //
+        $("body").mLoading("show");
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/coursestandard/getCourseStandarddata', // 调用地址
+            data: JSON.stringify({
+                id: courseID
+            }),
+            async: false,
+            success: function (data) {
+                setTimeout(function () {
+                    $('.mloading-text').html('正在获取数据...');
+                    $('#mainTable').DataTable().ajax.reload(null, false);
+
+                    $("body").mLoading("hide");
+                }, 1000);
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+                $("body").mLoading("hide");
+            }
+        });
+
+        $("#FType").select2({
+            placeholder: '请选择类型',
+            data: [{id: "-1", text: "全部"}, {id: 2, text: "填报"}, {id: 1, text: "关联"}],
+            language: "zh-CN"
+        });
+
+        $("#FSZState").select2({
+            placeholder: '请选择设置状态',
+            data: [{id: "-2", text: "全部"}, {id: -1, text: "未设置"}, {id: 1, text: "保存未提交"}, {
+                id: 2,
+                text: "已设置"
+            }],
+            language: "zh-CN"
+        });
+
+
+        // 封装表格
+        $('#mainTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/coursestandard/querycoursestandardlist', // 调用地址
+                data: function (d) {
+                    return JSON.stringify($.extend({}, d, {
+                        page: d.start / d.length + 1, // 当前页
+                        results: d.length, // 每页显示条数
+                        courseID: courseID,
+                        FTJName: $(".form-text-FName").val(),
+                        FSZState: $("#FSZState").val(),
+                        FType: $("#FType").val()
+                    }));
+                },
+                dataSrc: function (json) {
+                    json.recordsFiltered = json.total;  // 总行数
+                    json.recordsTotal = json.page; // 当前页数
+                    return json.list;
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+            },
+            columns: [
+                {
+                    title: '能力', data: 'FAbilityID',
+                    render: function (data, type, row) {
+                        return row.FName;
+
+                    }
+                },
+                {
+                    title: '考核条件', data: 'FAbilityCAMID',
+                    render: function (data, type, row) {
+                        return row.FAbilityCAMName;
+
+                    }
+                },
+                {
+                    title: '类型', data: 'FType',
+                    render: function (data, type, row) {
+                        if (data == -1) {
+                            return '未选择';
+                        } else if (data == 0) {
+                            return '填报';
+                        } else if (data == 1) {
+                            return '关联';
+                        }
+                    }
+                },
+                {
+                    title: '取值类型', data: 'FQZType',
+                    render: function (data, type, row) {
+                        if (data == -1) {
+                            return '未选择';
+                        } else if (data == 0) {
+                            return '布尔';
+                        } else if (data == 1) {
+                            return '数值';
+                        }else if (data == 2) {
+                            return '字符串';
+                        }else if (data == 3) {
+                            return '原值';
+                        }
+                    }
+                },
+
+                {
+                    title: '设置状态', data: 'FSZState',
+                    render: function (data, type, row) {
+                        if (data == -1) {
+                            return '<span style="color: #FD4363">未设置</span>';
+                        } else if (data == 1) {
+                            return '<span style="color: #2503BD">保存未提交</span>';
+                        } else if (data == 2) {
+                            return '<span style="color: #0e90d2">已设置</span>';
+                        }
+                    }
+                },
+                {
+                    title: '操作',
+                    data: 'FState',
+                    width: 90,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<button type="button" class="btn btn-secondary size-MINI" onclick="biaozhunset(\'' + row.key + '\')">标准设置</button>';
+
+                    }
+                }
+            ],
+            scrollY: (document.body.clientHeight - 100) + 'px',
+            scrollX: true,
+            paging: true, // 是否开启本地分页
+            pageLength: 15, // 改变初始化页长度（每页多少条数据）
+            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+            lengthChange: false, // 是否允许因子改变表格每页显示的记录数
+            searching: false, // 是否允许Datatables开启本地搜索
+            ordering: true, // 是否允许Datatables开启排序
+            info: true, // 控制是否显示表格左下角的信息
+            language: DataTablesLanguage
+        });
+
+        // 查询按钮点击事件
+        $('.btn-search-fun').on('click', function () {
+            $('#mainTable').DataTable().ajax.reload(null, false);
+        });
+    });
+
+
+    function biaozhunset(fkeyid) {
+        //点击标准设置后 ，动态生成步骤向导内容；
+        var example_basic = $("#example-basic");
+        FStandardID = fkeyid;
+        if (istj == true && fsid != -1) {
+            var oFlag = confirm("该数据未提交，确定要切换吗？");
+            if (oFlag) {
+                istjqd = 0;
+            } else {
+                istjqd = 1;
+            }
+        } else {
+            istjqd = 0;
+        }
+
+        if (istjqd == 0) {
+            var count = 0;
+            var setdiv = $("#setdiv");
+            fqztype =-1;
+            var html = `<div id="example-basic" style="width: 100%;">
+                            <h3></h3>
+                            <section>
+                                <div style="height: 50px;">
+                                    <div class="row cl">
+                                        <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>数据源：</label>
+                                        <div class="formControls col-xs-8 col-sm-9">
+                                            <select name="aFType" id="aFType" style="width: 100%;">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div id="jisuan" style="display: none;">
+                                        <div class="row cl">
+                                            <label class="form-label col-xs-3 col-sm-2"><span
+                                                    class="c-red">*</span>计算方式：</label>
+                                            <div class="formControls col-xs-8 col-sm-9">
+                                                <select name="FcalcType" id="FcalcType" style="width: 100%;">
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <h3></h3>
+                            <section>
+                                <div>
+                                    <div class="row cl">
+                                        <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>取值类型：</label>
+                                        <div class="formControls col-xs-8 col-sm-9">
+                                            <select name="FType2" id="FType2" style="width: 100%;">
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <h3></h3>
+                            <section>
+                                <div id="buer" style="display: block;">
+                                    <div class="row cl">
+                                        <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>是：</label>
+                                        <div class="formControls col-xs-4 col-sm-4">
+                                            <input type="text" name="booltrue1" class="input-text"
+                                                   id="booltrue1" placeholder="得分"
+                                                   oninput="this.value=/^([1-9][0-9]{0,1}|100)$/.test(this.value)?this.value:''">
+                                        </div>
+                                        <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>描述：</label>
+                                        <div class="formControls col-xs-4 col-sm-4">
+                                            <input type="text" name="booltrueFMemo" class="input-text"
+                                                   id="booltrueFMemo" placeholder="描述">
+                                        </div>
+                                    </div>
+                                    <div class="row cl">
+                                        <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>否：</label>
+                                        <div class="formControls col-xs-4 col-sm-4">
+                                            <input type="text" name="boolfalse1" class="input-text"
+                                                   id="boolfalse1" placeholder="得分"
+                                                   oninput="this.value=/^([1-9][0-9]{0,1}|100)$/.test(this.value)?this.value:''">
+                                        </div>
+                                        <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>描述：</label>
+                                        <div class="formControls col-xs-4 col-sm-4">
+                                            <input type="text" name="boolfalseFMemo" class="input-text"
+                                                   id="boolfalseFMemo" placeholder="描述">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="shuzhi" style="display: block;">
+                                    <button type="button" class="btn btn-default size-S my-btn"
+                                            onclick="settingsValues(1,1)">
+                                        <i class=" fa fa-plus mr-2"></i>新增区间值
+                                    </button>
+                                    <div id="shuzhiTablediv"><table id="shuzhiTable" class="display compact"></table></div>
+
+                                </div>
+                                <div id="zifuchuan" style="display: block;">
+                                    <button type="button" class="btn btn-default size-S my-btn"
+                                            onclick="settingsValuesstr(1,1)">
+                                        <i class=" fa fa-plus mr-2"></i>新增结果值
+                                    </button>
+                                    <div id="strTablediv">
+                                        <table id="strTable" class="display compact"></table>
+                                    </div>
+
+                                </div>
+                                <div id="yuanzhi" style="display: block;">
+                                    获取原值，无需设置，直接提交！
+                                </div>
+                            </section>
+
+                        </div>`;
+
+            setdiv.empty();
+            setdiv.append(html);
+            data = {};
+            data['id'] = fkeyid;
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/coursestandards/querysettingInfo', // 调用地址
+                data: JSON.stringify(data),
+                async: false,
+                success: function (data) {
+                    $("#mxname").val(data.FTJName);
+                    $("#example-basic").steps({
+                        headerTag: "h3",
+                        bodyTag: "section",
+                        transitionEffect: "slideLeft",
+                        autoFocus: true,
+                        onStepChanging: function (event, currentIndex, newIndex) {/*步骤更改之前进行验证，默认验证结果是true*/
+                            if (currentIndex == 0) {
+                                //数据源
+                                if ($("#aFType").val() == -1) {
+                                    toastr.error("请选择数据源！");
+                                    return false;
+                                }
+
+                                if ($("#aFType").val() == 1 && ($("#FcalcType").val() == -1 || $("#FcalcType").val() == null)) {
+                                    jstype = 0;
+                                    toastr.error("请选择计算方式！");
+                                    return false;
+                                }
+
+                                if (($("#aFType").val() == 2 || ($("#aFType").val() == 1 && $("#FcalcType").val() != -1 && $("#FcalcType").val() != null)) && count == 0) {
+                                    count=1;
+                                }
+
+                                var datas={};
+                                datas['FKeyID'] = fkeyid;
+                                datas['FType'] = $("#aFType").val();
+                                if($("#aFType").val() == 1){
+                                    datas['FcalcType'] = $("#FcalcType").val();
+                                }
+                                $.ajax({
+                                    type: 'POST',
+                                    contentType: 'application/json',
+                                    url: '/s/coursestandard/updatecourseStandardFType', // 调用地址
+                                    data: JSON.stringify(datas),
+                                    async: false,
+                                    success: function(data) {
+                                        if (data.result == 'success') {
+                                            $('#mainTable').DataTable().ajax.reload(null, false);
+                                        }else if (data.result == 'error') {
+                                            toastr.error(data.error);
+                                        }
+                                    },
+                                    error : function(e){
+                                        toastr.error(e.status);
+                                        toastr.error(e.responseText);
+                                    }
+                                });
+                            } else if (currentIndex == 1) {
+                                //取值类型
+                                if ($("#FType2").val() == -1) {
+                                    toastr.error("请选择取值类型！");
+                                    return false;
+                                }
+                            }
+                            return true;
+                        },
+                        onStepChanged: function (event, currentIndex, newIndex) {/*步骤后变更后  触发的函数   */
+                            if(newIndex===0 && currentIndex === 1){
+
+                                if(data.FQZType != -1)
+                                    $("#FType2").val([data.FQZType]).trigger('change');
+                            }else if(newIndex === 1 && currentIndex===2){
+                                if($("#FType2").val() == 1){
+                                    //数值
+                                    fqztype =1;
+                                    if (shuzhiTable) {
+                                        shuzhiTable.destroy(); // 销毁数据对象
+                                        $('#shuzhiTable').empty(); // 清空表格的表头
+                                        var table = '<table id="shuzhiTable" class="display compact" style="width: 99.8%;"></table>';
+                                        $('#shuzhiTablediv').append(table);
+                                    }
+                                    // 封装表格
+                                    shuzhiTable =  $('#shuzhiTable').DataTable({
+                                        processing: true,
+                                        serverSide: true,
+                                        ajax: {
+                                            type: 'POST',
+                                            contentType: 'application/json',
+                                            url: '/s/coursestandards/queryStandardSettings', // 调用地址
+                                            data: function (d) {
+                                                return JSON.stringify($.extend({}, d, {
+                                                    page: d.start / d.length + 1, // 当前页
+                                                    results: d.length, // 每页显示条数
+                                                    id: fkeyid,
+                                                }));
+                                            },
+                                            dataSrc: function (json) {
+                                                json.recordsFiltered = json.total;  // 总行数
+                                                json.recordsTotal = json.page; // 当前页数
+                                                return json.list;
+                                            },
+                                            error: function (xhr, status, error) {
+                                                toastr.error(xhr);
+                                            }
+                                        },
+                                        createdRow: function (row, data, dataIndex) {
+                                            if (data.FMemo.length > remarkShowLength) {//只有超长，才有td点击事件
+                                                $(row).children('td').eq(4).attr('onclick', 'javascript:changeShowRemarks(this);');
+                                                $(row).children('td').eq(4).css('word-wrap', 'break-word');
+                                                $(row).children('td').eq(4).css('white-space', 'normal');
+                                                $(row).children('td').eq(4).css('word-break', 'break-all');
+                                            }
+                                            $(row).children('td').eq(4).attr('content', data.FMemo);
+                                        },
+                                        columns: [
+                                            {title: '序号', data: 'XH', orderable: false, width: 40},
+                                            {title: '区间下限', data: 'FValueLL', orderable: false, width: 60},
+                                            {title: '区间上限', data: 'FValueUL', orderable: false, width: 60},
+                                            {title: '分值', data: 'FSValue', orderable: false, width: 60},
+                                            {
+                                                title: '分值描述', data: 'FMemo', orderable: false, width: 80,
+                                                render: function (data, type, full, row) {
+                                                    if (data.length > remarkShowLength) {//只有超长，才有td点击事件
+                                                        return getPartialRemarksHtml(data);//显示部分信息
+                                                    } else {
+                                                        return data;
+                                                    }
+                                                }
+
+                                            },
+                                            {
+                                                title: '操作',
+                                                data: '',
+                                                width: 60,
+                                                orderable: false,
+                                                render: function (data, type, row) {
+                                                    return '<button type="button" class="btn btn-block btn-default btn-xs" onclick="settingsValues(2,\'' + row.key + '\')"><i class="fas fa-edit mr-2"></i>编辑</button>';
+                                                }
+                                            },
+                                            {
+                                                title: '',
+                                                data: '',
+                                                width: 60,
+                                                orderable: false,
+                                                render: function (data, type, row) {
+                                                    return '<button type="button" class="btn btn-block btn-danger btn-xs"  onclick="onClicksettingBtnDel(\'' + row.key + '\',\'' + row.FValueUL + '\',\'' + row.FValueLL + '\')"><i class="fas fa-trash mr-2"></i>删除</button>';
+                                                }
+                                            },
+                                        ],
+
+                                        paging: true, // 是否开启本地分页
+                                        pageLength: 5, // 改变初始化页长度（每页多少条数据）
+                                        pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+                                        lengthChange: false, // 是否允许用户改变表格每页显示的记录数
+                                        searching: false, // 是否允许Datatables开启本地搜索
+                                        ordering: false, // 是否允许Datatables开启排序
+                                        info: true, // 控制是否显示表格左下角的信息
+                                        autoWidth: false, // 控制Datatables是否自适应宽度
+                                        language: DataTablesLanguage
+                                    });
+
+                                }else if($("#FType2").val() == 0){
+                                    //bool
+                                    fqztype=0;
+                                }else if($("#FType2").val() == 2){
+                                    //字符串
+                                    fqztype=2;
+                                    if (strTable) {
+                                        strTable.destroy(); // 销毁数据对象
+                                        $('#strTable').empty(); // 清空表格的表头
+                                        var table = '<table id="strTable" class="display compact" style="width: 99.8%;"></table>';
+                                        $('#strTablediv').append(table);
+                                    }
+                                    // 封装表格
+                                    strTable = $('#strTable').DataTable({
+                                        processing: true,
+                                        serverSide: true,
+                                        ajax: {
+                                            type: 'POST',
+                                            contentType: 'application/json',
+                                            url: '/s/coursestandards/queryStandardSettings', // 调用地址
+                                            data: function (d) {
+                                                return JSON.stringify($.extend({}, d, {
+                                                    page: d.start / d.length + 1, // 当前页
+                                                    results: d.length, // 每页显示条数
+                                                    id: fkeyid,
+                                                }));
+                                            },
+                                            dataSrc: function (json) {
+                                                json.recordsFiltered = json.total;  // 总行数
+
+                                                json.recordsTotal = json.page; // 当前页数
+                                                return json.list;
+                                            },
+                                            error: function (xhr, status, error) {
+                                                toastr.error(xhr);
+                                            }
+                                        },
+                                        createdRow: function (row, data, dataIndex) {
+                                            if (data.FMemo.length > remarkShowLength) {//只有超长，才有td点击事件
+                                                $(row).children('td').eq(3).attr('onclick', 'javascript:changeShowRemarks(this);');
+                                                $(row).children('td').eq(3).css('word-wrap', 'break-word');
+                                                $(row).children('td').eq(3).css('white-space', 'normal');
+                                                $(row).children('td').eq(3).css('word-break', 'break-all');
+                                            }
+                                            $(row).children('td').eq(3).attr('content', data.FMemo);
+                                        },
+                                        columns: [
+                                            {title: '序号', data: 'XH', orderable: false, width: 40},
+                                            {title: '字符串', data: 'FSValue', orderable: false, width: 60},
+                                            {title: '分值', data: 'FValueUL', orderable: false, width: 60},
+                                            {
+                                                title: '分值描述', data: 'FMemo', orderable: false, width: 80,
+                                                render: function (data, type, full, row) {
+                                                    if (data.length > remarkShowLength) {//只有超长，才有td点击事件
+                                                        return getPartialRemarksHtml(data);//显示部分信息
+                                                    } else {
+                                                        return data;
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                title: '操作',
+                                                data: '',
+                                                width: 60,
+                                                orderable: false,
+                                                render: function (data, type, row) {
+                                                    return '<button type="button" class="btn btn-block btn-default btn-xs" onclick="settingsValuesstr(2,\'' + row.key + '\')"><i class="fas fa-edit mr-2"></i>编辑</button>';
+                                                }
+                                            },
+                                            {
+                                                title: '',
+                                                data: '',
+                                                width: 60,
+                                                orderable: false,
+                                                render: function (data, type, row) {
+                                                    return '<button type="button" class="btn btn-block btn-danger btn-xs"  onclick="onClicksettingstrBtnDel(\'' + row.key + '\',\'' + row.FSValue + '\')"><i class="fas fa-trash mr-2"></i>删除</button>';
+                                                }
+                                            },
+                                        ],
+
+                                        paging: true, // 是否开启本地分页
+                                        pageLength: 5, // 改变初始化页长度（每页多少条数据）
+                                        pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+                                        lengthChange: false, // 是否允许用户改变表格每页显示的记录数
+                                        searching: false, // 是否允许Datatables开启本地搜索
+                                        ordering: false, // 是否允许Datatables开启排序
+                                        info: true, // 控制是否显示表格左下角的信息
+                                        autoWidth: false, // 控制Datatables是否自适应宽度
+                                        language: DataTablesLanguage
+                                    });
+                                }else if($("#FType2").val() == 3){
+                                    //原值
+                                    fqztype=3;
+                                }
+
+                                var datas={};
+                                datas['FKeyID'] = fkeyid;
+                                datas['fqztype'] =fqztype;
+                                $.ajax({
+                                    type: 'POST',
+                                    contentType: 'application/json',
+                                    url: '/s/coursestandard/updatecourseStandardFqzType', // 调用地址
+                                    data: JSON.stringify(datas),
+                                    async: false,
+                                    success: function(data) {
+                                        if (data.result == 'success') {
+                                            $('#mainTable').DataTable().ajax.reload(null, false);
+
+                                        }else if (data.result == 'error') {
+                                            toastr.error(data.error);
+                                        }
+                                    },
+                                    error : function(e){
+                                        toastr.error(e.status);
+                                        toastr.error(e.responseText);
+                                    }
+                                });
+
+                            }
+                            // return false;
+                            //alert('步骤变更后触发');
+                            return true;
+                        },
+                        onFinishing: function () {/*点击 提交 前 触发的事件，默认验证结果是false */
+
+                            //alert('提交前触发');
+                            // return false;/*验证结果*/
+                            return true;
+                        },
+                        onFinished: function () {/*点击 提交 后触发的事件*/
+                            istj =false;
+                            if(fqztype ==0){
+                                data={}
+                                data['booltrue1'] = $("#booltrue1").val();//是
+                                data['boolfalse1'] = $("#boolfalse1").val();//否
+                                data['FStandardID'] = fkeyid;//设置主表ID
+                                data['booltrueFMemo'] = $("#booltrueFMemo").val();//描述
+                                data['boolfalseFMemo'] = $("#boolfalseFMemo").val();//描述
+
+                                $.ajax({
+                                    type: 'POST',
+                                    contentType: 'application/json',
+                                    url: '/s/coursestandards/addStandardSettingsdf', // 调用地址
+                                    data: JSON.stringify(data),
+                                    async: false,
+                                    success: function(data) {
+                                        if (data.result == 'success') {
+                                            toastr.success('设置成功！');
+                                            setdiv.empty();
+                                            setdiv.append("暂无数据");
+                                            $('#mainTable').DataTable().ajax.reload(null, false);
+                                            $("#mxname").html("");
+                                        }else if (data.result == 'error') {
+                                            toastr.error(data.error);
+                                            return false;
+                                        }
+                                    },
+                                    error : function(e){
+                                        toastr.error(e.status);
+                                        toastr.error(e.responseText);
+                                    }
+                                });
+                            }else if(fqztype ==1){
+                                data={}
+                                data['FStandardID'] = fkeyid;//设置主表ID
+                                data['fqztype'] = fqztype;//取值类型
+                                $.ajax({
+                                    type: 'POST',
+                                    contentType: 'application/json',
+                                    url: '/s/coursestandards/addStandardSettingsqzdf', // 调用地址
+                                    data: JSON.stringify(data),
+                                    async: false,
+                                    success: function(data) {
+                                        if (data.result == 'success') {
+                                            toastr.success('设置成功！');
+                                            setdiv.empty();
+                                            setdiv.append("暂无数据");
+                                            $('#mainTable').DataTable().ajax.reload(null, false);
+                                            $("#mxname").html("");
+                                        }else if (data.result == 'error') {
+                                            toastr.error(data.error);
+                                            return false;
+                                        }
+                                    },
+                                    error : function(e){
+                                        toastr.error(e.status);
+                                        toastr.error(e.responseText);
+                                    }
+                                });
+                            }else if(fqztype ==2){
+                                data={}
+                                data['FStandardID'] = fkeyid;//设置主表ID
+                                data['fqztype'] = fqztype;//取值类型
+                                $.ajax({
+                                    type: 'POST',
+                                    contentType: 'application/json',
+                                    url: '/s/coursestandards/addStandardSettingsqzdf', // 调用地址
+                                    data: JSON.stringify(data),
+                                    async: false,
+                                    success: function(data) {
+                                        if (data.result == 'success') {
+                                            toastr.success('设置成功！');
+                                            setdiv.empty();
+                                            setdiv.append("暂无数据");
+                                            $('#mainTable').DataTable().ajax.reload(null, false);
+                                            $("#mxname").html("");
+                                        }else if (data.result == 'error') {
+                                            toastr.error(data.error);
+                                            return false;
+                                        }
+                                    },
+                                    error : function(e){
+                                        toastr.error(e.status);
+                                        toastr.error(e.responseText);
+                                    }
+                                });
+                            }else if(fqztype ==3){
+                                toastr.success('设置成功！');
+                                setdiv.empty();
+                                setdiv.append("暂无数据");
+                                $('#mainTable').DataTable().ajax.reload(null, false);
+                                $("#mxname").html("");
+                            }
+                        }
+                    });
+
+
+
+                    $("#aFType").select2({
+                        placeholder: '请选择类型',
+                        data: [{id: "-1", text: "请选择"}, {id: 0, text: "填报"}, {id: 1, text: "关联"}],
+                        language: "zh-CN"
+                    });
+
+                    $("#aFType").val([data.FType]).trigger('change');
+
+
+
+                    $("#FType2").select2({
+                        placeholder: "请选择取值类型",
+                        allowClear: false,
+                        language: "zh-CN"
+                        ,
+                        data: [{id: -1, text: '请选择取值类型'}, {id: 0, text: '布尔类型'}, {id: 1, text: '数值类型'}, {
+                            id: 2,
+                            text: '字符串类型'
+                        }, {id: 3, text: '原值类型'}]
+                    });
+
+
+
+                    $('#aFType').change(function () {
+                        if ($(this).val() == 1) {
+                            $("#jisuan").show();
+                        } else {
+                            $("#jisuan").hide();
+                        }
+                    });
+
+                    $('#FType2').change(function () {
+                        if ($(this).val() == 0) {
+                            $("#buer").show();
+                            $("#shuzhi").hide();
+                            $("#zifuchuan").hide();
+                            $("#yuanzhi").hide();
+                        } else if ($(this).val() == 1) {
+                            $("#buer").hide();
+                            $("#shuzhi").show();
+                            $("#zifuchuan").hide();
+                            $("#yuanzhi").hide();
+                        } else if ($(this).val() == 2) {
+                            $("#buer").hide();
+                            $("#shuzhi").hide();
+                            $("#zifuchuan").show();
+                            $("#yuanzhi").hide();
+                        } else if ($(this).val() == 3) {
+                            $("#buer").hide();
+                            $("#shuzhi").hide();
+                            $("#zifuchuan").hide();
+                            $("#yuanzhi").show();
+                        }
+                    });
+                    selectFcalcType = $("#FcalcType").select2({
+                        placeholder: '请选择计算方式',
+                        ajax: {
+                            type: 'POST',
+                            url: "/s/standardsetting/queryCalculationSelect",
+                            dataType: 'json',
+                            data: function (params) {
+                                return {
+                                    search: params.term,
+                                    type: 'all',
+                                    fsftype: fsftype
+                                };
+                            },
+                            processResults: function (data) {
+                                return {
+                                    results: data.list
+                                };
+                            },
+                            delay: 800,
+                            cache: true
+                        },
+                        language: "zh-CN"
+                    });
+
+                    if (data.FSZState > -1) {
+                        $("#FType").val(data.FType).trigger('change');
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        }
+
+    }
+
+
+    //  区间 增加和修改
+    function settingsValues(op, fKey) {
+        if (op == 1) { // 新增
+            layer_show('新增区间信息', 'coursecalcqjedit.html?op=1&FStandardID='+FStandardID, '600', '500');
+        } else { // 修改
+            layer_show('修改区间信息', 'coursecalcqjedit.html?op=2&id=' + fKey+'&FStandardID='+FStandardID, '600', '500');
+        }
+    }
+
+    // 字符串 增加和修改
+    function settingsValuesstr(op, fKey) {
+        if (op == 1) { // 新增
+            layer_show('新增结果值信息', 'coursecalcstredit.html?op=1&FStandardID='+FStandardID, '600', '500');
+        } else { // 修改
+            layer_show('修改结果值信息', 'coursecalcstredit.html?op=2&id=' + fKey+'&FStandardID='+FStandardID, '600', '500');
+        }
+    }
+
+    // 区间删除按钮点击事件
+    function onClicksettingBtnDel(id, ul, ll) {
+        layer.confirm('<b>区间下限：' + ll + '区间上限：' + ul + '</b><br />确定要删除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/coursestandards/delStandardSettingsszdf',
+                data: JSON.stringify({
+                    id: id,
+                    fqztype: 1
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#shuzhiTable').DataTable().ajax.reload(null, false);
+                        toastr.success('删除成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error)
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+
+
+    // 字符串删除按钮点击事件
+    function onClicksettingstrBtnDel(id, name) {
+        layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/coursestandards/delStandardSettingsstrdf',
+                data: JSON.stringify({
+                    id: id
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#strTable').DataTable().ajax.reload(null, false);
+                        toastr.success('删除成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error)
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+
+
+    //切换显示备注信息，显示部分或者全部
+    function changeShowRemarks(obj) {//obj是td
+        var content = $(obj).attr("content");
+        if (content != null && content != '') {
+            if ($(obj).attr("isDetail") == 'true') {//当前显示的是详细备注，切换到显示部分
+                //$(obj).removeAttr('isDetail');//remove也可以
+                $(obj).attr('isDetail', false);
+                $(obj).html(getPartialRemarksHtml(content));
+            } else {//当前显示的是部分备注信息，切换到显示全部
+                $(obj).attr('isDetail', true);
+                $(obj).html(getTotalRemarksHtml(content));
+            }
+        }
+    }
+
+    //部分备注信息
+    function getPartialRemarksHtml(remarks) {
+        if (remarks.length > 0) {
+            return remarks.substr(0, remarkShowLength) + '&nbsp;&nbsp;<a href="javascript:void(0);" ><b>...</b></a>';
+        }
+    }
+
+    //全部备注信息
+    function getTotalRemarksHtml(remarks) {
+        return remarks + '&nbsp;&nbsp;<a href="javascript:void(0);" >收起</a>';
+    }
+
+    function szshuaxin(){
+        $('#shuzhiTable').DataTable().ajax.reload(null, false);
+    }
+    function strshuaxin(){
+        $('#strTable').DataTable().ajax.reload(null, false);
+    }
+</script>
+</body>
+</html>

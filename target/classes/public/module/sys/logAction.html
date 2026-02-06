@@ -1,0 +1,117 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<!--_global 公共配置文件 -->
+<script language="javascript">var golbal_type="admin";</script>
+<script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+<!--_only 独立样式 -->
+<link rel="stylesheet" href="/plugins/select2/css/select2.min.css" />
+<link rel="stylesheet" href="/plugins/daterangepicker/daterangepicker.css">
+<link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css" />
+<!--/_only 独立样式 -->
+</head>
+<body>
+<div class="page-container" style="padding: 2px;">
+  <div class="f-r text-r">
+    <select class="logAction-form-select-type-id" style="display: none; width: 150px;">
+      <option value="0">全部</option>
+      <option value="1">访问地址</option>
+      <option value="2">服务请求</option>
+      <option value="3">用户行为</option>
+    </select>
+    <input type="text" class="input-text size-S logAction-form-text-date" style="width:170px" placeholder="输入创建日期" />
+    <input type="text" class="input-text size-S logAction-form-text-username" style="width:100px" placeholder="输入姓名" />
+    <input type="text" class="input-text size-S logAction-form-text-memo" style="width:200px" placeholder="输入描述" />
+    <button type="button" class="btn btn-default size-S my-btn logAction-btn-search-fun"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+  </div>
+	<div class="f-l table-panel">
+    <table id="logActionTable" class="display compact" style="width: 99.8%;"></table>
+	</div>
+</div>
+
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/moment/moment.min.js"></script>
+<script type="text/javascript" src="/plugins/daterangepicker/daterangepicker.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+// 业务代码
+$(function(){
+  var startDate = new Date().Format("yyyy-MM-dd");
+  var endDate = new Date().Format("yyyy-MM-dd");
+  // 初始公司下拉列表(查询)
+  $(".logAction-form-select-type-id").select2();
+  // 初始化成立日期
+  $('.logAction-form-text-date').daterangepicker({
+    startDate: startDate,
+    endDate: endDate,
+    locale: DataTablesPublicLocale
+  }, function (start, end, label) {
+    startDate = start.format('YYYY-MM-DD HH:mm');
+    endDate = end.format('YYYY-MM-DD HH:mm');
+  });
+  // 服务器-表格
+  $('#logActionTable').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: {
+      type: 'POST',
+      contentType: 'application/json',
+      url: '/s/logAction/queryLogAction', // 调用地址
+      data: function ( d ) {
+        return JSON.stringify( $.extend( {}, d, {
+          page: d.start/d.length+1, // 当前页
+          results: d.length, // 每页显示条数
+          type: $('.logAction-form-select-type-id').val(),
+          startDate: startDate,
+          endDate: endDate,
+          username: $('.logAction-form-text-username').val(),
+          memo: $('.logAction-form-text-memo').val()
+        } ) );
+      },
+      dataSrc: function (json) {
+        json.recordsFiltered = json.total;  // 总行数
+        json.recordsTotal = json.page; // 当前页数
+        return json.list;
+      },
+      error: function (xhr, status, error) {
+        toastr.error(xhr);
+      }
+    },
+    columns: [
+      {
+        title: '类型',
+        data: 'f_type',
+        width: 50,
+        render: function (data, type, row) {
+          return row.typeName;
+        }
+      },
+      { title: '用户', data: 'f_user_name', width: 50 },
+      { title: '操作时间', data: 'f_c_date', width: 120 },
+      { title: '说明', data: 'f_memo', orderable: false }
+    ],
+    scrollY: (document.body.clientHeight-96) + 'px',
+    scrollX: true,
+    paging: true, // 是否开启本地分页
+    pageLength: 20, // 改变初始化页长度（每页多少条数据）
+    pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+    lengthChange: false, // 是否允许用户改变表格每页显示的记录数
+    searching: false, // 是否允许Datatables开启本地搜索
+    ordering: true, // 是否允许Datatables开启排序
+    order: [[ 2, "desc" ]],
+    info: true, // 控制是否显示表格左下角的信息
+    language: DataTablesLanguage
+  });
+  // 查询按钮点击事件
+  $('.logAction-btn-search-fun').on('click', function(){
+    $('#logActionTable').DataTable().ajax.reload(null, false);
+  });
+});
+</script> 
+</body>
+</html>

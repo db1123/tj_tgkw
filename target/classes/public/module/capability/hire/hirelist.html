@@ -1,0 +1,581 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+    <!--/_only 独立样式 -->
+</head>
+<style type="text/css">
+    .open-work-control2 {
+        cursor: pointer;
+    }
+
+    .open-work-control3 {
+        cursor: pointer;
+    }
+
+    .open-work-control4 {
+        cursor: pointer;
+    }
+  
+	.select2-container--default .select2-selection--single .select2-selection__placeholder {
+   		color: B3B3B3;
+   		font-size: 12px;
+	}
+</style>
+<body>
+
+<div class="page-container">
+    <div class="f-l" style="width: 99.8%; margin-top: 3px;">
+        <div class="row cl">
+            <div class="col-md-8 col-sm-8 col-xs-8">
+                <div class="panel panel-default">
+                    <div class="panel-header">招聘维护&nbsp;
+                        <div class="f-r text-l">
+                      
+                            &nbsp;<button type="button" class="btn btn-default size-S my-btn" onclick="Values(1)"><i
+                                class=" fa fa-plus"></i>
+                            新增招聘信息
+                        </button>
+                        </div>
+                        <div class="f-r text-r">
+                           <select style="width:200px;" id="enterpriseID" name="enterpriseID"> </select>
+                            <input type="text" class="input-text size-S form-text-FName" style="width:200px"
+                                   placeholder="职位名称">
+                        
+                            <button type="button" class="btn btn-default size-S my-btn btn-search-fun"><i
+                                    class="Hui-iconfont">&#xe665;</i>
+                                搜索
+                            </button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <table id="mainTable" class="display compact" style="width: 99.8%;"></table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-4 col-xs-4">
+                <!--                <div style="height: 20px;"></div>-->
+                 <div class="panel panel-default">
+                    <div class="panel-header"> 招聘能力&nbsp;
+                        <div class="f-r text-l">
+                         <!--  <img src="/images/AI2.png" width="20px" height="20px"/> -->
+                            <button type="button" class="btn btn-default size-S my-btn" onclick="Valuesuser(1)">
+                          <!--   <i class=" fa fa-plus"></i> -->
+                              <img src="/images/ai.png" width="20px" height="20px"/>
+                                新增招聘能力
+                            </button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <span id="mxname" style="color: #0e90d2;font-size: 15px;"></span>
+                        <table id="mainTablelevel" class="display compact" style="width: 99.8%;"></table>
+                    </div>
+                </div> 
+            </div>
+        </div>
+
+    </div>
+</div>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+    var abilityid;//权限组id
+    var mainTable;
+    var mainTablelevel;
+    var mainTablelevelCondition;
+    var abilityName;
+    var ConditionID;
+    var ConditionName;
+
+    var LevelID;
+    var LevelName;
+    // 业务代码
+    $(function () {
+
+         $("#enterpriseID").select2({
+            placeholder: '请选择招聘企业',
+            ajax: {
+                type: 'POST',
+                url: "/s/enterprise/queryDataenterpriseSelect",
+                dataType: 'json',
+                data: function (params) {
+                    return {
+                        search: params.term,
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.list
+                    };
+                },
+                delay: 800,
+                cache: true
+            },
+            language: "zh-CN"
+        }); 
+
+        // 封装表格
+        mainTable = $('#mainTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/hire/queryhire', // 调用地址
+                data: function (d) {
+                    return JSON.stringify($.extend({}, d, {
+                        page: d.start / d.length + 1, // 当前页
+                        results: d.length, // 每页显示条数
+                        name: $('.form-text-FName').val(),//招聘名称
+                        enterpriseID: $("#enterpriseID").val(),//企业
+                        dataall: 1
+                    }));
+                },
+                dataSrc: function (json) {
+                    json.recordsFiltered = json.total;  // 总行数
+                    json.recordsTotal = json.page; // 当前页数
+                    return json.list;
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+            },
+            columns: [
+              /*   {
+                    title: '',
+                    data: 'FTypeID',
+                    class: 'open-work-control2',
+                    render: function (data, type, row) {
+                        return row.FTypeName;
+                    }
+                }, */
+                
+                {title: '招聘职位名称', data: 'FName', class: 'open-work-control2'},
+                {title: '招聘企业名称', data: 'Fenterprise', class: 'open-work-control2'},
+                {title: '招聘人数', data: 'FNum', class: 'open-work-control2'},
+                {title: '薪酬', data: 'FWages', class: 'open-work-control2'},
+                {title: '福利', data: 'FBenefit', class: 'open-work-control2'},
+                {title: '工作时间', data: 'FWorkDate', class: 'open-work-control2'},
+                {title: '工作地点', data: 'FAddr', class: 'open-work-control2'},
+                
+              /*   {title: '招聘描述', data: 'FCon', class: 'open-work-control2'}, */
+                
+                {
+                	title: '招聘描述', 
+                	data: 'FCon', 
+                	class: 'open-work-control2',
+                	 render: function (data, type, full, meta) {
+                         if (data) {
+                             if (data.length > 20) {
+                                 return data.substr(0, 14) + "... ";
+                             }else{
+                                 return data;
+                             }
+                         }else {
+                                 return "";
+                         }
+
+                	}
+                },
+                
+                {
+                    title: '状态',
+                    data: 'FState',
+                    width: 35,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (data == 1) {
+                            return '<button type="button" class="btn btn-success size-MINI" onclick="onClickabilityBtnState(\'' + row.key + '\',' + row.FState + ',\'' + row.FName + '\')"><i class="fas fa-toggle-on"></i> 启用</button>';
+                        }else if(data == 0) {
+                            return '<button type="button" class="btn btn-warning size-MINI" onclick="onClickabilityBtnState(\'' + row.key + '\',' + row.FState + ',\'' + row.FName + '\')"><i class="fas fa-toggle-on"></i> 禁用</button>';
+                        } else {
+                            return '<button type="button" class="btn btn-secondary size-MINI" onclick="onClickhire_stu(\'' + row.key + '\')"><i class="fas fa-toggle-off"></i>已完成(查看招聘人员)</button>';
+                        }
+                    }
+                },
+                {
+                    title: '操作',
+                    data: 'FState',
+                    width: 90,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<button type="button" class="btn btn-secondary size-MINI" onclick="Values(2,\'' + row.key + '\')"><i class="fas fa-edit"></i>编辑</button>' +
+                               '<button type="button" class="btn btn-danger size-MINI" onclick="onClickBtnDel(\'' + row.key + '\',\'' + row.FName + '\')"><i class="fas fa-trash"></i>删除</button>';
+                    }
+                },
+                {
+                    title: '应聘列表',
+                    data: 'FState',
+                    width: 70,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<button type="button" class="btn btn-primary size-MINI" onclick="hire_stu(\'' + row.key + '\')"><i class="fas fa-edit"></i>应 聘 人 员</button>'+
+                        '<br/> <button type="button" class="btn btn-warning size-MINI" onclick="onClickhire_stu(\'' + row.key + '\')"><i class="fas fa-toggle-off"></i>已招聘人员</button>';
+                    }
+                }
+            ],
+            scrollY: (document.body.clientHeight - 100) + 'px',
+            scrollX: true,
+            paging: true, // 是否开启本地分页
+            pageLength: 15, // 改变初始化页长度（每页多少条数据）
+            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+            lengthChange: false, // 是否允许因子改变表格每页显示的记录数
+            searching: false, // 是否允许Datatables开启本地搜索
+            ordering: true, // 是否允许Datatables开启排序
+            info: true, // 控制是否显示表格左下角的信息
+            order: [[0, 'asc'], [2, 'asc']],
+            language: DataTablesLanguage
+        });
+
+
+        mainTablelevel = $('#mainTablelevel').DataTable({
+        	
+            processing: true,
+            serverSide: true,
+            ajax: {
+            	
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/HireAbility/queryhireability', // 调用地址
+                data: function (d) {
+                
+                    return JSON.stringify($.extend({}, d, {
+                        page: d.start / d.length + 1, // 当前页
+                        results: d.length, // 每页显示条数
+                        id: abilityid,
+                        dataall: 1
+                    }));
+                },
+                dataSrc: function (json) {
+                    json.recordsFiltered = json.total;  // 总行数
+                    json.recordsTotal = json.page; // 当前页数
+                    return json.list;
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+            },
+            columns: [
+                {title: '能力名称', data: 'FAbility',width: 150, orderable: false, class: 'open-work-control3'},
+                {title: '能力等级', data: 'FAbility_Level', orderable: false, class: 'open-work-control3'},
+              /*   {title: '权重', data: 'FWeight', orderable: false, class: 'open-work-control3'}, */
+                {
+                    title: '操作',
+                    data: 'FState',
+                    width: 60,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<button type="button" class="btn btn-secondary size-MINI" title="编辑" onclick="Valuesuser(2,\'' + row.key + '\')"><i class="fas fa-edit"></i></button> ' +
+                            '<button type="button" class="btn btn-danger size-MINI" title="删除" onclick="onClickBtnuserDel(\'' + row.key + '\',\'' + row.FHireid + '\')"><i class="fas fa-trash"></i></button>';
+                    }
+                }
+            ],
+            //scrollY: (document.body.clientHeight-50) + 'px',
+            scrollX: true,
+            paging: true, // 是否开启本地分页
+            pageLength: 20, // 改变初始化页长度（每页多少条数据）
+            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+            lengthChange: false, // 是否允许维度改变表格每页显示的记录数
+            searching: false, // 是否允许Datatables开启本地搜索
+            ordering: false, // 是否允许Datatables开启排序
+            info: true, // 控制是否显示表格左下角的信息
+            language: DataTablesLanguage
+        });
+
+        $('#mainTable tbody').on('click', 'tr td.open-work-control2', function () {
+
+            if (!$(this).parent().hasClass('selected')) { // 处理点击行样式
+                mainTable.$('tr.selected').removeClass('selected');
+                $(this).parent().addClass('selected');
+            }
+            var data = mainTable.row(this).data(); // 获取点击行数据
+
+            abilityid = data.key;
+            //abilityName = data.FTypeName + "/" + data.FName;
+            $('#mxname').text("招聘职位：" + "/" + data.FName);
+            $('#mainTablelevel').DataTable().ajax.reload(null, false);
+            LevelID = null;
+            LevelName= null;
+            ConditionID= null;
+            ConditionName= null;
+            $('#mxname2').text("");
+            $('#mxname3').text("");
+            $('#mainTablelevelCondition').DataTable().ajax.reload(null, false);
+            $('#mainTablelevelConditionAssessment').DataTable().ajax.reload(null, false);
+        });
+
+        // 查询按钮点击事件
+        $('.btn-search-fun').on('click', function () {
+            $('#mainTable').DataTable().ajax.reload(null, false);
+        });
+
+    }); 
+
+    function reloadtable(abilityID, name) {
+        abilityid = abilityID;
+        abilityName = name;
+        $('#mainTablelevel').DataTable().ajax.reload(null, false);
+    }
+
+    function Valuesuser(op, fkeyid) {
+        if (abilityid) {
+            if (op == 1) { // 新增
+            	//layer_show('新增能力等级信息', 'hireabilityedit.html?op=1&hireid=' + abilityid, '', '');
+            	 layer.open({
+            	  skin: 'demo-class',
+            	  content: '您是否想使用AI大模型匹配招聘能力？',
+            	  btn: ["确认", "手动添加"],  //修改按钮文字
+            	  yes: function (index) {
+            	    layer.close(index) //关闭弹窗
+            	    
+            		// 显示 loading 效果
+            		  let loadingIndex = layer.load(1, {
+            		      shade: [0.1, '#fff']
+            		  });
+
+            		  $.ajax({
+            		      type: 'POST',
+            		      contentType: 'application/json;charset=UTF-8',
+            		      url: '/s/HireAbility/hire_ai_ability',
+            		      data: JSON.stringify({
+            		          id: abilityid
+            		      }),
+            		      success: function (data) {
+            		          // 隐藏 loading 效果
+            		          layer.close(loadingIndex);
+            		          if (data.result == 'success') {
+            		        	  //alert('匹配成功');
+            		              //$('#mainTable').DataTable().ajax.reload(null, false);
+            		              toastr.success('匹配成功！');
+            		              $('#mainTablelevel').DataTable().ajax.reload(null, false);
+            		              layer.close(index);
+            		              layer.close(layer.index);
+            		          }
+            		          if (data.result == 'error') {
+            		              toastr.error(data.error);
+            		          }
+            		      },
+            		      error: function (e) {
+            		          // 隐藏 loading 效果
+            		          layer.close(loadingIndex);
+            		          toastr.error(e.status);
+            		          toastr.error(e.responseText);
+            		      }
+            		  });    
+            	    
+            	    
+            	  },
+            	  btn2: function (index) {
+            		  layer_show('新增能力等级信息', 'hireabilityedit.html?op=1&hireid=' + abilityid, '800', '600');
+            	  }
+            	}); 
+            	
+            
+              
+            
+            } else {
+                layer_show('修改能力等级信息', 'hireabilityedit.html?op=2&hireid=' + abilityid + '&HireAbilityID=' + fkeyid);
+            }
+        } else {
+            toastr.error('请选择招聘信息后再添加！');
+        }
+    }
+  
+    // 新增或者修改点击事件
+    function Values(op, fKey) {
+        if (op == 1) { // 新增
+            layer_show('新增招聘信息', 'hireedit.html?op=1' ,'', '');
+        } else { // 修改
+            layer_show('修改招聘信息', 'hireedit.html?op=2&id=' + fKey , '', '' );
+        }
+    }
+
+
+    // 删除按钮点击事件
+    function onClickBtnDel(id, name) {
+        layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/hire/delhire',
+                data: JSON.stringify({
+                    id: id
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#mainTable').DataTable().ajax.reload(null, false);
+                        toastr.success('删除成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error);
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+
+    function onClickBtnuserDel(id, name) {
+
+        layer.confirm('<br />确定要删除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/HireAbility/delhireability',
+                data: JSON.stringify({
+                    id: id
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#mainTablelevel').DataTable().ajax.reload(null, false);
+                        $('#mainTablelevel').DataTable().ajax.reload(null, false);
+                        LevelID = null;
+                        LevelName= null;
+                        ConditionID= null;
+                        ConditionName= null;
+                        $('#mxname2').text("");
+                        $('#mxname3').text("");
+                        $('#mainTablelevelCondition').DataTable().ajax.reload(null, false);
+                        $('#mainTablelevelConditionAssessment').DataTable().ajax.reload(null, false);
+                        toastr.success('删除成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error);
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+
+    function onClickBtnuserlcDel(id, name) {
+        //考核条件删除
+        layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/abilitycondition/delabilityCondition',
+                data: JSON.stringify({
+                    id: id
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#mainTablelevelCondition').DataTable().ajax.reload(null, false);
+                        $('#mainTablelevelConditionAssessment').DataTable().ajax.reload(null, false);
+                        toastr.success('删除成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error);
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+
+    function onClickBtnuserfsDel(id, name) {
+        //考核方式删除
+        layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/abilityconditionassessmentmethod/delabilityConditionAssessmentmethod',
+                data: JSON.stringify({
+                    id: id
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#mainTablelevelConditionAssessment').DataTable().ajax.reload(null, false);
+                        toastr.success('删除成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error);
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+    function onClickabilityBtnState(id, state, name) {
+        var text = '';
+        if (state == 1) {
+            text = '<b>' + name + '</b><br />确定要&nbsp;<b>禁用</b>&nbsp;吗?';
+        } else {
+            text = '<b>' + name + '</b><br />确定要&nbsp;<b>启用</b>&nbsp;吗?';
+        }
+        layer.confirm(text, function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/hire/statehire',
+                data: JSON.stringify({
+                    id: id,
+                    state: state
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#mainTable').DataTable().ajax.reload(null, false);
+                        toastr.success('状态改变成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error)
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+    
+    //已招聘查看
+      function onClickhire_stu(id) {
+    	 layer_show('查看已招聘人员', 'hirestudent_show.html?fkeyid='+id ,'800', '600');
+    }
+    
+      //应聘人员查看
+      function hire_stu(id) {
+    	 layer_show('查看应聘人员', 'hirestudent_show_yp.html?fkeyid='+id ,'800', '600');
+    }
+  
+</script>
+</body>
+</html>

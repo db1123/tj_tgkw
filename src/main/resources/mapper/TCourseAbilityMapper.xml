@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fun.server.mapper.TCourseAbilityMapper">
+  <resultMap id="BaseResultMap" type="fun.server.model.TCourseAbility">
+    <!--
+    @mbg.generated
+    -->
+    <constructor>
+      <idArg column="FKeyID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FUID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCDATE" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FUDATE" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FState" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FCourseID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FAbilityID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FAbilityLevelID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FOrder" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FMethodWeight" javaType="java.lang.Float" jdbcType="REAL" />
+    </constructor>
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <!--
+    @mbg.generated
+    -->
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <!--
+    @mbg.generated
+    -->
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    <!--
+    @mbg.generated
+    -->
+    FKeyID, FCID, FUID, FCDATE, FUDATE, FState, FCourseID, FAbilityID, FAbilityLevelID, 
+    FOrder, FMethodWeight
+  </sql>
+
+<!--  <select id="getCourseAbility" parameterType="fun.server.model.customQuery.courseAbility.CourseabilityCS" resultType="fun.server.model.customQuery.courseAbility.CourseabilityData">-->
+<!--    SELECT tab.FKeyID AS FAbilityID,IFNULL(tab.FName,'') AS FAbilityName,IFNULL(tal.FName,'') AS FLevelName,tal.FKeyID AS FLevelID,tab.FTypeID,IFNULL(tat.FName,'') AS FTypeName-->
+<!--    FROM t_ability_level tal-->
+<!--    INNER   JOIN t_ability tab-->
+<!--    ON tal.FAbilityID = tab.FKeyID-->
+<!--    LEFT JOIN t_ability_type tat-->
+<!--    ON tab.FTypeID = tat.FKeyID-->
+<!--    LEFT JOIN t_course_ability tca-->
+<!--    ON tca.FAbilityID = tab.FKeyID AND tca.FAbilityLevelID = tal.FKeyID-->
+<!--    <if test="FCourseID != null and FCourseID!='' and FCourseID!='0' ">-->
+<!--      AND tca.FCourseID = #{FCourseID}-->
+<!--    </if>-->
+<!--    WHERE  tca.FAbilityLevelID IS NULL AND tca.FAbilityID IS NULL-->
+<!--    <if test="name != null and name!=''">-->
+<!--      and tab.FName like concat('%',#{name},'%')-->
+<!--    </if>-->
+<!--    <if test="FTypeID != null and FTypeID!='' and FTypeID!='0' ">-->
+<!--      AND tab.FTypeID = #{FTypeID}-->
+<!--    </if>-->
+<!--    <if test="orderBy != null and orderBy!=''">-->
+<!--      order by ${orderBy}-->
+<!--    </if>-->
+<!--  </select>-->
+
+  <select id="getCourseAbility" parameterType="fun.server.model.customQuery.courseAbility.CourseabilityCS" resultType="fun.server.model.customQuery.courseAbility.CourseabilityData">
+    SELECT tab.FKeyID AS FAbilityID,IFNULL(tab.FName,'') AS FAbilityName,IFNULL(tal.FName,'') AS FLevelName,tal.FKeyID AS FLevelID,tab.FTypeID,IFNULL(tat.FName,'') AS FTypeName
+    FROM t_ability_tree tal
+    INNER   JOIN t_ability_tree tab
+    ON tal.FPID = tab.FKeyID and tab.FNodeType = 1
+    LEFT JOIN t_ability_type tat
+    ON tab.FTypeID = tat.FKeyID
+    LEFT JOIN t_course_ability tca
+    ON tca.FAbilityID = tab.FKeyID AND tca.FAbilityLevelID = tal.FKeyID
+    <if test="FCourseID != null and FCourseID!='' and FCourseID!='0' ">
+      AND tca.FCourseID = #{FCourseID}
+    </if>
+    WHERE  tca.FAbilityLevelID IS NULL AND tca.FAbilityID IS NULL and tal.FDel =1 and tab.FDel = 1 and tab.FState = 1
+    <if test="name != null and name!=''">
+      and tab.FName like concat('%',#{name},'%')
+    </if>
+    <if test="FTypeID != null and FTypeID!='' and FTypeID!='0' ">
+      AND tab.FTypeID = #{FTypeID}
+    </if>
+    <if test="orderBy != null and orderBy!=''">
+      order by ${orderBy}
+    </if>
+  </select>
+
+<!--  <select id="getCourseAbilityList" parameterType="fun.server.model.customQuery.courseAbility.CourseabilityCS" resultType="fun.server.model.customQuery.courseAbility.CourseabilityData">-->
+<!--    SELECT tca.FKeyID, tab.FKeyID AS FAbilityID,IFNULL(tab.FName,'') AS FAbilityName,IFNULL(tal.FName,'') AS FLevelName,tal.FKeyID AS FLevelID,tab.FTypeID,IFNULL(tat.FName,'') AS FTypeName-->
+<!--    ,tca.FCourseID-->
+<!--    ,(SELECT COUNT(*) FROM t_course_standard tcs WHERE tcs.FCourseAbilityID = tca.FKeyID) AS fdardnum-->
+<!--    ,(SELECT COUNT(*) FROM t_course_standard tcs WHERE tcs.FCourseAbilityID = tca.FKeyID AND FSZState =2 ) AS fstatedardnum-->
+<!--    ,IFNULL(tca.FMethodWeight,0) AS FMethodWeight-->
+<!--    FROM t_course_ability tca-->
+<!--    LEFT JOIN t_ability_level tal-->
+<!--    ON tca.FAbilityLevelID = tal.FKeyID-->
+<!--    LEFT JOIN t_ability tab-->
+<!--    ON tca.FAbilityID = tab.FKeyID-->
+<!--    LEFT JOIN t_ability_type tat-->
+<!--    ON tab.FTypeID =tat.FKeyID-->
+<!--    WHERE 1=1-->
+<!--    <if test="FCourseID != null and FCourseID!='' and FCourseID!='0' ">-->
+<!--      AND tca.FCourseID = #{FCourseID}-->
+<!--    </if>-->
+
+<!--    <choose>-->
+<!--      <when test="FCourseID != null and FCourseID!='' and FCourseID!='0' ">-->
+<!--        AND tca.FCourseID = #{FCourseID}-->
+<!--      </when>-->
+<!--      <otherwise>-->
+<!--        AND tca.FCourseID =  0-->
+<!--      </otherwise>-->
+<!--    </choose>-->
+<!--    <if test="name != null and name!=''">-->
+<!--      and tab.FName like concat('%',#{name},'%')-->
+<!--    </if>-->
+<!--    <if test="FTypeID != null and FTypeID!='' and FTypeID!='0' ">-->
+<!--      AND tab.FTypeID = #{FTypeID}-->
+<!--    </if>-->
+<!--    <if test="orderBy != null and orderBy!=''">-->
+<!--      order by ${orderBy}-->
+<!--    </if>-->
+<!--  </select>-->
+
+  <select id="getCourseAbilityList" parameterType="fun.server.model.customQuery.courseAbility.CourseabilityCS" resultType="fun.server.model.customQuery.courseAbility.CourseabilityData">
+    SELECT tca.FKeyID, tab.FKeyID AS FAbilityID,IFNULL(tab.FName,'') AS FAbilityName,IFNULL(tal.FName,'') AS FLevelName,tal.FKeyID AS FLevelID,tab.FTypeID,IFNULL(tat.FName,'') AS FTypeName
+    ,tca.FCourseID
+    ,(SELECT COUNT(*) FROM t_course_standard tcs WHERE tcs.FCourseAbilityID = tca.FKeyID) AS fdardnum
+    ,(SELECT COUNT(*) FROM t_course_standard tcs WHERE tcs.FCourseAbilityID = tca.FKeyID AND FSZState =2 ) AS fstatedardnum
+    ,IFNULL(tca.FMethodWeight,0) AS FMethodWeight
+    FROM t_course_ability tca
+    LEFT JOIN t_ability_tree tal
+    ON tca.FAbilityLevelID = tal.FKeyID and tal.FNodeType = 2
+    LEFT JOIN t_ability_tree tab
+    ON tca.FAbilityID = tab.FKeyID and tab.FNodeType = 1
+    LEFT JOIN t_ability_type tat
+    ON tab.FTypeID =tat.FKeyID
+    WHERE 1=1 and tca.FState = 1
+    and tal.FDel =1 and tab.FDel = 1  -- and tab.FState =1 and tal.FState = 1
+    <if test="FCourseID != null and FCourseID!='' and FCourseID!='0' ">
+      AND tca.FCourseID = #{FCourseID}
+    </if>
+
+    <choose>
+      <when test="FCourseID != null and FCourseID!='' and FCourseID!='0' ">
+        AND tca.FCourseID = #{FCourseID}
+      </when>
+      <otherwise>
+        AND tca.FCourseID =  0
+      </otherwise>
+    </choose>
+    <if test="name != null and name!=''">
+      and tab.FName like concat('%',#{name},'%')
+    </if>
+    <if test="FTypeID != null and FTypeID!='' and FTypeID!='0' ">
+      AND tab.FTypeID = #{FTypeID}
+    </if>
+    <if test="orderBy != null and orderBy!=''">
+      order by ${orderBy}
+    </if>
+  </select>
+
+</mapper>

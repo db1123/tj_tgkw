@@ -1,0 +1,113 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<!--_global 公共配置文件 -->
+<script language="javascript">var golbal_type="admin";</script>
+<script type="text/javascript" src="/javascript/global.js"></script>
+<!--/_global 公共配置文件-->
+</head>
+<body>
+<article class="page-container">
+	<form action="" method="post" class="form form-horizontal" id="passwordEditForm">
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>原始密码：</label>
+			<div class="formControls col-xs-9 col-sm-10">
+				<input type="password" class="input-text" name="old_pass" />
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>新密码：</label>
+			<div class="formControls col-xs-9 col-sm-10">
+				<input type="password" class="input-text" name="new_pass" />
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>确认密码：</label>
+			<div class="formControls col-xs-9 col-sm-10">
+				<input type="password" class="input-text" name="confirm_pass" />
+			</div>
+		</div>
+    <div class="toolbar-bottom-line"></div>
+		<div class="toolbar-bottom-btn">
+			<input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;" />
+			<input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;" onclick="layer_close()" />
+		</div>
+    <input type="hidden" value="" name="f_key_id" />
+	</form>
+</article>
+
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript">
+// 业务代码
+$(function(){
+  // 密码-检验数据
+  $('#passwordEditForm').validate({
+    rules: {
+      old_pass: {
+        required: true
+      },
+      new_pass: {
+        minlength: 6,
+        required: true
+      },
+      confirm_pass: {
+        minlength: 6,
+        required: true
+      },
+    },
+    messages: {
+      new_pass: {
+        required: '*请输入新密码',
+        minlength: '*密码长度至少6位'
+      },
+      confirm_pass: {
+        required: '*请输入确认密码',
+        minlength: '*密码长度至少6位'
+      },
+    },
+    onfocusout: false, // 是否在获取焦点时验证
+    onkeyup: false, // 是否在敲击键盘时验证
+    focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+    focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+    success: 'valid',
+    submitHandler:function(){
+      // 获取参数
+      var dataJSON = form2Json('passwordEditForm');
+      // 执行
+      if (dataJSON['new_pass'] != dataJSON['confirm_pass']) {
+        toastr.error('确认密码与新密码不符！');
+      } else {
+        $.ajax({
+          type: 'POST',
+          contentType: 'application/json',
+          url: '/s/user/updateSupplierPassword', // 调用地址
+          data: JSON.stringify(dataJSON),
+          async: false,
+          success: function(data) {
+            if (data.result == 'success') {
+              parent.toastr.success('修改成功！');
+              layer_close();
+            } else if (data.result == 'error') {
+              toastr.error(data.error);
+            }
+          },
+          error : function(e){
+            toastr.error(e.status);
+            toastr.error(e.responseText);
+          }
+        });
+      }
+    }
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+    <!--/_only 独立样式 -->
+</head>
+<body>
+<div class="page-container" style="padding: 2px;">
+    <div class="f-l text-l" id="adddiv">
+        <button type="button" class="btn btn-default size-S my-btn" onclick="Values(1)"><i class=" fa fa-plus"></i>
+            新增
+        </button>
+    </div>
+<!--    <div class="f-r text-r">-->
+<!--        <input type="text" class="input-text size-S form-text-FName" style="width:200px" placeholder="学制、学位、学分名称">-->
+<!--        <button type="button" class="btn btn-default size-S my-btn btn-search-fun"><i class="Hui-iconfont">&#xe665;</i>-->
+<!--            搜索-->
+<!--        </button>-->
+<!--    </div>-->
+    <div class="f-l" style="width: 100%; margin-top: 3px;">
+        <table id="mainTable" class="display compact" style="width: 99.8%;"></table>
+    </div>
+</div>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+    var id = getQueryStringByName('tpid');//培养ID
+    var fmajorid = getQueryStringByName('fmajorid');//专利ID
+    var showtype = getQueryStringByName('showtype'); //显示类型
+    // 业务代码
+    $(function () {
+        if(showtype ==1){
+            $("#adddiv").show();
+        }else  {
+            $("#adddiv").hide();
+        }
+
+        querytrainingprogramcz();
+        // 封装表格
+        $('#mainTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/trainingprogramxzwf/querytrainingprogramxzwf', // 调用地址
+                data: function (d) {
+                    return JSON.stringify($.extend({}, d, {
+                        page: d.start / d.length + 1, // 当前页
+                        results: d.length, // 每页显示条数
+                        name: $('.form-text-FName').val(),//学制、学位、学分名称
+                        dataall: 1,
+                        FTPID: id
+                    }));
+                },
+                dataSrc: function (json) {
+                    json.recordsFiltered = json.total;  // 总行数
+                    json.recordsTotal = json.page; // 当前页数
+                    return json.list;
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+            },
+            columns: [
+                {title: '学制', data: 'FXZ'},
+                {title: '授予学位', data: 'FXW'},
+                {title: '本专业毕业学分', data: 'FXF'},
+                {
+                    title: '操作',
+                    data: 'FState',
+                    width: 90,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if(showtype ==1){
+                            return '<button type="button" class="btn btn-secondary size-MINI" onclick="Values(2,\'' + row.key + '\')"><i class="fas fa-edit"></i>编辑</button>' +
+                                '<button type="button" class="btn btn-danger size-MINI" onclick="onClickBtnDel(\'' + row.key + '\',\'' + row.FXZ + '\')"><i class="fas fa-trash"></i>删除</button>';
+                        }else{
+                            return '<button type="button" class="btn  size-MINI" disabled="disabled"">只读</button>';
+                        }
+
+
+                    }
+                }
+            ],
+            scrollY: (document.body.clientHeight - 100) + 'px',
+            scrollX: true,
+            paging: true, // 是否开启本地分页
+            pageLength: 15, // 改变初始化页长度（每页多少条数据）
+            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+            lengthChange: false, // 是否允许因子改变表格每页显示的记录数
+            searching: false, // 是否允许Datatables开启本地搜索
+            ordering: true, // 是否允许Datatables开启排序
+            info: true, // 控制是否显示表格左下角的信息
+            language: DataTablesLanguage
+        });
+
+        // 查询按钮点击事件
+        $('.btn-search-fun').on('click', function () {
+            $('#mainTable').DataTable().ajax.reload(null, false);
+        });
+
+    });
+
+    // 新增或者修改点击事件
+    function Values(op, fKey) {
+        if (op == 1) { // 新增
+            layer_show('新增学制、学位、学分信息', '/module/capability/trainingprogram/xzwf/trainingprogramxzwfedit.html?op=1&FTPID=' + id+'&fmajorid=' + fmajorid, '600', '300');
+        } else { // 修改
+            layer_show('修改学制、学位、学分信息', '/module/capability/trainingprogram/xzwf/trainingprogramxzwfedit.html?op=2&id=' + fKey+'&FTPID=' + id+'&fmajorid=' + fmajorid, '600', '300');
+        }
+    }
+
+    // 删除按钮点击事件
+    function onClickBtnDel(id, name) {
+        layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/trainingprogramxzwf/deltrainingprogramxzwf',
+                data: JSON.stringify({
+                    id: id
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#mainTable').DataTable().ajax.reload(null, false);
+                        toastr.success('删除成功！');
+                        querytrainingprogramcz();
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error);
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+    function querytrainingprogramcz() {
+        //先检测当前专业是否已经有培养方案 如果没有显示添加按钮 有的话显示升版按钮
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/trainingprogramxzwf/querytrainingprogramxzwfcz', // 调用地址
+            data: JSON.stringify({
+                id: id
+            }),
+            async: false,
+            success: function (data) {
+                if (data.isadd == 0) {
+                    $("#adddiv").show();
+                } else {
+                    $("#adddiv").hide();
+                }
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

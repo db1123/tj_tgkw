@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fun.server.mapper.TTrainingProgramMapper">
+  <resultMap id="BaseResultMap" type="fun.server.model.TTrainingProgram">
+    <!--
+    @mbg.generated
+    -->
+    <constructor>
+      <idArg column="FKeyID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FUID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCDATE" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FUDATE" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FState" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FTMID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FName" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FJS" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FZYJS" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FEditionNo" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FEdition" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FValid" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FParentId" javaType="java.lang.Long" jdbcType="BIGINT" />
+    </constructor>
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <!--
+    @mbg.generated
+    -->
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <!--
+    @mbg.generated
+    -->
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    <!--
+    @mbg.generated
+    -->
+    FKeyID, FCID, FUID, FCDATE, FUDATE, FState, FTMID, FName, FJS, FZYJS, FEditionNo, 
+    FEdition, FValid, FParentId
+  </sql>
+
+
+  <select id="getTrainingProgramDataList" parameterType="fun.server.model.customQuery.trainingprogram.TrainingprogramCS" resultType="fun.server.model.customQuery.trainingprogram.TrainingprogramData">
+    SELECT
+    ttp.FKeyID,ttp.FState,ttp.FCDATE,ttp.FUDATE,IFNULL(ttp.FName,'') AS FName,ttp.FJS,ttp.FZYJS,ttp.FEdition,ttp.FEditionNo,ttp.FValid
+    ,tm.FKeyID AS FMjorID,tm.FMajorName AS FMjorName
+    ,tc.FCollegeName AS FCollegeName,ttp.FParentId
+    FROM t_training_program ttp
+    LEFT JOIN t_major tm
+    ON ttp.FTMID = tm.FKeyID
+    LEFT JOIN t_college tc
+    ON tm.FCollegeID = tc.FKeyID
+    where 1=1
+
+    <if test="FMjorName != null and FMjorName!=''">
+      and tm.FMajorName like concat('%',#{FMjorName},'%')
+    </if>
+    <if test="FName != null and FName!=''">
+      and ttp.FName like concat('%',#{FName},'%')
+    </if>
+    <if test="FCollegeName != null and FCollegeName!=''">
+      and tc.FCollegeName like concat('%',#{FCollegeName},'%')
+    </if>
+    <if test=" FValid != null and FValid!= -1 ">
+      and ttp.FValid = #{FValid}
+    </if>
+    <if test="orderBy != null and orderBy!=''">
+      order by ${orderBy}
+    </if>
+  </select>
+  <select id="getTrainingVersionDataList" parameterType="fun.server.model.customQuery.trainingprogram.TrainingprogramversionCS" resultType="fun.server.model.customQuery.trainingprogram.TrainingprogramData">
+    SELECT
+    ttp.FKeyID,ttp.FState,ttp.FCDATE,ttp.FUDATE,IFNULL(ttp.FName,'') AS FName,ttp.FJS,ttp.FZYJS,ttp.FEdition,ttp.FEditionNo,ttp.FValid
+    ,tm.FKeyID AS FMjorID,tm.FMajorName AS FMjorName
+    ,tc.FCollegeName AS FCollegeName,ttp.FParentId
+    FROM t_training_program ttp
+    LEFT JOIN t_major tm
+    ON ttp.FTMID = tm.FKeyID
+    LEFT JOIN t_college tc
+    ON tm.FCollegeID = tc.FKeyID
+    where 1=1 and ttp.FValid = 0
+    <if test=" FParentId != null and FParentId!='' ">
+      and (ttp.FKeyid = #{FParentId} or ttp.FParentId = #{FParentId})
+    </if>
+    <if test="orderBy != null and orderBy!=''">
+      order by ${orderBy}
+    </if>
+  </select>
+
+  <select id="getCourseVersionDataList" parameterType="fun.server.model.customQuery.trainingprogram.TrainingprogramversionCS" resultType="fun.server.model.customQuery.trainingprogram.CouserVersionData">
+    SELECT ifnull(tcn.FName,'') AS FNatureName,ifnull(tcc.FName,'') AS FTypeName,
+    tc.FKeyID,tc.FCDATE,tc.FUDATE,IFNULL(tc.FNo,'') AS FNo,IFNULL(tc.FName,'') AS FName,IFNULL(tc.FYWName,'') AS FYWName,tc.FType AS FTypeID,tc.FCNature AS FNatureID,tc.FCredits,tc.FSJZS,tc.FJYXNXQ,
+    tc.FIstk,tc.FValid,tc.FParentId,tc.FEdition
+    FROM t_course tc
+    LEFT JOIN t_course_nature tcn
+    ON tc.FCNature = tcn.FKeyID
+    LEFT JOIN t_course_category tcc
+    ON tcc.FKeyID = tc.FType
+    WHERE 1=1 AND tc.FValid = 0
+    <if test=" FParentId != null and FParentId!='' ">
+      and (tc.FKeyid = #{FParentId} or tc.FParentId = #{FParentId})
+    </if>
+    <if test="orderBy != null and orderBy!=''">
+      order by ${orderBy}
+    </if>
+  </select>
+
+
+  <select id="getTrainingProgramDataInfo" parameterType="fun.server.model.customQuery.trainingprogram.TrainingprogramCS" resultType="fun.server.model.customQuery.trainingprogram.TrainingprogramData">
+    SELECT
+    ttp.FKeyID,ttp.FState,ttp.FCDATE,ttp.FUDATE,IFNULL(ttp.FName,'') AS FName,ttp.FJS,ttp.FZYJS,ttp.FEdition,ttp.FEditionNo,ttp.FValid
+    ,tm.FKeyID AS FMjorID,tm.FMajorName AS FMjorName
+    ,tc.FCollegeName AS FCollegeName,ttp.FParentId
+    FROM t_training_program ttp
+    LEFT JOIN t_major tm
+    ON ttp.FTMID = tm.FKeyID
+    LEFT JOIN t_college tc
+    ON tm.FCollegeID = tc.FKeyID
+    where 1=1
+    <choose>
+      <when test="FKeyID != null and FKeyID!=''">
+        and ttp.FKeyID = #{FKeyID}
+      </when>
+      <otherwise>
+        and ttp.FKeyID = 0
+      </otherwise>
+    </choose>
+    <if test="FMjorName != null and FMjorName!=''">
+      and tm.FMajorName like concat('%',#{FMjorName},'%')
+    </if>
+    <if test="FName != null and FName!=''">
+      and ttp.FName like concat('%',#{FName},'%')
+    </if>
+    <if test="FCollegeName != null and FCollegeName!=''">
+      and tc.FCollegeName like concat('%',#{FCollegeName},'%')
+    </if>
+    <if test="orderBy != null and orderBy!=''">
+      order by ${orderBy}
+    </if>
+  </select>
+
+
+</mapper>

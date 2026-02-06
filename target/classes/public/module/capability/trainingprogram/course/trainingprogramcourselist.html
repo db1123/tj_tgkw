@@ -1,0 +1,340 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+    <!--/_only 独立样式 -->
+</head>
+<body>
+<div class="page-container" style="padding: 2px;">
+    <div class="f-l text-l" id="adddiv" style="display: none;">
+        <button type="button" class="btn btn-default size-S my-btn" onclick="Values(1)"><i
+                class=" fa fa-plus"></i>
+            新增课程安排
+        </button>
+<!--        <button type="button" class="btn btn-default size-S my-btn" onclick="dayin()"><i class="fa fa-print" aria-hidden="true"> </i>-->
+<!--            打印课程安排-->
+<!--        </button>-->
+    </div>
+    <div class="f-r text-r">
+
+        <input type="text" class="input-text size-S form-text-FNo" style="width:200px" placeholder="课程编号">
+        <input type="text" class="input-text size-S form-text-FName" style="width:200px" placeholder="课程名称">
+        <select class="course-form-select-type" id="course-form-select-type" style="width:200px"></select>
+        <select class="course-form-select-nature" id="course-form-select-nature" style="width:200px"></select>
+
+        <button type="button" class="btn btn-default size-S my-btn btn-search-fun"><i class="Hui-iconfont">&#xe665;</i>
+            搜索
+        </button>
+    </div>
+    <div class="f-l" style="width: 100%; margin-top: 3px;">
+        <table id="mainTable" class="display compact" style="width: 99.8%;"></table>
+    </div>
+</div>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+
+    var id = getQueryStringByName('tpid');//培养ID
+    var fmajorid = getQueryStringByName('fmajorid');//专业ID
+    var showtype = getQueryStringByName('showtype'); //显示类型
+    var xmname;
+    // 业务代码
+    $(function () {
+
+        if (showtype == 1) {
+            $("#adddiv").show();
+        } else {
+            $("#adddiv").hide();
+        }
+
+        //课程类别
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/coursecategory/querycourseCategoryALL', // 调用地址
+            async: false,
+            success: function(data) {
+                var newObj2 = Object.assign([], data.zNodes);
+                newObj2.push({id: 1, pId: 0, name: '全部', showname:'全部' , open: true});
+                $('.course-form-select-type').select2ztree({
+                    textField: 'showname',
+                    titleField: 'name',
+                    placeholder: '请选择课程类别',
+                    ztree: {
+                        setting: {
+                            view: {
+                                dblClickExpand: false
+                            },
+                            data: {
+                                simpleData: {
+                                    enable: true,
+                                    idKey: "id",
+                                    pIdKey: "pId",
+                                    rootPId: 0
+                                }
+                            }
+                        },
+                        zNodes: newObj2
+                    },
+                    language: "zh-CN"
+                });
+            },
+            error : function(e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+        //课程性质
+        var natrueselect = $(".course-form-select-nature").select2({
+            placeholder: '请选择课程性质',
+            ajax: {
+                type: 'POST',
+                url: "/s/coursenature/queryDatacoursenatureSelect",
+                dataType: 'json',
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        ftype:2
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.list
+                    };
+                },
+                delay: 800,
+                cache: true
+            },
+            language: "zh-CN"
+        });
+        var option = new Option("全部", "EBCA805FCF2DB7A2835690143664B03C", true, true);
+        natrueselect.append(option);
+        natrueselect.change();
+
+        // 封装表格
+        var m = $('#mainTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/trainingprogramcourse/querytrainingprogramcoursesql', // 调用地址
+                data: function (d) {
+                    return JSON.stringify($.extend({}, d, {
+                        page: d.start / d.length + 1, // 当前页
+                        results: d.length, // 每页显示条数
+                        name: $('.form-text-FName').val(),//课程名称
+                        fno: $('.form-text-FNo').val(),//课程编号
+                        ftype:$(".course-form-select-type").val(),//课程类别
+                        fnature:$(".course-form-select-nature").val(),//课程性质
+                        tpID:id,
+                    }));
+                },
+                dataSrc: function (json) {
+                    json.recordsFiltered = json.total;  // 总行数
+                    json.recordsTotal = json.page; // 当前页数
+                    return json.list;
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+            },
+            columns: [
+
+                {
+                    title: '类别', data: 'FType',
+                    render: function (data, type, row) {
+                        return row.FTypeName;
+                    }
+                },
+                {
+                    title: '课程编号', data: 'FNo',
+                    render: function (data, type, row) {
+                        return data;
+                    }
+                },
+                {
+                    title: '课程名称', data: 'FName',
+                    render: function (data, type, row) {
+                        return data;
+                    }
+                },
+                {
+                    title: '课程英文名称', data: 'FYWName',
+                    render: function (data, type, row) {
+                        return data;
+                    }
+                },
+                {
+                    title: '课程性质', data: 'FCNature',
+                    render: function (data, type, row) {
+                        return row.FCNatureName;
+                    }
+                },
+                {
+                    title: '学分', data: 'FXF',
+                    render: function (data, type, row) {
+                        return data;
+                    }
+                },
+                {
+                    title: '实践周数', data: 'FSJZS',
+                    render: function (data, type, row) {
+                        return data;
+                    }
+                },
+                {
+                    title: '是否停课', data: 'FIstk',
+                    render: function (data, type, row) {
+                        if(data ==1){
+                            return "否";
+                        }else  if(data ==2){
+                            return "是";
+                        }else{
+                            return  "";
+                        }
+
+                    }
+                },
+
+                // {
+                //     title: '学年', data: 'FXN',
+                //     render: function (data, type, row) {
+                //         return data;
+                //     }
+                // },
+                // {
+                //     title: '学期', data: 'FXQ',
+                //     render: function (data, type, row) {
+                //         if(data == -1){
+                //             return '';
+                //         }else{
+                //             return data;
+                //         }
+                //
+                //     }
+                // },
+                {
+                    title: '学年学期', data: 'FSemesterName',
+                    render: function (data, type, row) {
+                        return data;
+                    }
+                },
+                {
+                    title: '课程详情',
+                    data: 'FState',
+                    width: 90,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<button type="button" class="btn btn-default size-MINI" onclick="oppenadminister(\'' + row.key + '\',\'' + row.FName + '\')" style="background-color:#D9D9D9; color: #0a001f" >课程详情</button> ';
+                    }
+                },
+                {
+                    title: '操作',
+                    data: 'FState',
+                    width: 90,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if(showtype == 1){
+
+                            return  '<button type="button" class="btn btn-primary size-MINI" onclick="bianji(\'' + row.FTrainingCourseID + '\')"><i class="fas fa-edit"></i>编辑</button> ' +
+                                    '<button type="button" class="btn btn-danger size-MINI" onclick="onClickBtnDel(\'' + row.FTrainingCourseID + '\',\'' + row.FName + '\')"><i class="fas fa-trash"></i>移除</button>';
+                        }else{
+                            return '<button type="button" class="btn  size-MINI" disabled="disabled"">只读</button>';
+                        }
+
+                    }
+                }
+            ],
+            scrollY: (document.body.clientHeight - 100) + 'px',
+            scrollX: true,
+            paging: true, // 是否开启本地分页
+            pageLength: 15, // 改变初始化页长度（每页多少条数据）
+            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+            lengthChange: false, // 是否允许因子改变表格每页显示的记录数
+            searching: false, // 是否允许Datatables开启本地搜索
+            ordering: true, // 是否允许Datatables开启排序
+            info: true, // 控制是否显示表格左下角的信息
+            // order: [[1, 'asc']],
+            language: DataTablesLanguage
+        });
+        // m.column(1).visible(false);
+        // 查询按钮点击事件
+        $('.btn-search-fun').on('click', function () {
+            $('#mainTable').DataTable().ajax.reload(null, false);
+        });
+
+    });
+
+
+    function bianji(fKey) {
+        layer_show('修改课程信息', '/module/capability/trainingprogram/course/trainingprogramcoursexnxq.html?id=' + fKey, '600', '300');
+
+    }
+    function oppenadminister(key, name) {
+        xmname = name;
+        top.layer_show('查看课程详情', '/module/capability/course/courseminister.html?id=' + key + '&showtype=2'+ '&name='+name, '', '');
+    }
+    // 新增或者修改点击事件
+    function Values(op, fKey) {
+        if (op == 1) { // 新增
+            layer_show('新增课程安排信息', '/module/capability/trainingprogram/course/trainingprogramcourseedit.html?op=1&FTPID=' + id + '&fmajorid=' + fmajorid, '800', '400');
+        }
+    }
+
+    // 删除按钮点击事件
+    function onClickBtnDel(id, name) {
+        layer.confirm('<b>' + name + '</b><br />确定要移除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/trainingprogramcourse/deltrainingprogramcourse',
+                data: JSON.stringify({
+                    id: id
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#mainTable').DataTable().ajax.reload(null, false);
+                        toastr.success('删除成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error);
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+
+    function dayin(){
+        const url = '/module/capability/trainingprogram/course/trainingprogramcoursedayin.html?FTPID='+id;
+        // 直接打开新标签页
+        window.open(url, '_blank');
+    }
+</script>
+</body>
+</html>

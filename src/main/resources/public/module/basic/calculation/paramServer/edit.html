@@ -1,0 +1,261 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<!--_global 公共配置文件 -->
+<script language="javascript">var golbal_type="admin";</script>
+<script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+<!--_only 独立样式 -->
+<link rel="stylesheet" href="/plugins/select2/css/select2.min.css" />
+<!--/_only 独立样式 -->
+</head>
+<body>
+<article class="page-container">
+  <form action="" method="post" class="form form-horizontal" id="paramServerForm">
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>名称：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="f_name" />
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>IP：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="f_ip" />
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>端口：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="f_port" />
+			</div>
+		</div>
+    <div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>数据库类型：</label>
+			<div class="formControls col-xs-8 col-sm-9 big">
+				<select name="f_type" style="width: 100%;"></select>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>数据库名：</label>
+			<div class="formControls col-xs-8 col-sm-9 big">
+				<input type="text" class="input-text" name="f_db_name" />
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>用户名：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="f_username" />
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2">密码：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="password" class="input-text" name="f_password" />
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2">字符集：</label>
+			<div class="formControls col-xs-8 col-sm-9 big">
+				<select name="f_character_set" style="width: 100%;">
+          <option value="GBK">GBK</option>
+          <option value="GB2312">GB2312</option>
+          <option value="ISO-8859-1">ISO-8859-1</option>
+          <option value="UTF-8">UTF-8</option>
+          <option value="UTF-16">UTF-16</option>
+        </select>
+			</div>
+		</div>
+    <div class="toolbar-bottom-line"></div>
+		<div class="toolbar-bottom-btn">
+			<input class="btn btn-success-outline radius mr-20" type="button" value="&nbsp;&nbsp;测试连接&nbsp;&nbsp;" onclick="ParamServerTestConnection()" />
+			<input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;" />
+			<input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;" onclick="layer_close()" />
+		</div>
+    <input type="hidden" value="" name="f_key_id" />
+	</form>
+</article>
+
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript">
+// 编辑框状态 1新建 2修改
+var op = getQueryStringByName('op');
+// 业务代码
+$(function(){
+  // 初始化驱动类型下拉列表
+  $("#paramServerForm select[name='f_type']").select2({
+    placeholder: '请选择驱动程序类型',
+    ajax: {
+      type:'POST',
+      url: "/s/paramServerType/queryParamServerTypeSelect",
+      dataType: 'json',
+      data: function (params) {
+        return {
+          search: params.term,
+        };
+      },
+      delay: 800,
+      cache: true
+    },
+    language: "zh-CN"
+  });
+  // 初始化字符集下拉列表
+  var CharacterSetSelect = $("#paramServerForm select[name='f_character_set']").select2({
+    placeholder: '请选择字符集',
+    language: "zh-CN"
+  });
+  // 修改操作时读取表单信息
+  if (op == 2) {
+    var id = getQueryStringByName('id');
+    $.ajax({
+      type: 'POST',
+      contentType: 'application/json',
+      url: '/s/paramServer/queryParamServerInfo', // 调用地址
+      data: JSON.stringify({
+        id
+      }),
+      async: false,
+      success: function(data) {
+        var option = new Option(data.info.typeName, data.info.f_type, true, true);
+        $("#paramServerForm select[name='f_type']").append(option);
+        $("#paramServerForm select[name='f_type']").change();
+        $("#paramServerForm input[name='f_name']").val(data.info.f_name);
+        $("#paramServerForm input[name='f_ip']").val(data.info.f_ip);
+        $("#paramServerForm input[name='f_port']").val(data.info.f_port);
+        $("#paramServerForm input[name='f_db_name']").val(data.info.f_db_name);
+        $("#paramServerForm input[name='f_username']").val(data.info.f_username);
+        $("#paramServerForm input[name='f_password']").val(data.info.f_password);
+        CharacterSetSelect.val(data.info.f_character_set).trigger('change');
+        $("#paramServerForm input[name='f_key_id']").val(data.info.key);
+      },
+      error : function(e) {
+        toastr.error(e.status);
+        toastr.error(e.responseText);
+      }
+    });
+  }
+  // 检验数据
+  $('#paramServerForm').validate({
+    rules: {
+      f_name: {
+        required: true
+      },
+      f_db_name: {
+        required: true
+      }
+    },
+    messages: {
+      f_name: {
+        required: '*请输入名称'
+      },
+      f_db_name: {
+        required: '*请输入数据库名'
+      }
+    },
+    onfocusout: false, // 是否在获取焦点时验证
+    onkeyup: false, // 是否在敲击键盘时验证
+    focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+    focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+    success: 'valid',
+    submitHandler:function(){
+      // 获取参数
+      var data = form2Json('paramServerForm');
+      // 执行
+      if (op == 1) { // 添加操作
+        $.ajax({
+          type: 'POST',
+          contentType: 'application/json',
+          url: '/s/paramServer/addParamServer', // 调用地址
+          data: JSON.stringify(data),
+          async: false,
+          success: function(data) {
+            if (data.result == 'success') {
+              parent.$('#paramServerTable').DataTable().ajax.reload(null, false);
+              parent.toastr.success('添加成功！');
+              layer_close();
+            } else if (data.result == 'error') {
+              toastr.error(data.error);
+            }
+          },
+          error : function(e){
+            toastr.error(e.status);
+            toastr.error(e.responseText);
+          }
+        });
+      }else {
+        $.ajax({
+          type: 'POST',
+          contentType: 'application/json',
+          url: '/s/paramServer/updateParamServer', // 调用地址
+          data: JSON.stringify(data),
+          async: false,
+          success: function(data) {
+            if (data.result == 'success') {
+              parent.$('#paramServerTable').DataTable().ajax.reload(null, false);
+              parent.toastr.success('修改成功！');
+              layer_close();
+            } else if (data.result == 'error') {
+              toastr.error(data.error);
+            }
+          },
+          error : function(e){
+            toastr.error(e.status);
+            toastr.error(e.responseText);
+          }
+        });
+      }
+    }
+  });
+});
+// 测试连接
+function ParamServerTestConnection() {
+  // 获取参数
+  var JsonData = form2Json('paramServerForm');
+  var typeOption = $("#paramServerForm select[name='f_type']").select2('data');
+  // 执行
+  if (JsonData['f_ip'] == '' || JsonData['f_port'] == '') {
+    toastr.error('请填写 IP地址和端口号');
+  } else if (!typeOption[0] || typeOption[0].id == '') {
+    toastr.error('请选择 数据库类型');
+  } else if(JsonData['f_db_name'] == '' || JsonData['f_username'] == '') {
+    toastr.error('请填写 数据库名称、用户名、密码');
+  } else {
+    $('body').mLoading('show');
+    setTimeout(function(){
+      $.ajax({
+        type: 'POST',
+        contentType: 'application/json',
+        url: '/s/paramServer/testConnection', // 调用地址
+        data: JSON.stringify(JsonData),
+        async: false,
+        success: function(data) {
+          if (data.result == 'success') {
+            if (data.op == true) {
+              toastr.success('连接成功！');
+            } else {
+              toastr.error('连接失败！');
+            }
+          } else if (data.result == 'error') {
+            toastr.error(data.error);
+          }
+        },
+        error : function(e){
+          toastr.error(e.status);
+          toastr.error(e.responseText);
+        }
+      });
+      $('body').mLoading('hide');
+    }, 200);
+  }
+}
+</script>
+</body>
+</html>

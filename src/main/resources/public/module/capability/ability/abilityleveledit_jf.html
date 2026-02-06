@@ -1,0 +1,630 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <!--/_only 独立样式 -->
+</head>
+<style type="text/css">
+    .vertical-line {
+        width: 5px; /* 竖线的宽度 */
+        height: 15px; /* 竖线的高度 */
+        background-color: blue; /* 竖线的颜色 */
+        margin-right: 5px; /* 竖线与文字之间的右边距 */
+    }
+
+    .container {
+        display: flex; /* 使用 Flexbox 布局 */
+        align-items: center; /* 垂直居中对齐 */
+        margin-left: -10px;
+    }
+
+    .rowtop {
+        margin-top: 10px;
+    }
+
+
+</style>
+<body>
+<article class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="abilitytleveltiaojianForm">
+        <div class="panel panel-default">
+            <div class="panel-header">
+                <div class="container">
+                    <div class="vertical-line"></div>
+                    <div class="text">能力等级</div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>能力：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" name="FNName" id="FNName" disabled="disabled"/>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>等级名称：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" name="FName" id="FName"/>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>等级最低分数：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" name="FScoreMin" id="FScoreMin"
+                               onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"
+                               onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'0')}else{this.value=this.value.replace(/\D/g,'')}"/>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>等级最高分数：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" name="FScoreMax" id="FScoreMax"
+                               onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"
+                               onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'0')}else{this.value=this.value.replace(/\D/g,'')}"/>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>能力积分：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" name="FPoints" id="FPoints" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"
+                               onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'0')}else{this.value=this.value.replace(/\D/g,'')}"/>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-3 col-sm-2">描述：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" name="FNote" id="FNote"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-default rowtop">
+            <div class="panel-header">
+                <div class="container">
+                    <div class="vertical-line"></div>
+                    <div class="text">能力等级条件
+
+                    </div>
+
+                </div>
+            </div>
+            <div class="panel-body" style="padding: 8px;">
+                <div class="row cl">
+                    <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>条件名称：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <input type="text" class="input-text" name="FConditionName1" id="FConditionName1"/>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>条件类型：</label>
+                    <div class="formControls col-xs-1 col-sm-1">
+                        <select id="FConditionType1" name="FConditionType1" class="FConditionTypes"
+                                style="width: 100%;">
+                            <option value="1">数值</option>
+                            <option value="2">布尔值</option>
+                            <option value="3">字符串</option>
+                        </select>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>条件值：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <div id="wenben1" style="display: block;">
+                            <input type="text" class="input-text" name="FConditionValue1" id="FConditionValue1"/>
+                        </div>
+                        <div id="danyuan1" style="display: none;">
+                            <input type="radio" value="是" name="FConditionValueradio1" checked="checked" />是 <input type="radio" value="否" name="FConditionValueradio1" />否
+                        </div>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>条件分数：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <input type="text" class="input-text" name="FConditionScore1" id="FConditionScore1"/>
+                    </div>
+                    <!--                    <div class="formControls col-xs-1 col-sm-1">-->
+                    <!--                        <span style="cursor:pointer;margin-left: 20px;" title="新增条件"><i class="fa fa-plus"-->
+                    <!--                                                                                            aria-hidden="true"-->
+                    <!--                                                                                            onclick="addinput()"></i></span>-->
+                    <!--                    </div>-->
+                </div>
+                <div class="row cl">
+
+                    <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>考核方式：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <select name="FMethodID1" id="FMethodID1" class="FMethodID" style="width: 100%;"></select>
+                    </div>
+
+                    <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>权重：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <input type="number" style="width: 100%;" min="0.1" step="0.01" class="input-text" name="FMethodWeight1" id="FMethodWeight1"/>
+                    </div>
+
+                    <div class="formControls col-xs-1 col-sm-1" >
+                        <span style="cursor:pointer;margin-left: 20px;" title="新增条件"><i class="fa fa-plus"
+                                                                                            aria-hidden="true"
+                                                                                            onclick="addinput()"></i></span>
+                    </div>
+                    <div style="border-bottom: 1px solid #ccc; margin: 40px;width: 90%;"></div>
+                </div>
+                <div id="tiaojian">
+
+                </div>
+            </div>
+        </div>
+        <!--        <div class="panel panel-default rowtop">-->
+        <!--            <div class="panel-header">-->
+        <!--                <div class="container">-->
+        <!--                    <div class="vertical-line"></div>-->
+        <!--                    <div class="text">能力等级考核方式</div>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--            <div class="panel-body">-->
+        <!--                <div class="row cl">-->
+        <!--                    <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>条件名称：</label>-->
+        <!--                    <div class="formControls col-xs-8 col-sm-9">-->
+        <!--                        <input type="text" class="input-text" name="FMethodID" id="FMethodID"/>-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--        </div>-->
+
+        <div class="toolbar-bottom-line"></div>
+        <div class="toolbar-bottom-btn">
+            <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+            <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                   onclick="layer_close()"/>
+        </div>
+        <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+        <input type="hidden" value="" name="FAbilityID" id="FAbilityID"/>
+    </form>
+</article>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript">
+    var xmname = parent.abilityName;
+    var FAbilityID = getQueryStringByName('FAbilityID');
+    var op = getQueryStringByName('op');
+    var tiaojianinputnum = 1;
+    var userValidate;
+    var rulesstr;
+    var messagesstr;
+    // 业务代码
+    $(function () {
+        $('#FNName').val(xmname);
+        $('#FAbilityID').val(FAbilityID);
+        //条件类型
+        $("#FConditionType1").select2({
+            placeholder: '请选择条件类型',
+            language: "zh-CN"
+        });
+
+        selectzhi(1);
+        selectfangshi(1);
+        // 修改操作时读取表单信息
+        if (op == 2) {
+            var id = getQueryStringByName('id');
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/abilitylevel/queryabilitylevelInfo', // 调用地址
+                data: JSON.stringify({
+                    id: id
+                }),
+                async: false,
+                success: function (data) {
+                    $('#FName').val(data.info.FName);
+                    $('#FNote').val(data.info.FNote);
+                    $('#FPoints').val(data.info.FPoints);
+                    $('#FKeyID').val(data.info.key);
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        }
+
+        rulesstr = {
+            FName: {
+                required: true,
+                levelLimit: false
+            },
+            FScoreMin: {
+                required: true,
+                lessThanOrEqual: "#FScoreMax"
+            },
+            FScoreMax: {
+                required: true,
+
+            },
+            FConditionName1: {
+                required: true,
+
+            },
+            FConditionTypes: {
+                required: true,
+
+            },
+            FConditionValue1: {
+                required: true,
+
+            },
+            FConditionScore1: {
+                required: true,
+
+            },
+            FMethodID1: {
+                required: true,
+
+            },
+            FMethodWeight1: {
+                required: true,
+
+            },
+            FPoints: {
+                required: true,
+
+            },
+        };
+
+        messagesstr = {
+            FName: {
+                required: '*请输入等级名称'
+            },
+            FPoints: {
+                required: '*请输入能力积分'
+            },
+            FScoreMin: {
+                required: '*请输入等级最低分数',
+
+            },
+            FScoreMax: {
+                required: '*请输入等级最高分数',
+
+            },
+            FConditionName1: {
+                required: '*请输入条件名称',
+
+            },
+            FConditionTypes: {
+                required: '*请输入条件类型',
+
+            },
+            FConditionValue1: {
+                required: '*请输入条件值',
+
+            },
+            FConditionScore1: {
+                required: '*请输入条件分数',
+
+            },
+            FMethodID1: {
+                required: '*请选择考核方式',
+
+            },
+            FMethodWeight1: {
+                required: '*请输入权重',
+
+            },
+        };
+
+        $.validator.addMethod("lessThanOrEqual", function(value, element, param) {
+            var fullScore = $(param).val();
+            return parseFloat(value) <= parseFloat(fullScore);
+        }, "*最低分数不能大于最高分数!");
+        // 检验数据
+        userValidate = $('#abilitytleveltiaojianForm').validate({
+            rules: rulesstr,
+            messages: messagesstr,
+            onfocusout: false, // 是否在获取焦点时验证
+            onkeyup: false, // 是否在敲击键盘时验证
+            focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+            focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+            success: 'valid',
+            submitHandler: function () {
+                // 获取参数
+                var data = form2Json('abilitytleveltiaojianForm');
+                data['FAbilityID'] = FAbilityID;
+                // 获取所有 FName 和 FNo 的输入框
+                let FConditionName = document.querySelectorAll('input[name^="FConditionName"]');
+                // 创建一个数组来存储分组数据
+                let groupedData = [];
+
+                // 遍历 FName 输入框，并找到对应的 FNo 和 FType
+                FConditionName.forEach(fNameInput => {
+                    // 获取 FName 的编号（例如 "FName1" 中的 "1"）
+                    let index = fNameInput.name.replace("FConditionName", ""); // 提取 "1"
+
+                    let FConditionScore = document.querySelector(`input[name="FConditionScore${index}"]`);
+                    let FConditionType = document.querySelector(`select[name="FConditionType${index}"]`);
+
+                    let FMethodID = document.querySelector(`select[name="FMethodID${index}"]`);
+                    let FMethodWeight = document.querySelector(`input[name="FMethodWeight${index}"]`);
+
+                    if(FConditionType.value == 2){
+                        let FConditionValue2 = document.querySelector(`input[name="FConditionValueradio${index}"]:checked`);
+                        if (FConditionValue2 && FConditionType && FConditionScore) {
+                            groupedData.push({
+                                FName: fNameInput.value,
+                                Value: FConditionValue2.value,
+                                FType: FConditionType.value,
+                                Score: FConditionScore.value,
+                                MethodID : FMethodID.value,
+                                MethodWeight : FMethodWeight.value,
+                            });
+                        }
+                    }else{
+                        let FConditionValue = document.querySelector(`input[name="FConditionValue${index}"]`);
+                        if (FConditionValue && FConditionType && FConditionScore) {
+                            groupedData.push({
+                                FName: fNameInput.value,
+                                Value: FConditionValue.value,
+                                FType: FConditionType.value,
+                                Score: FConditionScore.value,
+                                MethodID : FMethodID.value,
+                                MethodWeight : FMethodWeight.value,
+                            });
+                        }
+                    }
+
+                });
+                // console.log(groupedData);
+                data['tiaojian'] = JSON.stringify(groupedData);
+                if (op == 1) { // 添加操作
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/abilitycondition/addabilitylevelCondition', // 调用地址
+                        data: JSON.stringify(data),
+                        async: false,
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                parent.reloadtable(FAbilityID, xmname);
+                                parent.toastr.success('添加成功！');
+                                layer_close();
+                            } else if (data.result == 'fail') {
+                                toastr.warning('等级名称重复，请重新输入');
+                            } else if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                } else {
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s//', // 调用地址
+                        data: JSON.stringify(data),
+                        async: false,
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                parent.reloadtable(FAbilityID, xmname);
+                                parent.toastr.success('修改成功！');
+                                layer_close();
+                            } else if (data.result == 'fail') {
+                                toastr.warning('等级名称重复，请重新输入');
+                            } else if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                }
+            }
+        });
+    });
+
+    function addinput() {
+        if (tiaojianinputnum < 5) {
+            //动态添加输入框
+            var quyudiv = $("#tiaojian");
+            var html = '';
+            html +=`<div id="inputtiaojian` + (tiaojianinputnum + 1) + `">`;
+            html += `<div class="row cl" >
+                    <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>条件` + (tiaojianinputnum + 1) + `名称：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <input type="text" class="input-text" name="FConditionName` + (tiaojianinputnum + 1) + `" id="FConditionName` + (tiaojianinputnum + 1) + `"/>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>条件` + (tiaojianinputnum + 1) + `类型：</label>
+                    <div class="formControls col-xs-1 col-sm-1">
+                        <select id="FConditionType` + (tiaojianinputnum + 1) + `" name="FConditionType` + (tiaojianinputnum + 1) + `"  style="width: 100%;">
+                            <option value="1">数值</option>
+                            <option value="2">布尔值</option>
+                            <option value="3">字符串</option>
+                        </select>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>条件` + (tiaojianinputnum + 1) + `值：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <div id="wenben` + (tiaojianinputnum + 1) + `" style="display: block;">
+                            <input type="text" class="input-text" name="FConditionValue` + (tiaojianinputnum + 1) + `" id="FConditionValue` + (tiaojianinputnum + 1) + `"/>
+                        </div>
+                        <div id="danyuan` + (tiaojianinputnum + 1) + `" style="display: none;">
+                            <input type="radio" value="是" name="FConditionValueradio` + (tiaojianinputnum + 1) + `" checked="checked" />是 <input type="radio" value="否" name="FConditionValueradio` + (tiaojianinputnum + 1) + `" />否
+                        </div>
+
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>条件` + (tiaojianinputnum + 1) + `分数：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <input type="text" class="input-text" name="FConditionScore` + (tiaojianinputnum + 1) + `" id="FConditionScore` + (tiaojianinputnum + 1) + `"/>
+                    </div>
+
+                </div>`;
+
+            html +=`<div class="row cl">
+                    <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>考核方式：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <select name="FMethodID` + (tiaojianinputnum + 1) + `" id="FMethodID` + (tiaojianinputnum + 1) + `" class="FMethodID" style="width: 100%;"></select>
+                    </div>
+                    <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>权重：</label>
+                    <div class="formControls col-xs-2 col-sm-2">
+                        <input type="number" style="width: 100%;" min="0.1" step="0.01" class="input-text" name="FMethodWeight` + (tiaojianinputnum + 1) + `" id="FMethodWeight` + (tiaojianinputnum + 1) + `"/>
+                    </div>
+                    <div class="formControls col-xs-1 col-sm-1">
+                        <span title="删除条件" onclick="deltiaojian()" style="cursor:pointer;margin-left: 20px;"><i class="fa fa-minus" aria-hidden="true" ></i></span>
+                    </div>
+                    <div style="border-bottom: 1px solid #ccc; margin: 40px;width: 90%;"></div>
+                </div>`;
+            html +=`</div>`;
+
+            html += `<script>
+                $(document).ready(function(){
+                // $(function () {
+                    $("#FConditionType` + (tiaojianinputnum + 1) + `").select2({
+                        placeholder: '请选择条件` + (tiaojianinputnum + 1) + `类型',
+                        language: "zh-CN"
+                    });
+                });
+                <\/script>`;
+            quyudiv.append(html);
+            insertv((tiaojianinputnum + 1), 1);
+            selectfangshi((tiaojianinputnum + 1));
+            selectzhi((tiaojianinputnum + 1));
+            tiaojianinputnum = tiaojianinputnum + 1;
+        } else {
+            toastr.error("每次条件最多添加5个！");
+        }
+    }
+
+    function deltiaojian() {
+        $('#inputtiaojian' + tiaojianinputnum).remove();
+        tiaojianinputnum = tiaojianinputnum - 1;
+        // insertv(tiaojianinputnum,2);
+    }
+
+    function insertv(numss, type) {
+
+        if (type == 1) {
+            // //新增
+            if (!hasRule("#FConditionType" + numss, "required")) {
+                $("#FConditionType" + numss).rules("add", {
+                    required: true,
+                    messages: {
+                        required: "*请选择条件类型",
+                    }
+                });
+            }
+            if (!hasRule("#FConditionName" + numss, "required")) {
+                $("#FConditionName" + numss).rules("add", {
+                    required: true,
+                    messages: {
+                        required: "*请输入条件名称",
+                    }
+                });
+            }
+            if (!hasRule("#FConditionValue" + numss, "required")) {
+                $("#FConditionValue" + numss).rules("add", {
+                    required: true,
+                    messages: {
+                        required: "*请输入条件值",
+                    }
+                });
+            }
+            if (!hasRule("#FConditionScore" + numss, "required")) {
+                $("#FConditionScore" + numss).rules("add", {
+                    required: true,
+                    messages: {
+                        required: "*请输入条件分数",
+                    }
+                });
+            }
+            if (!hasRule("#FMethodID" + numss, "required")) {
+                $("#FMethodID" + numss).rules("add", {
+                    required: true,
+                    messages: {
+                        required: "*请选择考核方式",
+                    }
+                });
+            }
+            if (!hasRule("#FMethodWeight" + numss, "required")) {
+                $("#FMethodWeight" + numss).rules("add", {
+                    required: true,
+                    messages: {
+                        required: "*请输入权重",
+                    }
+                });
+            }
+        } else {
+            //删除
+            // $("#FConditionType"+ numss).rules("remove", "required");
+            // $("#FConditionName"+ numss).rules("remove", "required");
+            // $("#FConditionValue"+ numss).rules("remove", "required");
+            // $("#FConditionScore" + numss).rules("remove", "required");
+        }
+
+    }
+
+    // 检查字段是否已经存在某个规则
+    function hasRule(field, ruleName) {
+        var rules = $(field).rules(); // 获取字段的规则
+        return rules && rules[ruleName]; // 检查规则是否存在
+    }
+
+    function selectfangshi(num){
+        var names  = 'FMethodID' + num;
+        $("#" + names ).select2({
+            placeholder: '请选择考核方式',
+            ajax: {
+                type: 'POST',
+                url: "/s/abilityassessmentmethod/queryabilityassessmentmethod_xl",
+                dataType: 'json',
+                data: function (params) {
+                    return {
+                        search: params.term,
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.list
+                    };
+                },
+                delay: 800,
+                cache: true
+            },
+            language: "zh-CN"
+        });
+    }
+
+
+    function selectzhi(nums){
+
+        $('#FConditionType' + nums).change(function() {
+            // Show the selected div
+            var selectedOption = $(this).val();
+            if(selectedOption == 2){
+                $('#danyuan' + nums).show();
+                $('#wenben' + nums).hide();
+
+            }else{
+                $('#danyuan' +nums).hide();
+                $('#wenben' + nums).show();
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

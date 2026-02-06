@@ -1,0 +1,977 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <!--/_only 独立样式 -->
+</head>
+<style>
+    /* CSS 样式 */
+    .custom-checkbox {
+        display: block;
+        position: relative;
+        padding-left: 35px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        font-size: 18px;
+        user-select: none;
+    }
+
+    .custom-checkbox-input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+    }
+
+    .custom-checkbox-checkmark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 25px;
+        width: 25px;
+        background-color: #eee;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+
+    .custom-checkbox:hover .custom-checkbox-input ~ .custom-checkbox-checkmark {
+        background-color: #ccc;
+    }
+
+    .custom-checkbox-input:checked ~ .custom-checkbox-checkmark {
+        background-color: #2196F3;
+    }
+
+    .custom-checkbox-checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+        left: 9px;
+        top: 5px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 3px 3px 0;
+        transform: rotate(45deg);
+    }
+
+    .custom-checkbox-input:checked ~ .custom-checkbox-checkmark:after {
+        display: block;
+    }
+</style>
+<body>
+<article class="page-container">
+    <form action="" method="course" class="form form-horizontal" id="courseForm">
+        <div class="row cl">
+            <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>课程编号：</label>
+            <div class="formControls col-xs-3 col-sm-3">
+                <input type="text" class="input-text" name="FNo" id="FNo"/>
+            </div>
+            <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>课程名称：</label>
+            <div class="formControls col-xs-3 col-sm-3">
+                <input type="text" class="input-text" name="FName" id="FName"/>
+            </div>
+            <label class="form-label col-xs-1 col-sm-1">英文名称：</label>
+            <div class="formControls col-xs-3 col-sm-3">
+                <input type="text" class="input-text" name="FYWName" id="FYWName"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>课程类别：</label>
+            <div class="formControls col-xs-5 col-sm-5">
+                <select name="FType" id="FType" style="width: 100%;">
+                    <option></option>
+                </select>
+            </div>
+            <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>课程性质：</label>
+            <div class="formControls col-xs-5 col-sm-5">
+                <select name="FCNature" id="FCNature" style="width: 100%;"></select>
+            </div>
+        </div>
+
+        <!--        <div class="row cl">-->
+        <!--            <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>能力：</label>-->
+        <!--            <div class="formControls col-xs-5 col-sm-5">-->
+        <!--                <select name="FAbilityID" id="FAbilityID" style="width: 100%;"></select>-->
+        <!--            </div>-->
+        <!--            <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>能力等级：</label>-->
+        <!--            <div class="formControls col-xs-5 col-sm-5">-->
+        <!--                <select name="FAbilityLevelID" id="FAbilityLevelID" style="width: 100%;"></select>-->
+        <!--            </div>-->
+        <!--        </div>-->
+        <div class="row cl">
+            <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>周学时：</label>
+            <div class="formControls col-xs-2 col-sm-2">
+                <input type="text" class="input-text"  name="FWeeklyStudyHours" id="FWeeklyStudyHours"
+                        onkeypress="return isNumberKey(event)" value="0"/>
+            </div>
+            <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>理论学时：</label>
+            <div class="formControls col-xs-2 col-sm-2">
+                <input type="text" class="input-text" name="FTheoreticalStudyHours" id="FTheoreticalStudyHours"
+                       oninput="calculateTotalHours()" onkeypress="return isNumberKey(event)" value="0"/>
+            </div>
+            <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>实践学时：</label>
+            <div class="formControls col-xs-2 col-sm-2">
+                <input type="text" class="input-text" name="FPracticalStudyHours" id="FPracticalStudyHours"
+                       oninput="calculateTotalHours()" onkeypress="return isNumberKey(event)" value="0"/>
+            </div>
+            <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>总学时：</label>
+            <div class="formControls col-xs-2 col-sm-2">
+                <input type="text" class="input-text" name="FTotalHours" readonly id="FTotalHours" value="0"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>建议学分：</label>
+            <div class="formControls col-xs-2 col-sm-2">
+                <input type="text" class="input-text" name="FCredits" id="FCredits"
+                       onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/[^0-9.]/g,'').replace(/(\..*)\./g, '$1').replace(/^(\d*\.\d{0,2}).*$/, '$1').replace(/^\./, '')}"
+                       onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/[^0-9.]/g,'').replace(/(\..*)\./g, '$1').replace(/^(\d*\.\d{0,2}).*$/, '$1').replace(/^\./, '')}"/>
+            </div>
+            <label class="form-label col-xs-1 col-sm-1">建议学年：</label>
+            <div class="formControls col-xs-2 col-sm-2">
+<!--                <input type="text" class="input-text" name="FJYXNXQ" id="FJYXNXQ"/>-->
+                <select style="width: 100%" name = "FJYXNXQ" id="FJYXNXQ">
+                    <option value="1">1年</option>
+                    <option value="2">2年</option>
+                    <option value="3">3年</option>
+                    <option value="4">4年</option>
+                </select>
+            </div>
+
+            <label class="form-label col-xs-1 col-sm-1">建议学期：</label>
+            <div class="formControls col-xs-2 col-sm-2">
+               <select style="width: 100%" name = "FJYXQ" id="FJYXQ">
+                   <option value="1">1</option>
+                   <option value="2">2</option>
+                   <option value="3">3</option>
+               </select>
+            </div>
+
+            <label class="form-label col-xs-1 col-sm-1">课程类型：</label>
+            <div class="formControls col-xs-2 col-sm-2">
+                <select style="width: 100%" name = "FJCZYK" id="FJCZYK">
+                    <option value="1">基础课</option>
+                    <option value="2">专业课</option>
+
+                </select>
+            </div>
+
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-1 col-sm-1">实践周数：</label>
+            <div class="formControls col-xs-2 col-sm-2">
+                <input type="text" class="input-text" name="FSJZS" id="FSJZS"/>
+            </div>
+            <label class="form-label col-xs-1 col-sm-1">是否停课：</label>
+            <div class="formControls col-xs-2 col-sm-2">
+                <select name="FIstk" id="FIstk" style="width: 100%;">
+                    <option value="1">否</option>
+                    <option value="2">是</option>
+                </select>
+            </div>
+
+            <label class="form-label col-xs-1 col-sm-1">合格分数：</label>
+            <div class="formControls col-xs-2 col-sm-2">
+                <input type="text" class="input-text" name="FPassScore" id="FPassScore"
+                       onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/[^0-9.]/g,'').replace(/(\..*)\./g, '$1').replace(/^(\d*\.\d{0,2}).*$/, '$1').replace(/^\./, '')}"
+                       onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/[^0-9.]/g,'').replace(/(\..*)\./g, '$1').replace(/^(\d*\.\d{0,2}).*$/, '$1').replace(/^\./, '')}"/>
+            </div>
+            <label class="form-label col-xs-1 col-sm-1">满分：</label>
+            <div class="formControls col-xs-2 col-sm-2">
+                <input type="text" class="input-text" name="FFullScore" id="FFullScore"
+                       onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/[^0-9.]/g,'').replace(/(\..*)\./g, '$1').replace(/^(\d*\.\d{0,2}).*$/, '$1').replace(/^\./, '')}"
+                       onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/[^0-9.]/g,'').replace(/(\..*)\./g, '$1').replace(/^(\d*\.\d{0,2}).*$/, '$1').replace(/^\./, '')}"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-1 col-sm-1">开课秋季：</label>
+            <div class="formControls col-xs-2 col-sm-2">
+                <label class="custom-checkbox">
+                    <input type="checkbox" class="custom-checkbox-input" name="FKKQJ" id="FKKQJ">
+                    <span class="custom-checkbox-checkmark"></span>
+                </label>
+
+            </div>
+            <label class="form-label col-xs-1 col-sm-1">开课春季：</label>
+            <div class="formControls col-xs-2 col-sm-2">
+
+                <label class="custom-checkbox">
+                    <input type="checkbox" class="custom-checkbox-input" name="FKKCJ" id="FKKCJ">
+                    <span class="custom-checkbox-checkmark"></span>
+                </label>
+            </div>
+            <label class="form-label col-xs-1 col-sm-1">短学期：</label>
+            <div class="formControls col-xs-2 col-sm-2">
+                <label class="custom-checkbox">
+                    <input type="checkbox" class="custom-checkbox-input" name="FDXQ" id="FDXQ">
+                    <span class="custom-checkbox-checkmark"></span>
+                </label>
+
+            </div>
+        </div>
+
+        <div class="row cl">
+            <label class="form-label col-xs-1 col-sm-1">适用专业：</label>
+            <div class="formControls col-xs-11 col-sm-11">
+<!--                <input type="text" class="input-text" name="FMajor" id="FMajor"/>-->
+                                <select name="FMajor" multiple="multiple" style="width: 100%;"></select>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-1 col-sm-1">先修课程：</label>
+            <div class="formControls col-xs-11 col-sm-11">
+<!--                <input type="text" class="input-text" name="FPrerequisites" id="FPrerequisites"/>-->
+                                <select name="FPrerequisites" multiple="multiple" style="width: 100%;"></select>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-1 col-sm-1">基本要求：</label>
+            <div class="formControls col-xs-11 col-sm-11">
+                <input type="text" class="input-text" name="FTeachingRequirements" id="FTeachingRequirements"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-1 col-sm-1">课程描述：</label>
+            <div class="formControls col-xs-11 col-sm-11">
+                <input type="text" class="input-text" name="FCon" id="FCon"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-1 col-sm-1">开课单位：</label>
+            <div class="formControls col-xs-11 col-sm-11">
+<!--                <input type="text" class="input-text" name="FKKDW" id="FKKDW"/>-->
+<!--                <select name="FKKDW" id="FKKDW" style="width: 100%;"></select>-->
+                <select name="FKKDW" multiple="multiple" style="width: 100%;"></select>
+            </div>
+        </div>
+        <div class="toolbar-bottom-line"></div>
+        <div class="toolbar-bottom-btn">
+            <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+            <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                   onclick="layer_close()"/>
+        </div>
+        <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+    </form>
+</article>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+
+
+<script type="text/javascript">
+    // 编辑框状态 1新建 2修改
+    var op = getQueryStringByName('op');
+    // 定义全局变量
+    let globalVar1 = 0; // 开课秋季 的全局变量
+    let globalVar2 = 0; // 开课春季 的全局变量
+    let globalVar3 = 0; // 短学期 的全局变量
+
+    var FTypeIDS;
+
+    var selectFMajor;
+    var selectFKKDW;
+    var selectPrerequisites;
+
+    var FCourseID;
+
+    // 页面加载完成后，为输入框添加事件监听（兼容动态添加的元素）
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputElements = [
+            'FWeeklyStudyHours',
+            'FTheoreticalStudyHours',
+            'FPracticalStudyHours'
+        ];
+
+        inputElements.forEach(id => {
+            const element = document.getElementById(id);
+            // 添失去焦点事件（防止粘贴非数字内容）
+            element.addEventListener('blur', function() {
+                // 过滤非数字内容
+                this.value = this.value.replace(/[^0-9.]/g, '');
+                // 确保只有一个小数点
+                const parts = this.value.split('.');
+                if (parts.length > 2) {
+                    this.value = parts[0] + '.' + parts.slice(1).join('');
+                }
+                // 重新计算
+                calculateTotalHours();
+            });
+        });
+    });
+    // 业务代码
+    $(function () {
+        globalVar1 = 1;
+        $('#FKKQJ').prop('checked', true);
+        $('#FJYXQ').change(function () {
+            let a = $(this).val();
+            if(a ==1){
+                $('#FKKQJ').prop('checked', true);
+                $('#FKKCJ').prop('checked', false);
+                $('#FDXQ').prop('checked', false);
+                globalVar1 = 1;
+                globalVar2 = 0;
+                globalVar3 = 0;
+            }else if(a ==2 ){
+                $('#FKKQJ').prop('checked', false);
+                $('#FKKCJ').prop('checked', true);
+                $('#FDXQ').prop('checked', false);
+                globalVar1 = 0;
+                globalVar2 = 1;
+                globalVar3 = 0;
+            }else if(a == 3){
+                $('#FKKQJ').prop('checked', false);
+                $('#FKKCJ').prop('checked', false);
+                $('#FDXQ').prop('checked', true);
+                globalVar1 = 0;
+                globalVar2 = 0;
+                globalVar3 = 1;
+            }else{
+                $('#FKKQJ').prop('checked', false);
+                $('#FKKCJ').prop('checked', false);
+                $('#FDXQ').prop('checked', false);
+                globalVar1 = 0;
+                globalVar2 = 0;
+                globalVar3 = 0;
+            }
+        });
+
+
+
+
+
+        // 监听选项 1 的变化
+        $('#FKKQJ').change(function () {
+            globalVar1 = $(this).is(':checked') ? 1 : 0; // 选中时赋值为 1，否则为 0
+        });
+
+        // 监听选项 2 的变化
+        $('#FKKCJ').change(function () {
+            globalVar2 = $(this).is(':checked') ? 1 : 0; // 选中时赋值为 1，否则为 0
+
+        });
+
+        // 监听选项 3 的变化
+        $('#FDXQ').change(function () {
+            globalVar3 = $(this).is(':checked') ? 1 : 0; // 选中时赋值为 1，否则为 0
+
+        });
+        var selectFIstk = $("#FIstk").select2({
+            placeholder: '请选择是否停课',
+            language: "zh-CN"
+        });
+
+        var selectFJYXQ = $("#FJYXQ").select2({
+            placeholder: '请选择建议学期',
+            language: "zh-CN"
+        });
+
+        var selectFJYXNXQ = $("#FJYXNXQ").select2({
+            placeholder: '请选择建议学年',
+            language: "zh-CN"
+        });
+
+        var selectFJCZYK = $("#FJCZYK").select2({
+            placeholder: '请选择课程类型',
+            language: "zh-CN"
+        });
+
+
+        //课程类别
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/coursecategory/querycourseCategoryALL', // 调用地址
+            async: false,
+            success: function (data) {
+                // var newObj2 = Object.assign([], data.zNodes);
+                // newObj2.push({id: 1, pId: 0, name: '全部', open: true});
+                $('#FType').select2ztree({
+                    textField: 'showname',
+                    titleField: 'name',
+                    placeholder: '请选择课程类别',
+                    ztree: {
+                        setting: {
+                            view: {
+                                dblClickExpand: false
+                            },
+                            data: {
+                                simpleData: {
+                                    enable: true,
+                                    idKey: "id",
+                                    pIdKey: "pId",
+                                    rootPId: 0
+                                }
+                            }
+                        },
+                        zNodes: data.zNodes
+                    },
+                    language: "zh-CN"
+                });
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+        //课程性质
+        var selectcoursenature = $("#FCNature").select2({
+            placeholder: '请选择课程性质',
+            ajax: {
+                type: 'POST',
+                url: "/s/coursenature/queryDatacoursenatureSelect",
+                dataType: 'json',
+                data: function (params) {
+                    return {
+                        search: params.term,
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.list
+                    };
+                },
+                delay: 800,
+                cache: true
+            },
+            language: "zh-CN"
+        });
+        // //能力
+        // var selectability = $("#FAbilityID").select2({
+        //     placeholder: '请选择能力',
+        //     ajax: {
+        //         type: 'POST',
+        //         url: "/s/ability/queryDataabilitySelect",
+        //         dataType: 'json',
+        //         data: function (params) {
+        //             return {
+        //                 search: params.term,
+        //             };
+        //         },
+        //         processResults: function (data) {
+        //             return {
+        //                 results: data.list
+        //             };
+        //         },
+        //         delay: 800,
+        //         cache: true
+        //     },
+        //     language: "zh-CN"
+        // });
+        // // 能力等级
+        // var selectabilityLevel = $("#FAbilityLevelID").select2({
+        //     placeholder: '请选择能力等级',
+        //     language: "zh-CN"
+        // });
+        // //能力与能力等级联动
+        // selectability.on("select2:select", function (e) {
+        //     if (e.params.data) {
+        //         $.ajax({
+        //             type: 'POST',
+        //             contentType: 'application/json;charset=UTF-8',
+        //             url: '/s/abilitylevel/queryDataabilitylevelSelectld',
+        //             data: JSON.stringify({
+        //                 abilityID: e.params.data.id
+        //             }),
+        //             async: false, // false代表只有在等待ajax执行完毕后才执行后续代码
+        //             success: function (data) {
+        //                 if (data.result == 'success') {
+        //                     $("#FAbilityLevelID").empty();
+        //                     selectabilityLevel = $("#FAbilityLevelID").select2({
+        //                         data: data.list,
+        //                         placeholder: '请选择能力等级',
+        //                         language: "zh-CN"
+        //                     });
+        //                 }
+        //                 if (data.result == 'error') {
+        //                     toastr.error(data.error)
+        //                 }
+        //             },
+        //             error: function (e) {
+        //                 toastr.error(e.status);
+        //                 toastr.error(e.responseText);
+        //             }
+        //         });
+        //     }
+        // });
+
+
+        // 初始化适用专业
+        selectFMajor = $("#courseForm select[name='FMajor']").select2({
+            placeholder: '请选择适用专业',
+            ajax: {
+                type: 'POST',
+                url: "/s/major/queryDatamajorSelectsql",
+                dataType: 'json',
+                data: function (params) {
+                    return {
+                        search: params.term,
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.list
+                    };
+                },
+                delay: 800,
+                cache: true
+            },
+            language: "zh-CN"
+        });
+
+
+        // var FKKDW = $("#FKKDW").select2({
+        //     placeholder: '请选择开课单位',
+        //     ajax: {
+        //         type: 'POST',
+        //         url: "/s/college/queryDatacollegeSelect",
+        //         dataType: 'json',
+        //         data: function (params) {
+        //             return {
+        //                 search: params.term,
+        //             };
+        //         },
+        //         processResults: function (data) {
+        //             return {
+        //                 results: data.list
+        //             };
+        //         },
+        //         delay: 800,
+        //         cache: true
+        //     },
+        //     language: "zh-CN"
+        // });
+
+        // 开课单位
+        selectFKKDW = $("#courseForm select[name='FKKDW']").select2({
+            placeholder: '请选择开课单位',
+            ajax: {
+                type: 'POST',
+                url: "/s/college/queryDatacollegeSelect",
+                dataType: 'json',
+                data: function (params) {
+                    return {
+                        search: params.term,
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.list
+                    };
+                },
+                delay: 800,
+                cache: true
+            },
+            language: "zh-CN"
+        });
+
+        // 初始化先修课
+        selectPrerequisites = $("#courseForm select[name='FPrerequisites']").select2({
+            placeholder: '请选择先修课',
+            ajax: {
+                type: 'POST',
+                url: "/s/course/queryDatacourseSelectzs",
+                dataType: 'json',
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        FCourseID: FCourseID
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.list
+                    };
+                },
+                delay: 800,
+                cache: true
+            },
+            language: "zh-CN"
+        });
+
+
+        // 修改操作时读取表单信息
+        if (op == 2) {
+            var id = getQueryStringByName('id');
+            FCourseID = id;
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/course/querycourseInfo', // 调用地址
+                data: JSON.stringify({
+                    id: id
+                }),
+                async: false,
+                success: function (data) {
+
+                    $('#FName').val(data.info.FName);
+                    $('#FNo').val(data.info.FNo);
+                    $('#FCon').val(data.info.FCon);
+                    $('#FPassScore').val(data.info.FPassScore);
+                    $('#FFullScore').val(data.info.FFullScore);
+                    $('#FKKDW').val(data.info.FKKDW);
+
+                    $('#FSJZS').val(data.info.FSJZS);
+                    $('#FYWName').val(data.info.FYWName);
+                    selectFIstk.val(data.info.FIstk).change();
+                    selectFJYXQ.val(data.info.FJYXQ).change();
+                    selectFJYXNXQ.val(data.info.FJYXNXQ).change();
+                    selectFJCZYK.val(data.info.FJCZYK).change();
+
+                    // $.ajax({
+                    //     type: 'POST',
+                    //     contentType: 'application/json;charset=UTF-8',
+                    //     url: '/s/abilitylevel/queryDataabilitylevelSelectld',
+                    //     data: JSON.stringify({
+                    //         abilityID: data.info.FAbilityID
+                    //     }),
+                    //     async: false, // false代表只有在等待ajax执行完毕后才执行后续代码
+                    //     success: function (data) {
+                    //         if (data.result == 'success') {
+                    //             $("#FAbilityLevelID").empty();
+                    //             selectabilityLevel = $("#FAbilityLevelID").select2({
+                    //                 data: data.list,
+                    //                 placeholder: '请选择能力等级',
+                    //                 language: "zh-CN"
+                    //             });
+                    //         }
+                    //         if (data.result == 'error') {
+                    //             toastr.error(data.error)
+                    //         }
+                    //     },
+                    //     error: function (e) {
+                    //         toastr.error(e.status);
+                    //         toastr.error(e.responseText);
+                    //     }
+                    // });
+
+                    // var option = new Option(data.info.FAbilityLevelName, data.info.FAbilityLevelID, true, true);
+                    // selectabilityLevel.append(option);
+                    // selectabilityLevel.val(data.info.FAbilityLevelID).change();
+
+                    // var option = new Option(data.info.FAbilityName, data.info.FAbilityID, true, true);
+                    // selectability.append(option);
+                    // selectability.change();
+                    if(data.info.FCNatureName){
+                        option = new Option(data.info.FCNatureName, data.info.FCNature, true, true);
+                        selectcoursenature.append(option);
+                        selectcoursenature.change();
+                    }
+
+
+                    if(data.info.FTypeID){
+                        $("#FType").select2ztree('val', [data.info.FTypeID]);
+                        FTypeIDS = data.info.FTypeID;
+
+                    }
+
+                    $('#FWeeklyStudyHours').val(data.info.FWeeklyStudyHours);
+                    $('#FTheoreticalStudyHours').val(data.info.FTheoreticalStudyHours);
+                    $('#FPracticalStudyHours').val(data.info.FPracticalStudyHours);
+
+                    if (data.info.FKKQJ == 1) {
+                        $('#FKKQJ').prop('checked', true);
+                    } else {
+                        $('#FKKQJ').prop('checked', false);
+                    }
+
+                    if (data.info.FKKCJ == 1) {
+                        $('#FKKCJ').prop('checked', true);
+                    } else {
+                        $('#FKKCJ').prop('checked', false);
+                    }
+
+                    if (data.info.FDXQ == 1) {
+                        $('#FDXQ').prop('checked', true);
+                    } else {
+                        $('#FDXQ').prop('checked', false);
+                    }
+
+                    globalVar1 = data.info.FKKQJ; // 开课秋季 的全局变量
+                    globalVar2 = data.info.FKKCJ; // 开课春季 的全局变量
+                    globalVar3 = data.info.FDXQ; // 短学期 的全局变量
+                    $('#FJYXNXQ').val(data.info.FJYXNXQ);
+                    $('#FTotalHours').val(data.info.FTotalHours);
+                    $('#FCredits').val(data.info.FCredits);
+                    // $('#FMajor').val(data.info.FMajor);
+                    // $('#FPrerequisites').val(data.info.FPrerequisites);
+                    $('#FTeachingRequirements').val(data.info.FTeachingRequirements);
+                    $('#FKeyID').val(data.info.key);
+
+
+                    if(selectFMajor){
+                        selectFMajor.empty();
+                        data.info.majorlist.forEach(item => {
+                            var option = new Option(item.name, item.id, true, true);
+                            selectFMajor.append(option);
+                        });
+                    }
+
+                    if(selectPrerequisites){
+                        selectPrerequisites.empty();
+                        data.info.prerequisitelist.forEach(item => {
+                            var option = new Option(item.name, item.id, true, true);
+                            selectPrerequisites.append(option);
+                        });
+                    }
+
+                    if(selectFKKDW){
+                        selectFKKDW.empty();
+                        data.info.kkdwlist.forEach(item => {
+                            var option = new Option(item.name, item.id, true, true);
+                            selectFKKDW.append(option);
+                        });
+                    }
+
+
+                    // var option = new Option(data.info.FKKDWName, data.info.FKKDW, true, true);
+                    // FKKDW.append(option);
+                    // FKKDW.change();
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        }
+
+
+        var rulesstr = {
+            FName: {
+                required: true
+            },
+            // FAbilityID: {
+            //     required: true
+            // },
+            // FAbilityLevelID: {
+            //     required: true
+            // },
+            FNo: {
+                required: true
+            },
+
+
+
+
+            FPassScore: {
+                // required: true,
+                lessThanOrEqual: "#FFullScore"
+            },
+            // FFullScore: {
+            //     required: true
+            // },
+            FTotalHours: {
+                required: true
+            }
+            , FCredits: {
+                required: true
+            },
+            FType: {
+                required: true
+            },
+            FCNature: {
+                required: true,
+
+            },
+            FWeeklyStudyHours: {
+                required: true
+            },
+            FTheoreticalStudyHours: {
+                required: true
+            },
+            FPracticalStudyHours: {
+                required: true
+            },
+        };
+        var messagesstr = {
+            FName: {
+                required: '*请输入课程名称'
+            },
+            // FAbilityID: {
+            //     required: '*请选择能力'
+            // },
+            // FAbilityLevelID: {
+            //     required: '*请选择能力等级'
+            // },
+            FNo: {
+                required: '*请输入课程编号'
+            },
+            // FPassScore: {
+            //     required: '*请输入合格分数'
+            // },
+            // FFullScore: {
+            //     required: '*请输入满分'
+            // },
+            FTotalHours: {
+                required: '*请输入学时'
+            },
+            FCredits: {
+                required: '*请输入学分'
+            },
+            FType: {
+                required: '*请选择课程类别'
+            },
+            FCNature: {
+                required: '*请选择课程性质',
+            },
+            FWeeklyStudyHours: {
+                required: '*请输入周学时'
+            },
+            FTheoreticalStudyHours: {
+                required: '*请输入理论学时'
+            },
+            FPracticalStudyHours: {
+                required: '*请输入实践学时'
+            },
+        }
+        $.validator.addMethod("lessThanOrEqual", function (value, element, param) {
+            var fullScore = $(param).val();
+            if (fullScore)
+                return parseFloat(value) <= parseFloat(fullScore);
+            else {
+                return true;
+            }
+        }, "*合格分数不能大于满分!");
+        // 检验数据
+        var userValidate = $('#courseForm').validate({
+            rules: rulesstr,
+            messages: messagesstr,
+            onfocusout: false, // 是否在获取焦点时验证
+            onkeyup: false, // 是否在敲击键盘时验证
+            focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+            focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+            success: 'valid',
+            submitHandler: function () {
+                // 获取参数
+                var data = form2Json('courseForm');
+                data['FKKQJ'] = globalVar1;
+                data['FKKCJ'] = globalVar2;
+                data['FDXQ'] = globalVar3;
+                // 获取菜单信息
+                var majorlist = [];
+                if(selectFMajor){
+                    selectFMajor.select2('data').forEach((item) => {
+                        majorlist.push(item.id);
+                    });
+                }
+                var Prerequisiteslist = [];
+                if(selectPrerequisites){
+                    selectPrerequisites.select2('data').forEach((item) => {
+                        Prerequisiteslist.push(item.id);
+                    });
+                }
+
+                var kkdwlist= [];
+                if(selectFKKDW){
+                    selectFKKDW.select2('data').forEach((item) => {
+                        kkdwlist.push(item.id);
+                    });
+                }
+                data['FMajorlist'] = majorlist;
+                data['FPrerequisiteslist'] = Prerequisiteslist;
+                data['FKKDWlist'] = kkdwlist;
+                // if(op==2)
+                //     data['FType'] =FTypeIDS;
+                if (op == 1) { // 添加操作
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/course/addcourse', // 调用地址
+                        data: JSON.stringify(data),
+                        async: false,
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                parent.$('#mainTable').DataTable().ajax.reload(null, false);
+                                parent.toastr.success('添加成功！');
+                                layer_close();
+                            } else if (data.result == 'fail') {
+                                toastr.warning('课程编号重复，请重新输入');
+                            } else if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                } else {
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/course/updatecourse', // 调用地址
+                        data: JSON.stringify(data),
+                        async: false,
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                if (getQueryStringByName('ftype')) {
+                                    layer_close();
+                                } else {
+                                    parent.$('#mainTable').DataTable().ajax.reload(null, false);
+                                    parent.toastr.success('修改成功！');
+                                    layer_close();
+                                }
+
+                            } else if (data.result == 'fail') {
+                                toastr.warning('课程编号重复，请重新输入');
+                            } else if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                }
+            }
+        });
+    });
+
+    // 验证输入是否为数字（包括小数点）
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        // 允许数字、小数点、退格键、删除键、方向键
+        if (charCode > 31 && (charCode < 48 || charCode > 57) && charCode !== 46) {
+            return false;
+        }
+        return true;
+    }
+
+    // 计算总学时
+    function calculateTotalHours() {
+        // 获取输入值，转换为数字（空值或非数字则为0）
+        // const weeklyHours = parseFloat(document.getElementById('FWeeklyStudyHours').value) || 0;
+        const theoreticalHours = parseFloat(document.getElementById('FTheoreticalStudyHours').value) || 0;
+        const practicalHours = parseFloat(document.getElementById('FPracticalStudyHours').value) || 0;
+
+        // 计算总和
+        // const totalHours = weeklyHours + theoreticalHours + practicalHours;
+        const totalHours = theoreticalHours + practicalHours;
+
+        // 设置总学时值（保留两位小数，避免浮点运算问题）
+        document.getElementById('FTotalHours').value = totalHours.toFixed(2).replace(/\.00$/, '');
+    }
+</script>
+</body>
+</html>

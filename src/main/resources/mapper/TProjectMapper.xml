@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fun.server.mapper.TProjectMapper">
+  <resultMap id="BaseResultMap" type="fun.server.model.TProject">
+    <!--
+    @mbg.generated
+    -->
+    <constructor>
+      <idArg column="FKeyID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FUID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FCDATE" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FUDATE" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FUserID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FDate" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FState" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FName" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FNo" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FCustomerID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FAsk" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FNote" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FTypeID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FLevelID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FLeadUserID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FSDate" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FEDate" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FStartDate" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FEndDate" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="FMaterialID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FDeptID" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FContractNo" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FSecret" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="FFrom" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FFunds" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FSysNo" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FSysNoNum" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="FYYMMNum" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="FInsideNo" javaType="java.lang.String" jdbcType="VARCHAR" />
+    </constructor>
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <!--
+    @mbg.generated
+    -->
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <!--
+    @mbg.generated
+    -->
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    <!--
+    @mbg.generated
+    -->
+    FKeyID, FCID, FUID, FCDATE, FUDATE, FUserID, FDate, FState, FName, FNo, FCustomerID, 
+    FAsk, FNote, FTypeID, FLevelID, FLeadUserID, FSDate, FEDate, FStartDate, FEndDate, 
+    FMaterialID, FDeptID, FContractNo, FSecret, FFrom, FFunds, FSysNo, FSysNoNum, FYYMMNum, 
+    FInsideNo
+  </sql>
+
+    <!--查询采购订单所属项目的集合-->
+    <select id="getGroupID" resultType="fun.server.model.customQuery.TProject_applyGroupID">
+    SELECT a.FProjectID as projectID FROM (
+	    SELECT IFNULL(FProjectID,'') AS FProjectID FROM `t_design_purchase_apply`
+	    GROUP BY FProjectID) AS a
+    WHERE a.FProjectID != ''
+  </select>
+
+    <!--查询项目绑定模具列表-->
+    <select id="getprojectMaterial" resultType="fun.server.model.customQuery.TProjectMaterialList">
+    SELECT boms.FKeyID as fkeyid,tm.FKeyID as FMID ,tm.FNo,tm.FName
+    from t_bom_s boms
+        LEFT JOIN t_bom_m bomm
+            ON boms.FBomMID= bomm.FKeyID
+        LEFT JOIN t_project project
+            ON project.FMaterialID= bomm.FMaterialID and bomm.FShow=1
+        LEFT JOIN t_material tm
+            ON tm.FKeyID= boms.FMaterialID
+        WHERE 1=1
+        <if test="search != null and search!=''">
+          <if test="FType == 1">
+            AND tm.FNo LIKE concat('%',#{search},'%')
+          </if>
+          <if test="FType == 2">
+            AND tm.FName LIKE concat('%',#{search},'%')
+          </if>
+        </if>
+        AND project.FKeyID= #{FProjectID}
+        <if test="FSType == 1">
+            AND boms.FFID != -1
+        </if>
+        <if test="FSType == 2">
+            AND boms.FFID = -1
+        </if>
+        order by tm.FCDATE
+  </select>
+</mapper>

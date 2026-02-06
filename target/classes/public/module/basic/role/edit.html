@@ -1,0 +1,199 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <!--/_only 独立样式 -->
+</head>
+<body>
+<article class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="roleForm">
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>名称：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="f_name"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">权限：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <ul id="rolePowerTree" class="ztree"
+                    style="width:338px; height:300px; overflow:auto; border: 1px solid #617775; background: #f7f7f7;"></ul>
+            </div>
+        </div>
+        <div class="toolbar-bottom-line"></div>
+        <div class="toolbar-bottom-btn">
+            <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+            <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                   onclick="layer_close()"/>
+        </div>
+        <input type="hidden" value="" name="f_key_id"/>
+    </form>
+</article>
+
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript">
+    // 编辑框状态 1新建 2修改
+    var op = getQueryStringByName('op');
+    // 权限树
+    var powerZTree;
+    // 业务代码
+    $(function () {
+        // 初始化权限树
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/s/role/showPowerTree', // 调用地址
+            async: false,
+            success: function (data) {
+                var zTreeSetting = {
+                    check: {
+                        enable: true
+                    },
+                    data: {
+                        simpleData: {
+                            enable: true,
+                            idKey: "id",
+                            pIdKey: "pId",
+                            rootPId: 0
+                        }
+                    }
+                };
+                powerZTree = $.fn.zTree.init($('#rolePowerTree'), zTreeSetting, data);
+            },
+            error: function (e) {
+                toastr.error(e.status);
+                toastr.error(e.responseText);
+            }
+        });
+        // 修改操作时读取表单信息
+        if (op == 2) {
+            var id = getQueryStringByName('id');
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/role/queryRoleInfo', // 调用地址
+                data: JSON.stringify({
+                    id
+                }),
+                async: false,
+                success: function (data) {
+                    // 表单信息
+                    $("#roleForm input[name='f_name']").val(data.info.f_name);
+                    $("#roleForm input[name='f_key_id']").val(data.info.key);
+                    // 权限菜单
+                    var nodes = data.info.nodes;
+                    // 去重并过滤无效值
+                    nodes = [...new Set(nodes.filter(id => id !== null && id !== undefined))];
+
+                    for (var i = 0; i < nodes.length; i++) {
+                        var node = powerZTree.getNodeByParam('id', nodes[i]);
+                        if (node && node.isParent === false) {
+                            powerZTree.checkNode(node, true, true);
+                        }
+                    }
+
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        }
+        // 检验数据
+        $('#roleForm').validate({
+            rules: {
+                f_name: {
+                    required: true
+                }
+            },
+            messages: {
+                f_name: {
+                    required: '*请输入名称'
+                }
+            },
+            onfocusout: false, // 是否在获取焦点时验证
+            onkeyup: false, // 是否在敲击键盘时验证
+            focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+            focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+            success: 'valid',
+            submitHandler: function () {
+                $("body").mLoading("show");
+                setTimeout(function () {
+                    // 获取权限树选择情况
+                    var nodes = powerZTree.getChangeCheckedNodes().map((item) => {
+                        return item.id;
+                    });
+
+                    console.log("nodes:" + nodes);
+                    // 获取参数
+                    var data = form2Json('roleForm');
+                    data['nodes'] = nodes;
+                    // 执行
+                    if (op == 1) { // 添加操作
+                        $.ajax({
+                            type: 'POST',
+                            contentType: 'application/json',
+                            url: '/s/role/addRole', // 调用地址
+                            data: JSON.stringify(data),
+                            async: false,
+                            success: function (data) {
+                                $("body").mLoading("hide");
+                                if (data.result == 'success') {
+                                    parent.$('#roleTable').DataTable().ajax.reload(null, false);
+                                    parent.toastr.success('添加成功！');
+                                    layer_close();
+                                } else if (data.result == 'error') {
+                                    toastr.error(data.error);
+                                }
+                            },
+                            error: function (e) {
+                                $("body").mLoading("hide");
+                                toastr.error(e.status);
+                                toastr.error(e.responseText);
+                            }
+                        });
+                    } else {
+                        $.ajax({
+                            type: 'POST',
+                            contentType: 'application/json',
+                            url: '/s/role/updateRole', // 调用地址
+                            data: JSON.stringify(data),
+                            async: false,
+                            success: function (data) {
+                                $("body").mLoading("hide");
+                                if (data.result == 'success') {
+                                    parent.$('#roleTable').DataTable().ajax.reload(null, false);
+                                    parent.toastr.success('修改成功！');
+                                    layer_close();
+                                } else if (data.result == 'error') {
+                                    toastr.error(data.error);
+                                }
+                            },
+                            error: function (e) {
+                                $("body").mLoading("hide");
+                                toastr.error(e.status);
+                                toastr.error(e.responseText);
+                            }
+                        });
+                    }
+                }, 200);
+            }
+        });
+    });
+</script>
+</body>
+</html>

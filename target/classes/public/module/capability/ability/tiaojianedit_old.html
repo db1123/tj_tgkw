@@ -1,0 +1,247 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <!--/_only 独立样式 -->
+</head>
+<body>
+<article class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="abilitytlevelForm">
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>能力：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="FNName" id="FNName" disabled="disabled"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>能力等级：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="FDName" id="FDName" disabled="disabled"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>条件名称：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="FConditionName" id="FConditionName"/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>条件类型：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <select id="FConditionType" name="FConditionType" class="FConditionTypes"
+                        style="width: 100%;">
+                    <option value="1">数值</option>
+                    <option value="2">布尔值</option>
+                    <option value="3">字符串</option>
+                </select>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>条件值：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <div id="wenben1" style="display: block;">
+                    <input type="text" class="input-text" name="FConditionValue" id="FConditionValue"/>
+                </div>
+                <div id="danyuan1" style="display: none;">
+                    <input type="radio" value="是" name="FConditionValueradio" checked="checked" />是 <input type="radio" value="否" name="FConditionValueradio" />否
+                </div>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>条件分数：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="FConditionScore" id="FConditionScore"/>
+            </div>
+        </div>
+
+        <div class="toolbar-bottom-line"></div>
+        <div class="toolbar-bottom-btn">
+            <input class="btn btn-primary radius mr-20" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;"/>
+            <input class="btn btn-default radius ml-20" type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"
+                   onclick="layer_close()"/>
+        </div>
+        <input type="hidden" value="" name="FKeyID" id="FKeyID"/>
+        <input type="hidden" value="" name="FAbilityID" id="FAbilityID"/>
+        <input type="hidden" value="" name="FAbilityLevelID" id="FAbilityLevelID"/>
+    </form>
+</article>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript">
+    var xmname = parent.abilityName;
+    var dmname = parent.LevelName;
+    var FAbilityID = getQueryStringByName('FAbilityID');
+    var FAbilityLevelID = getQueryStringByName('FAbilityLevelID');
+    console.log(FAbilityLevelID);
+    var op = getQueryStringByName('op');
+    // 业务代码
+    $(function () {
+        $('#FNName').val(xmname);
+        $('#FDName').val(dmname);
+        $('#FAbilityID').val(FAbilityID);
+        $('#FAbilityLevelID').val(FAbilityLevelID);
+        $("#FConditionType").select2({
+            placeholder: '请选择条件类型',
+            language: "zh-CN"
+        });
+        $('#FConditionType').change(function() {
+            // Show the selected div
+            var selectedOption = $(this).val();
+            if(selectedOption == 2){
+                $('#danyuan1').show();
+                $('#wenben1').hide();
+
+            }else{
+                $('#danyuan1' ).hide();
+                $('#wenben1').show();
+            }
+        });
+        // 修改操作时读取表单信息
+        if (op == 2) {
+            var id = getQueryStringByName('id');
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/abilitycondition/queryabilityconditionInfo', // 调用地址
+                data: JSON.stringify({
+                    id: id
+                }),
+                async: false,
+                success: function (data) {
+                    $('#FConditionName').val(data.info.FConditionName);
+                    $('#FConditionType').val(data.info.FConditionType).change();
+                    $('#FConditionValue').val(data.info.FConditionValue);
+                    $('#FConditionScore').val(data.info.FConditionScore);
+                    $('#FKeyID').val(data.info.key);
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        }
+        // 检验数据
+        var userValidate = $('#abilitytlevelForm').validate({
+            rules: {
+                FConditionName: {
+                    required: true,
+                    levelLimit: false
+                },
+                FConditionType: {
+                    required: true,
+
+                },
+                FConditionValue: {
+                    required: true,
+
+                },
+                FConditionScore: {
+                    required: true,
+
+                },
+            },
+            messages: {
+                FConditionName: {
+                    required: '*请输入条件名称'
+                },
+                FConditionType: {
+                    required: '*请输入条件类型'
+                },
+                FConditionValue: {
+                    required: '*请输入条件值'
+                },
+                FConditionScore: {
+                    required: '*请输入满足条件的分数'
+                },
+            },
+            onfocusout: false, // 是否在获取焦点时验证
+            onkeyup: false, // 是否在敲击键盘时验证
+            focusInvalid: false, //提交表单后，（第一个）未通过验证的表单获得焦点
+            focusCleanup: true, // 当未通过验证的元素获得焦点时，移除错误提示
+            success: 'valid',
+            submitHandler: function () {
+                // 获取参数
+                var data = form2Json('abilitytlevelForm');
+                data['FAbilityID'] = FAbilityID;
+                data['FAbilityLevelID'] = FAbilityLevelID;
+                if($("#FConditionType").val() == 2 ){
+                    var selectedValue = $('input[name="FConditionValueradio"]:checked').val();
+
+                    data['FConditionValue'] = selectedValue;
+                }else{
+                    data['FConditionValue'] = $("#FConditionValue").val();
+                }
+                if (op == 1) { // 添加操作
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/abilitycondition/newaddabilitylevelCondition', // 调用地址
+                        data: JSON.stringify(data),
+                        async: false,
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                parent.reloadtiaojiantable();
+                                parent.toastr.success('添加成功！');
+                                layer_close();
+                            } else if (data.result == 'fail') {
+                                toastr.warning('条件名称重复，请重新输入');
+                            } else if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                } else {
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/abilitycondition/updateabilitylevelCondition', // 调用地址
+                        data: JSON.stringify(data),
+                        async: false,
+                        success: function (data) {
+                            if (data.result == 'success') {
+                                parent.reloadtiaojiantable();
+                                parent.toastr.success('修改成功！');
+                                layer_close();
+                            } else if (data.result == 'fail') {
+                                toastr.warning('条件名称重复，请重新输入');
+                            } else if (data.result == 'error') {
+                                toastr.error(data.error);
+                            }
+                        },
+                        error: function (e) {
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

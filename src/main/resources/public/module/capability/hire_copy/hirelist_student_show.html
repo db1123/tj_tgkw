@@ -1,0 +1,273 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+    <!-- 引入 toastr 样式 -->
+    <link rel="stylesheet" href="/plugins/toastr/toastr.min.css">
+    <!--/_only 独立样式 -->
+</head>
+<style type="text/css">
+    .open-work-control2 {
+        cursor: pointer;
+    }
+
+    .open-work-control3 {
+        cursor: pointer;
+    }
+
+    .open-work-control4 {
+        cursor: pointer;
+    }
+  
+    .select2-container--default .select2-selection--single .select2-selection__placeholder {
+        color: B3B3B3;
+        font-size: 12px;
+    }
+</style>
+<body>
+<!-- AI匹配列表 -->
+<div class="">
+    <div class="f-l" style="width: 49%; margin-top: 3px;">
+        <div class="row cl">
+            <div class="col-md-8 col-sm-8 col-xs-8" style="width: 99.8%;">
+                <div class="panel panel-default">
+                    <div class="panel-header">AI匹配结果&nbsp;
+                    </div>
+                    <div class="panel-body">
+                        <table id="mainTable" class="display compact" style="width: 99%;"></table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-4 col-xs-4">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 学生列表 -->
+<div class="">
+    <div class="f-l" style="width: 49%; margin-top: 3px; margin-left: 15px;">
+        <div class="row cl">
+            <div class="col-md-8 col-sm-8 col-xs-8" style="width: 99.8%;">
+                <div class="panel panel-default">
+                    <div class="panel-header">所有学生列表&nbsp;
+                    </div>
+                    <div class="panel-body">
+                        <table id="mainTable_student" class="display compact" style="width: 99%;"></table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-4 col-xs-4">
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<!-- 引入 toastr 脚本 -->
+<script src="/plugins/toastr/toastr.min.js"></script>
+<script type="text/javascript">
+    
+    var hire_id = getQueryStringByName('fkeyid'); //招聘ID
+    var interface_id = getQueryStringByName('interface_id'); //AI数据接口ID
+    // 业务代码
+    $(function () {
+        // AI匹配数据查看
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json;charset=UTF-8',
+            url: '/s/ai_interface/hire_interface_search',
+            data: JSON.stringify({
+                id: interface_id,
+            }),
+            success: function (data) {
+                if (data.result === 'success') {
+                    try {
+                        // 将 data.ai_result 从字符串转换为数组
+                        var aiResult = JSON.parse(data.ai_result);
+                        if (aiResult && aiResult.length > 0) {
+                            var firstRow = aiResult[0];
+                            var columns = [];
+                            for (var key in firstRow) {
+                                if (firstRow.hasOwnProperty(key)) {
+                                    columns.push({ title: key, data: key });
+                                }
+                            }
+                            var table = $('#mainTable').DataTable({
+                            	//////////////
+					            scrollY: (document.body.clientHeight - 100) + 'px',
+					            scrollX: true,
+					            paging: true, // 是否开启本地分页
+					            pageLength: 15, // 改变初始化页长度（每页多少条数据）
+					            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+					            lengthChange: false, // 是否允许因子改变表格每页显示的记录数
+					            searching: false, // 是否允许Datatables开启本地搜索
+					            ordering: true, // 是否允许Datatables开启排序
+					            info: true, // 控制是否显示表格左下角的信息
+					            order: [[0, 'asc'], [1, 'asc']],
+					            language: DataTablesLanguage,
+                            	
+                            	//////////////
+                                data: aiResult,
+                                columns: columns
+                            });
+                        } else {
+                            toastr.warning('没有可用数据');
+                        }
+                    } catch (error) {
+                        toastr.error('数据解析失败: ' + error.message);
+                    }
+                }
+                if (data.result === 'error') {
+                    toastr.error(data.error);
+                }
+            },
+            error: function (e) {
+                console.error(e); // 打印错误信息，方便调试
+                toastr.error('AJAX 请求失败: ' + e.status + ' ' + e.statusText);
+            }
+        });
+        
+        
+        
+        // 学生列表封装表格
+       var mainTable = $('#mainTable_student').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/hireStudent/querytstudent', // 调用地址
+                data: function (d) {
+                    return JSON.stringify($.extend({}, d, {
+                        page: d.start / d.length + 1, // 当前页
+                        results: d.length, // 每页显示条数
+                        name: $('.form-text-FName').val(),//学生名称
+                        dataall: 1
+                    }));
+                },
+                dataSrc: function (json) {
+                    json.recordsFiltered = json.total;  // 总行数
+                    json.recordsTotal = json.page; // 当前页数
+                    return json.list;
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+            },
+            columns: [
+
+                {title: '学生姓名', data: 'FName', class: 'open-work-control2'},
+                {
+                    title: '学生性别', data: 'FSex', class: 'open-work-control2',
+                    render: function (data, type, row) {
+                        if (data == 0) {
+                            return "男";
+                        } else if (data == 1) {
+                            return "女";
+                        } else {
+                            return "未选择"
+                        }
+                    }
+                },
+                {title: '身份证号', data: 'FIDNumber', class: 'open-work-control2'},
+                {title: '联系电话', data: 'FTel', class: 'open-work-control2'},
+                {title: '邮箱', data: 'FEmail', class: 'open-work-control2'},
+                {title: '能力积分', data: 'FPoints', class: 'open-work-control2'},
+                {
+                    title: '能力报告',
+                    data: 'FState',
+                    width: 90,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<button type="button" class="btn btn-secondary size-MINI" onclick="Hire_report_show(\'' + row.key + '\')"><i class="fas fa-edit"></i>学生能力报告</button>';
+                  			
+                    }
+                },
+                {
+                    title: '操作',
+                    data: 'FState',
+                    width: 50,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<button type="button" class="btn btn-success size-MINI" onclick="Hire(\'' + row.key + '\' ,\'' + row.FPoints + '\' )"><i class="fas fa-edit"></i>聘用</button>';
+                    }
+                }
+            ],
+            scrollY: (document.body.clientHeight - 100) + 'px',
+            scrollX: true,
+            paging: true, // 是否开启本地分页
+            pageLength: 15, // 改变初始化页长度（每页多少条数据）
+            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+            lengthChange: false, // 是否允许因子改变表格每页显示的记录数
+            searching: false, // 是否允许Datatables开启本地搜索
+            ordering: true, // 是否允许Datatables开启排序
+            info: true, // 控制是否显示表格左下角的信息
+            order: [[0, 'asc'], [1, 'asc']],
+            language: DataTablesLanguage
+        });
+    }); 
+
+  //聘用学生
+    function Hire(stu_fkeyid, stu_point) {
+        // 弹出确认框，询问用户是否要聘用该学生
+        layer.confirm('是否决定聘用该学生？', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/hireStudent/stu_matchStudent',
+                data: JSON.stringify({
+                    stu_fkeyid: stu_fkeyid,
+                    hire_id: hire_id,
+                    stu_point: stu_point
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#mainTable_student').DataTable().ajax.reload(null, false);
+                        toastr.success('聘用成功！');
+                        // location.href = 'hirelist_student.html';
+                        //$('#mainTable').DataTable().ajax.reload(null, false);
+
+                    }
+                    if (data.result == 'fail') {
+                        toastr.success('该学生已被聘用！');
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error);
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+    //用户画像展示
+    function Hire_report_show(stu_fkeyid) {
+    	 layer_show('学生能力报告', '/module/capability/student/report/report.html?userid=' + stu_fkeyid + '&ftype=2', '', '');
+    }
+
+</script>
+</body>
+</html>
+    

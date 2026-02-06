@@ -1,0 +1,1114 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <!-- 引入Font Awesome图标 -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!--/_only 独立样式 -->
+
+    <style>
+        /* 适配后台管理系统的基础样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", "微软雅黑", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            font-size: 14px;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page-container {
+            width: 100%;
+            height: 100vh;
+            padding: 2px !important;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 颜色变量（适配后台系统风格） */
+        :root {
+            --color-primary: #1E9FFF; /* 后台常用蓝色 */
+            --color-success: #5CB85C; /* 成功绿 */
+            --color-warning: #F0AD4E; /* 警告橙 */
+            --color-danger: #D9534F; /* 危险红 */
+            --color-neutral-100: #f8f9fa;
+            --color-neutral-200: #e9ecef;
+            --color-neutral-300: #dee2e6;
+            --color-neutral-600: #6c757d;
+            --color-neutral-700: #495057;
+            --color-neutral-800: #343a40;
+            --color-white: #FFFFFF;
+            --color-black: #000000;
+            --border-radius: 4px; /* 适配后台圆角风格 */
+            --box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        /* 页面头部（替代弹窗头部） */
+        .page-header {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--color-neutral-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f8f8f8;
+        }
+
+        .page-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-neutral-800);
+            display: flex;
+            align-items: center;
+        }
+
+        .page-title i {
+            color: var(--color-primary);
+            margin-right: 8px;
+        }
+
+        .page-header-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .course-count-text {
+            font-size: 13px;
+            color: var(--color-neutral-600);
+            margin-right: 12px;
+        }
+
+        .course-count-text span {
+            color: var(--color-primary);
+            font-weight: 500;
+        }
+
+        /* 课程标签容器（适配后台标签页） */
+        .tabs-wrapper {
+            border-bottom: 1px solid var(--color-neutral-200);
+            position: relative;
+            background-color: #fff;
+        }
+
+        .tabs-container {
+            position: relative;
+            padding: 0 20px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .tabs-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tabs-scroll-indicator {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 20px;
+            height: 100%;
+            background: linear-gradient(to left, white 0%, transparent 100%);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tabs-container:hover .tabs-scroll-indicator {
+            opacity: 1;
+        }
+
+        .tabs-list {
+            display: flex;
+            gap: 4px;
+            padding: 8px 0;
+            min-width: max-content;
+        }
+
+        /* 课程标签基础样式 + 红点容器 */
+        .tab-btn {
+            padding: 8px 16px;
+            border-bottom: 2px solid transparent;
+            background: none;
+            border: none;
+            color: var(--color-neutral-600);
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            position: relative; /* 新增：用于红点定位 */
+        }
+
+        .tab-btn.active {
+            border-bottom-color: var(--color-primary);
+            color: var(--color-primary);
+            font-weight: 500;
+            background-color: rgba(30, 159, 255, 0.05);
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: var(--color-primary);
+            background-color: #f5f5f5;
+        }
+
+        /* 新增：红点提示样式 */
+        .tab-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--color-danger);
+            border-radius: 50%;
+            display: none; /* 默认隐藏 */
+        }
+
+        /* 相似课程数>1时显示红点 */
+        .tab-btn.has-badge .tab-badge {
+            display: block;
+        }
+
+        /* 课程内容容器 */
+        .page-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background-color: #fff;
+            scrollbar-width: thin;
+            scrollbar-color: var(--color-primary) var(--color-neutral-200);
+        }
+
+        .page-content::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .page-content::-webkit-scrollbar-thumb {
+            background-color: var(--color-primary);
+            border-radius: 3px;
+        }
+
+        .page-content::-webkit-scrollbar-track {
+            background-color: var(--color-neutral-200);
+            border-radius: 3px;
+        }
+
+        .course-content {
+            display: none;
+        }
+
+        .course-content.active {
+            display: block;
+        }
+
+        /* 手填课程名称区域 */
+        .manual-course-name {
+            margin-bottom: 20px;
+            background-color: var(--color-neutral-100);
+            padding: 12px 16px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--color-neutral-200);
+        }
+
+        .manual-course-name-label {
+            font-size: 13px;
+            color: var(--color-neutral-600);
+            margin-bottom: 4px;
+        }
+
+        .manual-course-name-value {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--color-neutral-800);
+        }
+
+        /* 相似课程列表 */
+        .similar-courses-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .similar-courses-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-neutral-700);
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 1px dashed var(--color-neutral-200);
+        }
+
+        /* 课程卡片（适配后台表单风格） */
+        .course-card {
+            border: 1px solid var(--color-neutral-200);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            background-color: #fff;
+        }
+
+        .course-card:hover {
+            border-color: var(--color-primary);
+            background-color: rgba(30, 159, 255, 0.05);
+            box-shadow: 0 2px 8px rgba(30, 159, 255, 0.1);
+        }
+
+        .course-card.active {
+            border-color: var(--color-primary);
+            background-color: rgba(30, 159, 255, 0.05);
+            border-left: 3px solid var(--color-primary);
+        }
+
+        .course-card-inner {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        .course-card-content {
+            flex: 1;
+        }
+
+        .course-card-meta {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .course-card-selected {
+            color: var(--color-success);
+            font-weight: 500;
+            font-size: 12px;
+            background-color: rgba(92, 184, 92, 0.1);
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .course-card-match-rate {
+            font-size: 12px;
+            padding: 2px 8px;
+            height: 20px;
+            line-height: 16px;
+            border-radius: 10px;
+        }
+
+        .match-rate-high {
+            background-color: rgba(30, 159, 255, 0.1);
+            color: var(--color-primary);
+        }
+
+        .match-rate-medium {
+            background-color: rgba(240, 173, 78, 0.1);
+            color: var(--color-warning);
+        }
+
+        .course-card-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--color-neutral-800);
+            margin-bottom: 8px;
+        }
+
+        .course-card-details {
+            font-size: 13px;
+            color: var(--color-neutral-600);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .course-card-details span {
+            display: flex;
+            align-items: center;
+        }
+
+        .course-card-details i {
+            margin-right: 4px;
+            font-size: 12px;
+        }
+
+        .course-card-radio {
+            margin-left: 16px;
+            flex-shrink: 0;
+        }
+
+        .course-card-radio input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--color-primary);
+            cursor: pointer;
+        }
+
+        /* 不选择选项卡片（替代原手动输入卡片） */
+        .no-select-card {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--color-neutral-200);
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+
+        .no-select-card:hover {
+            background-color: rgba(30, 159, 255, 0.03);
+        }
+
+        .no-select-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .no-select-label input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--color-primary);
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .no-select-label span {
+            color: var(--color-danger); /* 红色突出不选择选项 */
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* 页面底部操作区（替代弹窗底部） */
+        .page-footer {
+            padding: 12px 20px;
+            border-top: 1px solid var(--color-neutral-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f8f8f8;
+        }
+
+        .progress-text {
+            font-size: 13px;
+            color: var(--color-neutral-600);
+        }
+
+        .progress-text i {
+            color: var(--color-success);
+            margin-right: 4px;
+        }
+
+        .progress-text span {
+            color: var(--color-primary);
+            font-weight: 500;
+        }
+
+        .page-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            line-height: 1;
+        }
+
+        .btn i {
+            margin-right: 4px;
+            font-size: 12px;
+        }
+
+        .btn-text {
+            border: 1px solid var(--color-neutral-300);
+            background-color: #fff;
+            color: var(--color-neutral-700);
+        }
+
+        .btn-text:hover {
+            background-color: #f5f5f5;
+            border-color: var(--color-neutral-400);
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0e90d2;
+        }
+
+        .btn-success {
+            background-color: var(--color-success);
+            color: white;
+            padding: 8px 24px;
+        }
+
+        .btn-success:hover {
+            background-color: #4cae4c;
+        }
+
+        .btn-disabled {
+            background-color: var(--color-neutral-300);
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .btn-disabled:hover {
+            background-color: var(--color-neutral-300);
+        }
+
+        /* 缩放hover效果 */
+        .scale-hover {
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .scale-hover:hover {
+            transform: scale(1.01);
+        }
+
+        /* JSON结果展示区域 */
+        .json-result-container {
+            margin: 20px;
+            padding: 20px;
+            background: var(--color-white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            border: 1px solid var(--color-neutral-200);
+            display: none;
+        }
+
+        .json-result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--color-neutral-200);
+        }
+
+        .json-result-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--color-neutral-800);
+        }
+
+        .json-result-content {
+            background: var(--color-neutral-100);
+            padding: 16px;
+            border-radius: var(--border-radius);
+            overflow-y: auto;
+            max-height: 400px;
+            font-family: "Consolas", "Monaco", monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            border: 1px solid var(--color-neutral-200);
+        }
+
+        /* 复制按钮样式 */
+        .copy-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+        }
+
+        .copy-btn:hover {
+            background-color: #0e90d2;
+        }
+    </style>
+</head>
+<body>
+<div class="page-container" style="padding: 2px;">
+    <!-- 页面头部 -->
+    <div class="page-header">
+<!--        <h3 class="page-title">-->
+<!--            <i class="fa fa-search-plus"></i>-->
+<!--            多课程匹配确认-->
+<!--        </h3>-->
+        <div class="page-header-actions">
+<!--            <span class="course-count-text">-->
+<!--                共 <span id="totalCoursesCount">0</span> 门课程待匹配-->
+<!--            </span>-->
+        </div>
+    </div>
+
+    <!-- 课程切换标签 -->
+    <div class="tabs-wrapper">
+        <div class="tabs-container">
+            <div class="tabs-scroll-indicator"></div>
+            <div class="tabs-list" id="courseTabsContainer">
+                <!-- 动态生成课程标签 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 页面主要内容 -->
+    <div class="page-content" id="courseContentContainer">
+        <!-- 动态生成课程内容 -->
+    </div>
+
+    <!-- 页面底部操作区 -->
+    <div class="page-footer">
+        <!-- 进度提示 -->
+        <div class="progress-text" id="progressText">
+<!--            <i class="fa fa-check-circle"></i>-->
+<!--            已完成 <span>1/10</span> 门课程匹配-->
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="page-actions">
+            <button class="btn btn-text" id="resetBtn">
+                <i class="fa fa-refresh"></i> 重置选择
+            </button>
+            <button class="btn btn-disabled" id="prevBtn" disabled>
+                <i class="fa fa-arrow-left"></i> 上一门
+            </button>
+            <button class="btn btn-primary" id="nextBtn">
+                下一门 <i class="fa fa-arrow-right"></i>
+            </button>
+            <button class="btn btn-success" id="confirmAllBtn">
+                <i class="fa fa-check"></i> 确认所有匹配
+            </button>
+        </div>
+    </div>
+
+    <!-- JSON结果展示区域（默认隐藏） -->
+    <div class="json-result-container" id="jsonResultContainer">
+        <div class="json-result-header">
+            <h4 class="json-result-title">课程匹配结果（JSON）</h4>
+            <button class="copy-btn" id="copyJsonBtn">
+                <i class="fa fa-copy"></i> 复制JSON
+            </button>
+        </div>
+        <div class="json-result-content" id="jsonResultContent">
+            <!-- JSON内容展示 -->
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    // 业务代码
+    $(function () {
+
+        var id = getQueryStringByName('tpid');//培养ID
+
+        const coursesData = top.coursest.ppcourselist;
+
+
+        const courseTabsContainer = document.getElementById('courseTabsContainer');
+        const courseContentContainer = document.getElementById('courseContentContainer');
+        // const progressText = document.getElementById('progressText');
+        // const totalCoursesCount = document.getElementById('totalCoursesCount');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const confirmAllBtn = document.getElementById('confirmAllBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const jsonResultContainer = document.getElementById('jsonResultContainer');
+        const jsonResultContent = document.getElementById('jsonResultContent');
+        const copyJsonBtn = document.getElementById('copyJsonBtn');
+
+        const totalCourses = coursesData.length;
+        let currentCourseId = 1;
+        let selectedCoursesJson = '';
+
+        // ====================== 3. 初始化页面 ======================
+        function initPage() {
+            // 设置总课程数
+            // totalCoursesCount.textContent = totalCourses;
+
+            // 动态生成课程标签
+            generateCourseTabs();
+
+            // 动态生成课程内容
+            generateCourseContents();
+
+            // 初始化进度显示
+            updateProgress(currentCourseId);
+
+            // 初始显示第一个课程
+            switchCourse(currentCourseId);
+
+            // 绑定所有事件
+            bindEvents();
+        }
+
+        // ====================== 4. 动态生成课程标签（新增红点逻辑） ======================
+        function generateCourseTabs() {
+            courseTabsContainer.innerHTML = '';
+
+            coursesData.forEach(course => {
+                const tabBtn = document.createElement('button');
+                // 新增：判断相似课程数>1时添加has-badge类
+                const hasMultipleCourses = course.similarCourses.length > 1;
+                tabBtn.className = `tab-btn ${course.id === 1 ? 'active' : ''} ${hasMultipleCourses ? 'has-badge' : ''}`;
+                tabBtn.setAttribute('data-course-id', course.id);
+
+                // 创建标签文本容器
+                const tabText = document.createTextNode(course.name);
+                tabBtn.appendChild(tabText);
+
+                // 新增：创建红点元素
+                const badge = document.createElement('span');
+                badge.className = 'tab-badge';
+                tabBtn.appendChild(badge);
+
+                courseTabsContainer.appendChild(tabBtn);
+            });
+        }
+
+        // ====================== 5. 动态生成课程内容 ======================
+        function generateCourseContents() {
+            courseContentContainer.innerHTML = '';
+
+            coursesData.forEach(course => {
+                // 创建课程内容容器
+                const courseContent = document.createElement('div');
+                courseContent.className = `course-content ${course.id === 1 ? 'active' : ''}`;
+                courseContent.id = `course-${course.id}`;
+
+                // 手填课程名称区域
+                const manualCourseNameDiv = document.createElement('div');
+                manualCourseNameDiv.className = 'manual-course-name';
+
+                const nameLabel = document.createElement('div');
+                nameLabel.className = 'manual-course-name-label';
+                nameLabel.textContent = '手填课程名称';
+
+                const nameValue = document.createElement('div');
+                nameValue.className = 'manual-course-name-value';
+                nameValue.textContent = course.name;
+
+                manualCourseNameDiv.appendChild(nameLabel);
+                manualCourseNameDiv.appendChild(nameValue);
+                courseContent.appendChild(manualCourseNameDiv);
+
+                // 相似课程列表区域
+                const similarCoursesDiv = document.createElement('div');
+                similarCoursesDiv.className = 'similar-courses-list';
+
+                // 相似课程标题
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'similar-courses-title';
+                titleDiv.textContent = `找到 ${course.similarCourses.length} 个相似课程，请选择匹配项`;
+                similarCoursesDiv.appendChild(titleDiv);
+
+                // 生成相似课程卡片
+                course.similarCourses.forEach(similarCourse => {
+                    const courseCard = document.createElement('div');
+                    courseCard.className = `course-card scale-hover ${similarCourse.isActive ? 'active' : ''}`;
+                    courseCard.setAttribute('data-radio-name', `course-match-${course.id}`);
+                    courseCard.setAttribute('data-similar-id', similarCourse.id);
+
+                    // 匹配度颜色类名
+                    const matchRateClass = similarCourse.matchRate >= 90 ? 'match-rate-high' : 'match-rate-medium';
+
+                    // 卡片内部结构
+                    const cardInner = document.createElement('div');
+                    cardInner.className = 'course-card-inner';
+
+                    // 卡片内容区域
+                    const cardContent = document.createElement('div');
+                    cardContent.className = 'course-card-content';
+
+                    // 卡片元信息（选中状态+匹配度）
+                    const cardMeta = document.createElement('div');
+                    cardMeta.className = 'course-card-meta';
+
+                    // if (similarCourse.isActive) {
+                    //     const selectedSpan = document.createElement('span');
+                    //     selectedSpan.className = 'course-card-selected';
+                    //     selectedSpan.textContent = '已选中';
+                    //     cardMeta.appendChild(selectedSpan);
+                    // }
+
+                    const matchRateSpan = document.createElement('span');
+                    matchRateSpan.className = `course-card-match-rate ${matchRateClass}`;
+                    matchRateSpan.textContent = `匹配度 ${similarCourse.matchRate}%`;
+                    cardMeta.appendChild(matchRateSpan);
+
+                    // 课程名称
+                    const courseName = document.createElement('div');
+                    courseName.className = 'course-card-name';
+                    courseName.textContent = similarCourse.name;
+
+                    // 课程详情（编号+教师）
+                    const courseDetails = document.createElement('div');
+                    courseDetails.className = 'course-card-details';
+
+                    if (similarCourse.courseCode) {
+                        const codeSpan = document.createElement('span');
+                        codeSpan.innerHTML = `<i class="fa fa-bookmark-o"></i>课程编号：${similarCourse.courseCode}`;
+                        courseDetails.appendChild(codeSpan);
+                    }
+
+                    if (similarCourse.teacher) {
+                        const teacherSpan = document.createElement('span');
+                        teacherSpan.innerHTML = `<i class="fa fa-user-o"></i>授课教师：${similarCourse.teacher}`;
+                        courseDetails.appendChild(teacherSpan);
+                    }
+
+                    // 单选按钮区域
+                    const cardRadio = document.createElement('div');
+                    cardRadio.className = 'course-card-radio';
+
+                    const radioInput = document.createElement('input');
+                    radioInput.type = 'radio';
+                    radioInput.name = `course-match-${course.id}`;
+                    radioInput.checked = similarCourse.isActive;
+                    cardRadio.appendChild(radioInput);
+
+                    // 组装卡片
+                    cardContent.appendChild(cardMeta);
+                    cardContent.appendChild(courseName);
+                    if (similarCourse.courseCode || similarCourse.teacher) {
+                        cardContent.appendChild(courseDetails);
+                    }
+
+                    cardInner.appendChild(cardContent);
+                    cardInner.appendChild(cardRadio);
+                    courseCard.appendChild(cardInner);
+
+                    similarCoursesDiv.appendChild(courseCard);
+                });
+
+                // 不选择选项卡片（替代原手动输入卡片）
+                if (course.hasManualInput) {
+                    const noSelectCard = document.createElement('div');
+                    noSelectCard.className = 'no-select-card';
+                    noSelectCard.setAttribute('data-radio-name', `course-match-${course.id}`);
+
+                    // 不选择标签
+                    const noSelectLabel = document.createElement('label');
+                    noSelectLabel.className = 'no-select-label';
+
+                    const noSelectRadio = document.createElement('input');
+                    noSelectRadio.type = 'radio';
+                    noSelectRadio.name = `course-match-${course.id}`;
+                    noSelectLabel.appendChild(noSelectRadio);
+
+                    const labelSpan = document.createElement('span');
+                    labelSpan.innerHTML = '<i class="fa fa-times-circle mr-1"></i>不选择任何课程';
+                    noSelectLabel.appendChild(labelSpan);
+
+                    // 组装不选择卡片（移除输入框）
+                    noSelectCard.appendChild(noSelectLabel);
+                    similarCoursesDiv.appendChild(noSelectCard);
+                }
+
+                // 添加到课程内容容器
+                courseContent.appendChild(similarCoursesDiv);
+                courseContentContainer.appendChild(courseContent);
+            });
+        }
+
+        // ====================== 6. 切换课程显示 ======================
+        function switchCourse(id) {
+            // 更新标签状态
+            document.querySelectorAll('.tab-btn').forEach(tab => {
+                const tabId = parseInt(tab.getAttribute('data-course-id'));
+                if (tabId === id) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+
+            // 更新内容显示
+            document.querySelectorAll('.course-content').forEach(content => {
+                const contentId = parseInt(content.id.split('-')[1]);
+                if (contentId === id) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+
+            // 更新进度和按钮状态
+            updateProgress(id);
+
+            // 滚动到当前标签
+            const activeTab = document.querySelector(`.tab-btn[data-course-id="${id}"]`);
+            activeTab.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+        }
+
+        // ====================== 7. 更新进度和按钮状态 ======================
+        function updateProgress(currentId) {
+            // progressText.innerHTML = `
+            //     <i class="fa fa-check-circle"></i>
+            //     已完成 <span>${currentId}/${totalCourses}</span> 门课程匹配
+            // `;
+
+            // 上一门按钮状态
+            if (currentId === 1) {
+                prevBtn.disabled = true;
+                prevBtn.classList.add('btn-disabled');
+                prevBtn.classList.remove('btn-primary');
+            } else {
+                prevBtn.disabled = false;
+                prevBtn.classList.remove('btn-disabled');
+                prevBtn.classList.add('btn-primary');
+            }
+
+            // 下一门按钮状态
+            if (currentId === totalCourses) {
+                nextBtn.disabled = true;
+                nextBtn.classList.add('btn-disabled');
+                nextBtn.classList.remove('btn-primary');
+            } else {
+                nextBtn.disabled = false;
+                nextBtn.classList.remove('btn-disabled');
+                nextBtn.classList.add('btn-primary');
+            }
+        }
+
+        // ====================== 8. 收集选中的课程数据（返回JSON格式） ======================
+        function collectSelectedCourses() {
+            const selectedCourses = [];
+
+            coursesData.forEach(course => {
+                const radioName = `course-match-${course.id}`;
+                const selectedRadio = document.querySelector(`input[name="${radioName}"]:checked`);
+
+                if (selectedRadio) {
+                    const matchResult = {
+                        "原始课程ID": course.id,
+                        "原始课程名称": course.name,
+                        "匹配类型": "",
+                        "匹配课程ID": "",
+                        "匹配课程名称": "",
+                        "匹配度": "",
+                        "课程编号": "",
+                        "授课教师": "",
+                        "选择状态": ""
+                    };
+
+                    const parentCard = selectedRadio.closest('[data-radio-name]');
+
+                    // 判断是选择现有课程还是不选择
+                    if (parentCard.classList.contains('no-select-card')) {
+                        // 不选择任何课程
+                        matchResult["匹配类型"] = "不选择";
+                        matchResult["选择状态"] = "未选择任何课程";
+                    } else {
+                        // 选择现有课程
+                        matchResult["匹配类型"] = "系统匹配";
+
+                        // 获取相似课程ID
+                        const similarId = parentCard.getAttribute('data-similar-id');
+                        if (similarId) {
+                            matchResult["匹配课程ID"] = parseInt(similarId);
+                        }
+
+                        // 获取课程名称
+                        const courseNameEl = parentCard.querySelector('.course-card-name');
+                        if (courseNameEl) {
+                            matchResult["匹配课程名称"] = courseNameEl.textContent.trim();
+                        }
+
+                        // 获取匹配度
+                        const matchRateEl = parentCard.querySelector('.course-card-match-rate');
+                        if (matchRateEl) {
+                            const matchRateText = matchRateEl.textContent.trim();
+                            const matchRate = matchRateText.replace('匹配度 ', '').replace('%', '');
+                            matchResult["匹配度"] = parseInt(matchRate);
+                        }
+
+                        // 获取课程编号
+                        const codeEl = parentCard.querySelector('.course-card-details span:first-child');
+                        if (codeEl) {
+                            const codeText = codeEl.textContent.trim();
+                            const courseCode = codeText.replace('课程编号：', '');
+                            matchResult["课程编号"] = courseCode;
+                        }
+
+                        // 获取授课教师
+                        const teacherEl = parentCard.querySelector('.course-card-details span:last-child');
+                        if (teacherEl && teacherEl.textContent.includes('授课教师：')) {
+                            const teacherText = teacherEl.textContent.trim();
+                            const teacher = teacherText.replace('授课教师：', '');
+                            matchResult["授课教师"] = teacher;
+                        }
+                    }
+
+                    selectedCourses.push(matchResult);
+                }
+            });
+
+            // 返回格式化的JSON字符串
+            return JSON.stringify(selectedCourses, null, 2);
+        }
+
+        // ====================== 9. 重置选择 ======================
+        function resetSelections() {
+            // 重置所有单选按钮
+            document.querySelectorAll('input[type="radio"][name^="course-match-"]').forEach(radio => {
+                radio.checked = false;
+            });
+
+            // 重置所有卡片激活状态
+            document.querySelectorAll('.course-card, .no-select-card').forEach(card => {
+                card.classList.remove('active');
+            });
+
+            // 恢复默认选中状态
+            coursesData.forEach(course => {
+                course.similarCourses.forEach(similarCourse => {
+                    if (similarCourse.isActive) {
+                        const radioName = `course-match-${course.id}`;
+                        const radio = document.querySelector(`input[name="${radioName}"][type="radio"]`);
+                        if (radio) {
+                            radio.checked = true;
+                            const parentCard = radio.closest('[data-radio-name]');
+                            if (parentCard) parentCard.classList.add('active');
+                        }
+                    }
+                });
+            });
+
+            // 隐藏JSON结果区域
+            jsonResultContainer.style.display = 'none';
+
+            // 回到第一个课程
+            currentCourseId = 1;
+            switchCourse(currentCourseId);
+        }
+
+        // ====================== 10. 绑定所有事件 ======================
+        function bindEvents() {
+            // 课程标签点击事件
+            document.querySelectorAll('.tab-btn').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    currentCourseId = parseInt(tab.getAttribute('data-course-id'));
+                    switchCourse(currentCourseId);
+                });
+            });
+
+            // 上一门/下一门按钮事件
+            prevBtn.addEventListener('click', () => {
+                if (currentCourseId > 1) {
+                    currentCourseId--;
+                    switchCourse(currentCourseId);
+                }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (currentCourseId < totalCourses) {
+                    currentCourseId++;
+                    switchCourse(currentCourseId);
+                }
+            });
+
+            // 重置按钮事件
+            resetBtn.addEventListener('click', resetSelections);
+
+            // 确认所有匹配按钮事件（核心：输出JSON）
+            confirmAllBtn.addEventListener('click', () => {
+                // 收集选中数据并转为JSON
+                selectedCoursesJson = collectSelectedCourses();
+
+                // 控制台输出JSON
+                console.log('课程匹配结果(JSON)：\n', selectedCoursesJson);
+
+                // 显示JSON结果区域
+                jsonResultContent.textContent = selectedCoursesJson;
+                jsonResultContainer.style.display = 'block';
+
+                // 滚动到JSON结果区域
+                jsonResultContainer.scrollIntoView({ behavior: 'smooth' });
+            });
+
+            // 复制JSON按钮事件
+            copyJsonBtn.addEventListener('click', () => {
+                if (selectedCoursesJson) {
+                    navigator.clipboard.writeText(selectedCoursesJson).then(() => {
+                        alert('JSON数据已成功复制到剪贴板！');
+                    }).catch(err => {
+                        console.warn('复制失败：', err);
+                        alert('复制失败，请手动复制！');
+                    });
+                } else {
+                    alert('暂无匹配数据可复制！');
+                }
+            });
+
+            // 键盘导航支持
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft' && currentCourseId > 1) {
+                    prevBtn.click();
+                } else if (e.key === 'ArrowRight' && currentCourseId < totalCourses) {
+                    nextBtn.click();
+                }
+            });
+
+            // 点击课程卡片/不选择卡片选中对应单选按钮
+            document.querySelectorAll('.course-card, .no-select-card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'INPUT' && e.target.type === 'radio') return;
+
+                    const radioName = this.getAttribute('data-radio-name');
+                    const radioInput = this.querySelector(`input[name="${radioName}"]`);
+
+                    if (radioInput) {
+                        // 取消同组其他选中状态
+                        document.querySelectorAll(`[data-radio-name="${radioName}"]`).forEach(item => {
+                            item.classList.remove('active');
+                            const itemRadio = item.querySelector(`input[name="${radioName}"]`);
+                            if (itemRadio) itemRadio.checked = false;
+                        });
+
+                        // 选中当前
+                        radioInput.checked = true;
+                        this.classList.add('active');
+                    }
+                });
+            });
+
+            // 单选按钮变化同步卡片样式
+            document.querySelectorAll('input[type="radio"][name^="course-match-"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const radioName = this.name;
+                    document.querySelectorAll(`[data-radio-name="${radioName}"]`).forEach(card => {
+                        card.classList.remove('active');
+                    });
+                    const parentCard = this.closest('[data-radio-name]');
+                    if (parentCard) parentCard.classList.add('active');
+                });
+            });
+        }
+
+        // 初始化执行
+        initPage();
+    });
+</script>
+</body>
+</html>

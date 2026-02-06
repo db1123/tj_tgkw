@@ -1,0 +1,313 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--    <script type="text/javascript" src="/javascript/quanxian.js"></script>&lt;!&ndash;权限判断 配置文件 &ndash;&gt;-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css"/>
+    <!--/_only 独立样式 -->
+</head>
+<body>
+<div class="page-container" style="padding: 2px;">
+    <div class="f-l text-l">
+       <!--  <button type="button" class="btn btn-default size-S my-btn" onclick="UserValues(1)"><i
+                class=" fa fa-user-plus"></i> 新增
+        </button> -->
+    </div>
+    <div class="f-r text-r">
+<!--        <select class="user-form-select-f_type" style="width:90px" >-->
+<!--            <option value="1">系统用户</option>-->
+<!--            <option value="3">学生用户</option>-->
+<!--            <option value="2">企业用户</option>-->
+<!--        </select>-->
+        <!--        <select class="user-form-select-active" style="width:90px" name="server">-->
+        <!--            <option></option>-->
+        <!--            <option value="-1">全部</option>-->
+        <!--            <option value="1">在线</option>-->
+        <!--            <option value="0">离线</option>-->
+        <!--        </select>-->
+        <input type="text" class="input-text size-S user-form-text-name" style="width:200px" placeholder="输入姓名"/>
+        <button type="button" class="btn btn-default size-S my-btn user-btn-search-fun"><i
+                class="Hui-iconfont">&#xe665;</i> 搜索
+        </button>
+    </div>
+    <div class="f-l table-panel">
+        <table id="userTable" class="display compact" style="width: 99.8%;"></table>
+    </div>
+</div>
+
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+    // // 用户信息
+    // var accessInfo = top.accessInfo;
+    // 业务代码
+    $(function () {
+
+        // // 初始公司下拉列表(查询)
+        // $(".user-form-select-supplier-id").select2({
+        //     placeholder: '请选择公司',
+        //     ajax: {
+        //         type: 'POST',
+        //         url: "/s/supplier/queryDataSupplierSelect",
+        //         dataType: 'json',
+        //         data: function (params) {
+        //             return {
+        //                 search: params.term,
+        //                 type: 'all'
+        //             };
+        //         },
+        //         delay: 800,
+        //         cache: true
+        //     },
+        //     language: "zh-CN"
+        // });
+        // // 初始是否在线下拉列表(查询)
+        // $(".user-form-select-active").select2({
+        //     placeholder: '活跃状态',
+        //     language: "zh-CN"
+        // });
+
+        // $(".user-form-select-f_type").select2({
+        //     placeholder: '请选择用户类型',
+        //     language: "zh-CN"
+        // });
+        // 人员-表格
+        $('#userTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/user/queryUser', // 调用地址
+                data: function (d) {
+                    return JSON.stringify($.extend({}, d, {
+                        page: d.start / d.length + 1, // 当前页
+                        results: d.length, // 每页显示条数
+                        name:$(".user-form-text-name").val(),
+                        dataall: 1,
+                        ftype: 4//$(".user-form-select-f_type").val(),
+                    }));
+                },
+                dataSrc: function (json) {
+                    json.recordsFiltered = json.total;  // 总行数
+                    json.recordsTotal = json.page; // 当前页数
+                    return json.list;
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+            },
+            columns: [
+                {title: '教工号', data: 'f_login', width: 100},
+              /*   {title: '编号', data: 'f_userno', width: 60}, */
+                {title: '姓名', data: 'f_name', width: 60},
+          /*       {title: '部门', data: 'dept_name', orderable: false},
+                {title: '职务', data: 'post_name', orderable: false}, */
+                
+                {title: '所属学院', data: 't_fcollege', orderable: false},
+                {title: '性别', data: 't_gender', orderable: false},
+                {title: '职称', data: 't_ftitle', orderable: false},
+                {title: '在职状态', data: 't_fstatus', orderable: false},
+             
+                {title: '备注', data: 'f_note', orderable: false},
+                {
+                    title: '状态控制',
+                    data: 'f_state',
+                    width: 60,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (data == 1) {
+                            return '<button type="button" class="btn btn-success size-MINI" onclick="onClickUserBtnState(\'' + row.key + '\',' + row.f_state + ',\'' + row.f_name + '\')"><i class="fas fa-toggle-on"></i> 启用</button>';
+                        } else {
+                            return '<button type="button" class="btn btn-warning size-MINI" onclick="onClickUserBtnState(\'' + row.key + '\',' + row.f_state + ',\'' + row.f_name + '\')"><i class="fas fa-toggle-off"></i> 禁用</button>';
+                        }
+                    }
+                },
+                {
+                    title: '更换角色',
+                    data: 'f_state',
+                    width: 80,
+                    orderable: false,
+                    render: function (data, type, row) {
+                    	/* 
+                        return '<button type="button" class="btn btn-secondary size-MINI" onclick="UserValues(2,\'' + row.key + '\')"><i class="fas fa-edit"></i> 编辑</button>' +
+                            '<button type="button" class="btn btn-danger size-MINI" onclick="onClickUserBtnDel(\'' + row.key + '\',\'' + row.f_name + '\')"><i class="fas fa-trash"></i> 删除</button>';
+                     	*/
+                     	
+                        return  '<button type="button" class="btn btn-secondary size-MINI" onclick="UserValues(2,\'' + row.key + '\')"><i class="fas fa-edit"></i> 更换角色</button>';
+                    
+                    }
+                },
+                
+                {
+                    title: '重置密码',
+                    data: 'f_state',
+                    width: 80,
+                    orderable: false,
+                    render: function (data, type, row) {
+                    	/* 
+                        return '<button type="button" class="btn btn-secondary size-MINI" onclick="UserValues(2,\'' + row.key + '\')"><i class="fas fa-edit"></i> 编辑</button>' +
+                            '<button type="button" class="btn btn-danger size-MINI" onclick="onClickUserBtnDel(\'' + row.key + '\',\'' + row.f_name + '\')"><i class="fas fa-trash"></i> 删除</button>';
+                     	*/
+                     	
+                        return  '<button type="button" class="btn btn-primary size-MINI" onclick="changepwd(\'' + row.key + '\',\'' + row.f_name + '\')"><i class="fas fa-refresh"></i> 重置密码</button>' ;
+                       			
+                    }
+                },
+                
+                {
+                    title: '删除',
+                    data: 'f_state',
+                    width: 60,
+                    orderable: false,
+                    render: function (data, type, row) {
+                    	
+                     	
+                        return '<button type="button" class="btn btn-danger size-MINI" onclick="onClickUserBtnDel(\'' + row.key + '\',\'' + row.f_name + '\')"><i class="fas fa-trash"></i> 删除</button>';
+                    
+                    }
+                },
+                
+            ],
+            scrollY: (document.body.clientHeight - 96) + 'px',
+            scrollX: true,
+            paging: true, // 是否开启本地分页
+            pageLength: 20, // 改变初始化页长度（每页多少条数据）
+            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+            lengthChange: false, // 是否允许用户改变表格每页显示的记录数
+            searching: false, // 是否允许Datatables开启本地搜索
+            ordering: true, // 是否允许Datatables开启排序
+            info: true, // 控制是否显示表格左下角的信息
+            language: DataTablesLanguage
+        });
+        // 查询按钮点击事件
+        $('.user-btn-search-fun').on('click', function () {
+            $('#userTable').DataTable().ajax.reload(null, false);
+        });
+    });
+
+    // 新增或者修改点击事件
+    function UserValues(op, fKey) {
+        if (op == 1) { // 新增
+
+
+            layer_show('新增用户信息', 'edit.html?op=1', '1000', '500');
+
+        } else { // 修改
+
+            layer_show('更换角色', 'edit.html?op=2&id=' + fKey, '1000', '500');
+        }
+    }
+
+    // 状态按钮点击事件
+    function onClickUserBtnState(id, state, name) {
+
+
+        var text = '';
+        if (state == 1) {
+            text = '<b>' + name + '</b><br />确定要&nbsp;<b>禁用</b>&nbsp;吗?';
+        } else {
+            text = '<b>' + name + '</b><br />确定要&nbsp;<b>启用</b>&nbsp;吗?';
+        }
+        layer.confirm(text, function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/user/stateUser',
+                data: JSON.stringify({
+                    id: id,
+                    state: state
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#userTable').DataTable().ajax.reload(null, false);
+                        toastr.success('状态改变成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error)
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+
+    // 删除按钮点击事件
+    function onClickUserBtnDel(id, name) {
+        layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/user/delUser',
+                data: JSON.stringify({
+                    id: id
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#userTable').DataTable().ajax.reload(null, false);
+                        toastr.success('删除成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error)
+                    }
+                    if (data.result == 'tp_error') {
+                        toastr.error(data.error)
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+    // 重置密码点击事件
+    function changepwd(id,name) {
+        layer.confirm('确定要为用户“' + name + '”重置密码吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/user/changepwd',
+                data: JSON.stringify({
+                    id: id
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#userTable').DataTable().ajax.reload(null, false);
+                        toastr.success('重置密码成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error)
+                    }
+                    if (data.result == 'tp_error') {
+                        toastr.error(data.error)
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+    
+    
+</script>
+</body>
+</html>

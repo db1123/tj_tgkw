@@ -1,0 +1,230 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--_global 公共配置文件 -->
+    <script language="javascript">var golbal_type = "admin";</script>
+    <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+    <!--_only 独立样式 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+    <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+    <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+
+    <!--/_only 独立样式 -->
+</head>
+<body>
+<div class="page-container" style="padding: 2px;">
+    <div class="f-l text-l">
+        <button type="button" class="btn btn-default size-S my-btn" onclick="Values(1)"><i class=" fa fa-plus"></i>
+            新增
+        </button>
+    </div>
+    <div class="f-r text-r">
+
+        <input type="text" class="input-text size-S form-text-FName" style="width:200px" placeholder="教室">
+
+        <select style="width: 200px;" id="FWeekday"></select>
+        <button type="button" class="btn btn-default size-S my-btn btn-search-fun"><i class="Hui-iconfont">&#xe665;</i>
+            搜索
+        </button>
+    </div>
+    <div class="f-l" style="width: 100%; margin-top: 3px;">
+        <table id="mainTable" class="display compact" style="width: 99.8%;"></table>
+    </div>
+</div>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+<script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+<script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+<script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+<script src="/plugins/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+
+<script type="text/javascript">
+
+    var FCOID = getQueryStringByName('FCOID');//开课表ID
+    var FSemester = getQueryStringByName('FSemester');
+
+    // 业务代码
+    $(function () {
+
+        $("#FWeekday").select2({
+            placeholder: '请选择星期',
+            data: [{id: "-1", text: "全部"}, {id: 1, text: "星期一"}, {id: 2, text: "星期二"} , {id: 3, text: "星期三"}, {id: 4, text: "星期四"}, {id: 5, text: "星期五"}, {id: 6, text: "星期六"}, {id: 7, text: "星期日"}],
+            language: "zh-CN"
+        });
+
+
+        // $("#FCRMID").select2({
+        //     placeholder: '请选择教室',
+        //     ajax: {
+        //         type: 'POST',
+        //         url: "/s/classroom/queryDataclassroomSelectall",
+        //         dataType: 'json',
+        //         data: function (params) {
+        //             return {
+        //                 search: params.term,
+        //             };
+        //         },
+        //         processResults: function (data) {
+        //             return {
+        //                 results: data.list
+        //             };
+        //         },
+        //         delay: 800,
+        //         cache: true
+        //     },
+        //     language: "zh-CN"
+        // });
+
+        // 封装表格
+        $('#mainTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/s/courseschedule/querycourseschedule', // 调用地址
+                data: function (d) {
+                    return JSON.stringify($.extend({}, d, {
+                        page: d.start / d.length + 1, // 当前页
+                        results: d.length, // 每页显示条数
+                        FCRMName: $('.form-text-FName').val(),//名称
+                        FCOID: FCOID,
+                        FCRMName: $(".form-text-FName").val(),
+                        FWeekday: $("#FWeekday").val(),
+                        dataall: 1
+                    }));
+                },
+                dataSrc: function (json) {
+                    json.recordsFiltered = json.total;  // 总行数
+                    json.recordsTotal = json.page; // 当前页数
+                    return json.list;
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr);
+                }
+            },
+            columns: [
+                {
+                    title: '教室', data: 'FCRMID',
+                    render: function (data, type, row) {
+                        return row.FCRMName;
+                    }
+                },
+                {title: '开始时间', data: 'FStartTime'},
+                {title: '结束时间', data: 'FEndTime'},
+                {
+                    title: '星期', data: 'FWeekday',
+                    render: function (data, type, row) {
+                        switch (data) {
+                            case 1:
+                                return '<span class="label label-success radius">星期一</span>';
+                                break;
+
+                            case 2:
+                                return '<span class="label label-success radius">星期二</span>';
+                                break;
+
+                            case 3:
+                                return '<span class="label label-success radius">星期三</span>';
+                                break;
+
+                            case 4:
+                                return '<span class="label label-success radius">星期四</span>';
+                                break;
+
+                            case 5:
+                                return '<span class="label label-success radius">星期五</span>';
+                                break;
+
+                            case 6:
+                                return '<span class="label label-warning radius">星期六</span>';
+                                break;
+
+                            case 7:
+                                return '<span class="label label-warning radius">星期日</span>';
+                                break;
+                        }
+                    }
+                },
+
+                {title: '节次', data: 'FSession'},
+                {title: '备注', data: 'FNote'},
+                {
+                    title: '操作',
+                    data: 'FState',
+                    width: 90,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<button type="button" class="btn btn-secondary size-MINI" onclick="Values(2,\'' + row.key + '\')"><i class="fas fa-edit"></i>编辑</button> ' +
+                            '<button type="button" class="btn btn-danger size-MINI" onclick="onClickBtnDel(\'' + row.key + '\',\'' + row.FName + '\')"><i class="fas fa-trash"></i>删除</button>';
+                    }
+                }
+            ],
+            scrollY: (document.body.clientHeight - 100) + 'px',
+            scrollX: true,
+            paging: true, // 是否开启本地分页
+            pageLength: 15, // 改变初始化页长度（每页多少条数据）
+            pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+            lengthChange: false, // 是否允许因子改变表格每页显示的记录数
+            searching: false, // 是否允许Datatables开启本地搜索
+            ordering: true, // 是否允许Datatables开启排序
+            info: true, // 控制是否显示表格左下角的信息
+            language: DataTablesLanguage
+        });
+
+        // 查询按钮点击事件
+        $('.btn-search-fun').on('click', function () {
+            $('#mainTable').DataTable().ajax.reload(null, false);
+        });
+
+    });
+
+    // 新增或者修改点击事件
+    function Values(op, fKey) {
+        if (op == 1) { // 新增
+            layer_show('新增开课时间信息', '/module/capability/courseOffering/schedule/scheduleedit.html?op=1&FCOID='+FCOID +'&FSemester='+FSemester, '800', '450');
+        } else { // 修改
+            layer_show('修改开课时间信息', '/module/capability/courseOffering/schedule/scheduleedit.html?op=2&id=' + fKey+'&FCOID='+FCOID+'&FSemester='+FSemester, '800', '450');
+        }
+    }
+
+    // 删除按钮点击事件
+    function onClickBtnDel(id, name) {
+        layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function (index) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                url: '/s/courseschedule/delcourseschedule',
+                data: JSON.stringify({
+                    id: id
+                }),
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#mainTable').DataTable().ajax.reload(null, false);
+                        toastr.success('删除成功！');
+                        layer.close(layer.index);
+                    }
+                    if (data.result == 'error') {
+                        toastr.error(data.error);
+                    }
+                },
+                error: function (e) {
+                    toastr.error(e.status);
+                    toastr.error(e.responseText);
+                }
+            });
+        });
+    }
+</script>
+</body>
+</html>

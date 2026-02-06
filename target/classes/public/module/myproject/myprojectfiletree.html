@@ -1,0 +1,433 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport"
+              content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <!--_global 公共配置文件 -->
+        <script language="javascript">var golbal_type = "admin";</script>
+        <script type="text/javascript" src="/javascript/global.js"></script><!--/_global 公共配置文件-->
+        <!--_only 独立样式 -->
+        <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+        <link rel="stylesheet" href="/plugins/select2-ztree/bootstrapStyle.css"/>
+        <link rel="stylesheet" href="/plugins/jquery-jsonview/jquery.jsonview.css"/>
+        <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css"/>
+        <link rel="stylesheet" href="/nui-ad/lib/datatables/1.10.15/styling/base_style/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/demo.css" type="text/css">
+        <link rel="stylesheet" href="/nui-ad/lib/zTree/v3/css/metroStyle/metroStyle.css" type="text/css">
+        <!--/_only 独立样式 -->
+    </head>
+    <style type="text/css">
+        ul.ztree {
+            margin-left: 20px;
+            border: 1px solid #617775;
+            background: #f0f6e4;
+            width: 22vw;
+            height: 80vh;
+            overflow-y: scroll;
+            overflow-x: auto;
+        }
+
+        .sxts {
+            display: inline-block;
+            background-color: #ff9900;
+            color: white;
+            border-radius: 50%;
+            width: 15px;
+            height: 15px;
+            text-align: center;
+            line-height: 15px;
+        }
+    </style>
+    <body>
+        <div class="page-container" style="padding: 2px;">
+            <div class="f-l " style="width: 98.8%; padding-top: 1px;">
+                <div class="row cl">
+                    <div class="col-md-3">
+                        <div class="card-body">
+                            <div class="zTreeDemoBackground left">
+                                <ul id="treeDemo" class="ztree"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="card-body" style="margin-top: 10px;">
+                            <div class="panel panel-default">
+                                <div class="panel-header">已选类型：<strong class="typename">无</strong></div>
+                                <div class="panel-body">
+                                    <div class="f-l text-l mb-5" id="newadd" style="display: none;">
+                                        <button type="button" class="btn btn-default size-S my-btn"
+                                                onclick="shangchuan()"><i
+                                                class=" fa fa-plus"></i>
+                                            上传文件
+                                        </button>
+                                        <button type="button" class="btn btn-default size-S my-btn"
+                                                onclick="piliang()"><i
+                                                class=" fa fa-plus"></i>
+                                            批量上传
+                                        </button>
+
+                                    </div>
+                                    <table id="mainTable" class="display compact" style="width: 99.8%;"></table>
+                                    <a id="downloada" download="" href="" target="_blank" ><span id="downloadspan" style="display: none;">下载文件</span></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/zTree/v3/js/jquery.ztree.exhide-3.5.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree.js"></script>
+        <script type="text/javascript" src="/plugins/select2-ztree/select2-ztree-search.js"></script>
+        <script type="text/javascript" src="/plugins/jquery-jsonview/jquery.jsonview.js"></script>
+        <script src="/plugins/select2/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="/nui-ad/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" src="/javascript/jquery.base64.js"></script>
+        <script type="text/javascript">
+            var xfno;
+            var showtype = getQueryStringByName('showtype');
+            var projectid = getQueryStringByName('id');//项目ID
+            var zNodes = [];
+            var treesetting = {};
+            var treeObj = null;
+            var ftypeid = -1;
+            var ftypename = "";
+            var pfstate=-1;
+
+
+            var filename="";//文件名称
+            var feditionNo=1;//当前版本
+
+
+            // 业务代码
+            $(function () {
+                $("#newadd").attr("style", "display:none;"); //隐藏
+                //获取项目状态
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    url: '/s/myproject/getmyprojectstate', // 调用地址
+                    data: JSON.stringify({
+                        id: projectid
+                    }),
+                    async: false,
+                    success: function (data) {
+                        pfstate = data.pfstate;
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+                $("#downloada").hide();
+
+
+                if(pfstate == 1 && showtype== 2){
+                    if(ftypeid!=-1 && projectid){
+                        $("#newadd").attr("style", "display:block;"); //显示
+                    }else{
+                        $("#newadd").attr("style", "display:none;"); //隐藏
+                    }
+
+                }else{
+                    $("#newadd").attr("style", "display:none;"); //隐藏
+                }
+
+
+                treesetting = {
+                    view: {
+                        // addHoverDom: addHoverDom,
+                        // removeHoverDom: removeHoverDom,
+                        selectedMulti: false,
+                        showTitle: false, // 确保显示悬停提示
+                        nameIsHTML: true,
+                    },
+                    check: {
+                        enable: false
+                    },
+                    data: {
+                        simpleData: {
+                            enable: true
+                        }
+                    },
+                    edit: {
+                        enable: false
+                    },
+                    callback: {
+                        onClick: zTreeOnClick
+                    }
+                };
+                gettreedata();
+
+
+
+                // 封装表格
+                $('#mainTable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        type: 'POST',
+                        contentType: 'application/json',
+                        url: '/s/projectFiles/queryprojectFiles', // 调用地址
+                        data: function (d) {
+                            return JSON.stringify($.extend({}, d, {
+                                page: d.start / d.length + 1, // 当前页
+                                results: d.length, // 每页显示条数
+                                id: projectid,
+                                ftypeid: ftypeid,
+                                ftype:1
+                            }));
+                        },
+                        dataSrc: function (json) {
+                            json.recordsFiltered = json.total;  // 总行数
+                            json.recordsTotal = json.page; // 当前页数
+                            return json.list;
+                        },
+                        error: function (xhr, status, error) {
+                            toastr.error(xhr);
+                        }
+                    },
+                    columns: [
+                        {title: '文件名称', data: 'FFileName'},
+                        {title: '版本', data: 'FEdition',width: 35},
+                        {title: '上传者', data: 'FCID',width: 50,
+                            render: function (data, type, row) {
+                                return row.FCIDName;
+                            }
+                        },
+                        {title: '备注', data: 'FNote'},
+                        {
+                            title: '操作',
+                            data: 'FState',
+                            width: 120,
+                            orderable: false,
+                            render: function (data, type, row) {
+                                var yl= '<button  class="btn btn-default  size-MINI " title="预览" onclick="yulan(\'' + row.key + '\')"><i class="fa fa-eye" aria-hidden="true" /></i> </button> ';
+                                var xz ='<button  class="btn btn-default  size-MINI " title="下载" onclick="xiazai(\'' + row.key + '\')"><i class="fa fa-download" aria-hidden="true"></i> </button> ';
+                                var ls ='<button  class="btn btn-default  size-MINI " title="历史" onclick="lishi(\'' + row.FFileID + '\')"><i class="fa fa-columns" aria-hidden="true" /></i> </button> ';
+
+                                // if(pfstate==1 && (showtype==1 || showtype ==2)){
+                                //     return yl + xz +ls + '<button type="button" title="升版" class="btn btn-secondary size-MINI" onclick="shengban(\'' + row.key + '\',\'' + row.FFileName + '\',\'' + row.FEditionNo + '\')"><i class="fa fa-arrow-up" aria-hidden="true" /></i></button> ' +
+                                //         '<button type="button" class="btn btn-danger size-MINI" title="删除" onclick="onClickBtnDel(\'' + row.key + '\',\'' + row.FFileName + '\')"><i class="fas fa-trash"></i></button> ';
+                                // }else{
+                                //     return yl + xz + ls;
+                                // }
+                                let btn = yl + xz + ls;
+                                if(pfstate==1 && (showtype ==2)){
+                                    return btn + '<button type="button" title="升版" class="btn btn-secondary size-MINI" onclick="shengban(\'' + row.key + '\',\'' + row.FFileName + '\',\'' + row.FEditionNo + '\')"><i class="fa fa-arrow-up" aria-hidden="true" /></i></button> ' +
+                                        '<button type="button" class="btn btn-danger size-MINI" title="删除" onclick="onClickBtnDel(\'' + row.key + '\',\'' + row.FFileName + '\')"><i class="fas fa-trash"></i></button> ';
+                                }else{
+                                    return btn;
+                                }
+                            }
+                        }
+                    ],
+                    scrollY: (document.body.clientHeight * 0.5) + 'px',
+                    scrollX: true,
+                    paging: true, // 是否开启本地分页
+                    pageLength: 5, // 改变初始化页长度（每页多少条数据）
+                    pagingType: 'full_numbers', // 首页，尾页，上一页和下一页四个按钮,加上数字按钮
+                    lengthChange: false, // 是否允许因子改变表格每页显示的记录数
+                    searching: false, // 是否允许Datatables开启本地搜索
+                    ordering: true, // 是否允许Datatables开启排序
+                    info: true, // 控制是否显示表格左下角的信息
+                    language: DataTablesLanguage
+                });
+
+
+            });
+
+
+            function gettreedata() {
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json;charset=UTF-8',
+                    url: '/s/projectFiles/querapplyfiletype',
+                    data: JSON.stringify({
+                        ftype:1,
+                        projectid:projectid
+                    }),
+                    success: function (data) {
+                        if (data.result == 'success') {
+                            zNodes = data.zNodes;
+
+                            treeObj = $.fn.zTree.init($("#treeDemo"), treesetting, zNodes);
+
+                            treeObj.expandAll(true);
+                            var nodes = treeObj.getSelectedNodes();
+
+                            if (nodes.length > 0) {
+                                for (var i = 0; i < nodes.length; i++) {
+                                    treeObj.expandNode(nodes[i], true, true, true);
+                                }
+                            }
+                        }
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+            }
+
+            function zTreeOnClick(event, treeId, treeNode) {
+
+                if (treeNode.issc == 1) {
+                    ftypeid = treeNode.id;
+                    $(".typename").text(treeNode.titile);
+                    $('#mainTable').DataTable().ajax.reload(null, false);
+                    if(pfstate == 1 && showtype== 2 ){
+                        $("#newadd").attr("style", "display:block;"); //显示
+                    }else{
+                        $("#newadd").attr("style", "display:none;"); //隐藏
+                    }
+                } else {
+
+                    ftypeid=-1;
+                    $('#mainTable').DataTable().ajax.reload(null, false);
+                    $(".typename").text('无');
+                    $("#newadd").attr("style", "display:none;"); //隐藏
+                }
+            }
+
+            function shangchuan() {
+
+                if(ftypeid!=-1 && projectid){
+                    layer_show('上传项目文件', 'myprojectfilessub_up.html?FTypeID=' + ftypeid + '&FProjectID=' + projectid, '800', '250');
+                }else{
+                    toastr.error("选择类型节点后，再点击上传文件！");
+                }
+            }
+
+            function piliang() {
+
+                if(ftypeid!=-1 && projectid){
+                    layer_show('批量上传项目文件', '/module/myproject/projectfilepl/projectfilemultiple.html?FTypeID=' + ftypeid + '&FProjectID=' + projectid, '900', '500');
+                }else{
+                    toastr.error("选择类型节点后，再点击上传文件！");
+                }
+            }
+
+            function shuaxin(){
+                $('#mainTable').DataTable().ajax.reload(null, false);
+            }
+
+            function yulan(fkey) {
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json;charset=UTF-8',
+                    url: '/s/projectFiles/getmyprojectUrl',
+                    data: JSON.stringify({
+                        id: fkey,
+                        ip:YULANIP,
+                        ftype : 1,
+                        FProjectID:projectid
+                    }),
+                    success: function (data) {
+                        if (data.result == 'success') {
+                            //console.log("url:" + data.url);
+                            var url = data.url;
+                            var fileurl = YULANIP2 + 'onlinePreview?url=' + encodeURIComponent($.base64.encode((url)));
+                            window.open(fileurl);
+                        }
+                        if (data.result == 'error') {
+                            toastr.error(data.error);
+                        }
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+            }
+
+            function xiazai(fkey) {
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json;charset=UTF-8',
+                    url: '/s/projectFiles/getmyprojectUrl',
+                    data: JSON.stringify({
+                        id: fkey,
+                        ip:YULANIP,
+                        ftype : 2,
+                        FProjectID:projectid
+                    }),
+                    success: function (data) {
+                        if (data.result == 'success') {
+                            $("body").mLoading("show");
+                            setTimeout(function () {
+                                $('.mloading-text').html('正在获取文件信息...');
+                                $("#downloada").attr('download',data.filename);
+                                $("#downloada").attr('href',data.url);
+                                setTimeout(function () {
+                                    $('.mloading-text').html('获取完成准备下载...');
+                                    $("#downloadspan").trigger("click");
+                                    setTimeout(function () {
+                                        $('#mainTable').DataTable().ajax.reload(null, false);
+                                        $("body").mLoading("hide");
+                                    }, 1000);
+                                }, 1000);
+                            }, 1000);
+
+                        }
+                        if (data.result == 'error') {
+                            toastr.error(data.error);
+                        }
+                    },
+                    error: function (e) {
+                        toastr.error(e.status);
+                        toastr.error(e.responseText);
+                    }
+                });
+            }
+
+
+            // 删除按钮点击事件
+            function onClickBtnDel(id, name) {
+                layer.confirm('<b>' + name + '</b><br />确定要删除吗?', function(index){
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json;charset=UTF-8',
+                        url: '/s/projectFiles/delprojectfiles',
+                        data: JSON.stringify({
+                            id: id,
+                            projectid:projectid
+                        }),
+                        success: function(data) {
+                            if(data.result == 'success'){
+                                $('#mainTable').DataTable().ajax.reload(null, false);
+                                gettreedata();
+                                toastr.success('删除成功！');
+                                layer.close(layer.index);
+                            }if(data.result == 'error') {
+                                toastr.error(data.error);
+                                layer.close(layer.index);
+                            }
+                        },
+                        error: function(e){
+                            toastr.error(e.status);
+                            toastr.error(e.responseText);
+                        }
+                    });
+                });
+            }
+            //弹出历史数据框
+            function lishi(fkeyid) {
+                top.layer_show('历史项目文件', '/module/myproject/myprojectfilels.html?id=' + fkeyid+'&projectid='+projectid, '800', '500');
+            }
+            //升版
+            function shengban(fkeyid,name,no) {
+                feditionNo = no;
+                filename = name;
+                layer_show('项目文件升版', 'myprojectfileshengban.html?id=' + fkeyid, '1000', '400');
+            }
+        </script>
+    </body>
+</html>
